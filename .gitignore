@@ -1,0 +1,9 @@
+# Exclude personal content — only blueprint/ and scheduled-tasks/ are tracked
+raw/
+wiki/
+
+# Obsidian workspace files
+.obsidian/
+
+# macOS
+.DS_Store

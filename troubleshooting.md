@@ -1,0 +1,114 @@
+# Troubleshooting
+
+Real issues encountered during the original setup, with fixes.
+
+---
+
+## Obsidian shows tag errors on wiki pages
+
+**Symptom:** Obsidian flags YAML frontmatter tags as invalid. Pages show a warning icon.
+
+**Cause:** Tags were written with a `#` prefix in frontmatter — e.g. `tags: [#concept, #llm]`. Obsidian only accepts the `#` prefix for inline body tags, not YAML frontmatter.
+
+**Fix:** Tags in frontmatter must be plain words without `#`:
+```yaml
+# ✅ Correct
+tags: [concept, llm, tool]
+
+# ❌ Wrong
+tags: [#concept, #llm, #tool]
+```
+
+If this happened across many pages, fix with Python (see Bulk Edits section below). Never use `sed -i` for bulk edits.
+
+---
+
+## Strange `XX*` files appeared in wiki/pages subfolders
+
+**Symptom:** Files named `XX5dT39o`, `XXabcdef`, etc. appear in your pages folders. Obsidian cannot open them.
+
+**Cause:** `sed -i` was used for bulk file edits. On some systems, `sed -i` creates temporary backup files with `XX` prefixes. If the command fails or the flag is wrong, these files are left behind.
+
+**Fix:** Delete the `XX*` files. In terminal:
+```bash
+find Library/wiki/pages -name "XX*" -delete
+```
+
+**Prevention:** Always use Python for bulk edits across multiple pages — never `sed -i`:
+```python
+import re, pathlib
+for f in pathlib.Path("wiki/pages").rglob("*.md"):
+    text = f.read_text()
+    text = re.sub(r"old-pattern", "new-value", text)
+    f.write_text(text)
+```
+
+---
+
+## Obsidian created stray `.md` files at the vault root
+
+**Symptom:** Files like `LLM Wiki.md` or `RAG vs Wiki Compilation.md` appear at the root of your Library folder — not inside `wiki/pages/`.
+
+**Cause:** Obsidian auto-creates a note when you click an unresolved `[[wiki link]]`, and it places it in the default new note location (which defaults to vault root).
+
+**Fix:**
+1. Delete the stray files from the vault root
+2. Go to **Obsidian Settings → Files and links → Default location for new notes**
+3. Set it to `wiki/pages` (or a subfolder like `wiki/pages/concepts/`)
+
+This prevents Obsidian from creating notes in the wrong location in future.
+
+---
+
+## Phantom `[[Page Title]]` node in Obsidian graph
+
+**Symptom:** A node called "Page Title" appears in the Obsidian graph view with no real page behind it.
+
+**Cause:** The `CLAUDE.md` schema file contained a literal `[[Page Title]]` in an example code block, which Obsidian rendered as a real wiki link.
+
+**Fix:** Escape the brackets in example code so Obsidian ignores them:
+```
+\[\[Page Title\]\]
+```
+
+Or wrap the example in a fenced code block so Obsidian doesn't parse it as a link.
+
+---
+
+## Agent reads the full log.md on startup, consuming too many tokens
+
+**Symptom:** Sessions feel expensive even for simple queries. Token estimates are high before any real work is done.
+
+**Cause:** The agent is reading the full `log.md` at startup instead of just the tail.
+
+**Fix:** Check `wiki/CLAUDE.md` — the startup section should say to read only `hot.md` at startup, and defer `log.md` to when it's actually needed. The log should only ever be read with `tail -5` unless doing a full audit.
+
+---
+
+## Agent forgot to read the ops file before an operation and made mistakes
+
+**Symptom:** Agent skipped a step, formatted a page wrong, or forgot to update index.md or log.md.
+
+**Cause:** The agent started an operation without reading the matching ops file from `scheduled-tasks/ops/`.
+
+**Fix:** Remind the agent: `Before you proceed, read scheduled-tasks/ops/[operation].md`. The ops file reminder table in `wiki/CLAUDE.md` should prevent this — if it keeps happening, check that the table is still present in the schema.
+
+---
+
+## Bulk Edits Reference
+
+Always use Python for any edit touching more than one file:
+
+```python
+import re, pathlib
+
+# Example: fix tag format across all pages
+for f in pathlib.Path("wiki/pages").rglob("*.md"):
+    text = f.read_text()
+    # Remove # prefix from tags in frontmatter
+    text = re.sub(r"tags: \[#(\w)", r"tags: [\1", text)
+    text = re.sub(r", #(\w)", r", \1", text)
+    f.write_text(text)
+```
+
+Run via the agent's shell sandbox or in your own terminal.
