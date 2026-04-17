@@ -34,7 +34,7 @@ This system is different. An AI agent reads your sources, builds a wiki of inter
 ### 2. Clone this repo into your vault folder
 ```bash
 cd /path/to/your/vault
-git clone https://github.com/[your-repo] blueprint
+git clone https://github.com/nitekeeper/second-brain-blueprint blueprint
 ```
 
 ### 3. Tell your AI to set it up
