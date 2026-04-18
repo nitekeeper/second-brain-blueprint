@@ -29,9 +29,9 @@ If this happened across many pages, fix with Python (see Bulk Edits section belo
 
 **Cause:** `sed -i` was used for bulk file edits. GNU and BSD `sed -i` disagree on arguments — BSD/macOS `sed -i` requires an explicit suffix argument, and a misuse ends up treating a subsequent argument as the suffix or a file name. Depending on the exact invocation (and interplay with shell globbing and temp-file naming used by some sed implementations, editor swap files, or cleanup tools), you can end up with stray `XX*`-prefixed files that Obsidian cannot open. The root cause is always the same: `sed -i` is non-portable and easy to misuse across files.
 
-**Fix:** Delete the `XX*` files. In terminal:
+**Fix:** Delete the `XX*` files. Run from your working-folder root:
 ```bash
-find Library/wiki/pages -name "XX*" -delete
+find wiki/pages -name "XX*" -delete
 ```
 
 **Prevention:** Always use Python for bulk edits across multiple pages — never `sed -i`. Anchor to an absolute root and handle encoding/read errors so a silent zero-match doesn't look like success:

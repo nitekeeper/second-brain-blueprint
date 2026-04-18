@@ -5,7 +5,7 @@ Format: `~N tokens (R read / W write)`
 
 > **Estimates only:** Every number in this file is `chars ÷ 4`. Real token usage depends on the model's tokenizer, exact file contents, and runtime overhead (tool calls, system prompt) — treat these as rough planning figures, not precise accounting. Quote them as approximate when citing in approval requests.
 
-> **Self-cost note:** This file itself is ~1,050 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,050-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
+> **Self-cost note:** This file itself is ~1,130 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,130-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
 
 > **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
 
@@ -15,7 +15,7 @@ Format: `~N tokens (R read / W write)`
 |---|---|---|
 | `wiki/hot.md` | ~210 | ~55 |
 | `memory.md` | ~3,000 (when full) | ~750 |
-| `CLAUDE.md` | ~16,800 | ~4,200 |
+| `CLAUDE.md` | ~18,300 | ~4,580 |
 | `wiki/index.md` | ~800 (grows with pages) | ~200 |
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
