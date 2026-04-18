@@ -3,6 +3,109 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.4 — 2026-04-18
+
+### Follow-ups (audit-driven, fourth pass)
+
+- **Ingest op reordered to close a silent data-loss window (CRITICAL).** In
+  v2.0.0–v2.0.3, Step 5 wrote the source page (with `source_hash:` committed)
+  **before** Step 9 moved the inbox file to `raw/`. A mid-flight failure
+  between the two left the wiki in a state where `source_hash:` was committed
+  but no raw file existed; the next retry's Step 0 hash check compared the
+  still-present inbox content against the committed hash, matched, and executed
+  the rerun-proof short-circuit — deleting the inbox file and printing `No
+  change since last ingest — skipped.` The deletion was correct for the
+  "rerun of a completed ingest" path but catastrophic for the crash-recovery
+  path: the only remaining copy of the source was destroyed and the source
+  page's `original_file:` pointer dangled permanently. The fix reorders the
+  op so the raw-file move happens **before** the source-page write. New Step
+  numbering: Step 5 pre-computes a single `ts=$(date +%Y-%m-%d-%H%M%S)` once
+  per ingest; Step 6 moves `wiki/inbox/<file>` to `raw/<slug>-<ts>.md`; Step
+  7 writes the source page with `source_hash:` AND `original_file:
+  raw/<slug>-<ts>.md` using the pre-computed `ts`, with provenance footnotes
+  citing the same path. Old Steps 6–8 (index read / page updates / index
+  update) renumber to 8–10; old Steps 10–12 (log append / hot refresh /
+  recalibrate) renumber to 11–13. A mid-flight failure now either leaves the
+  inbox file untouched (crash before Step 6 — clean retry from Step 0) or
+  leaves the raw file in place with no source page yet (crash between Step 6
+  and 7 — retry finds the pre-moved raw file and writes the source page
+  against it). The inbox file is never silently deleted after a partial-write
+  state. See `troubleshooting.md` "Ingest interrupted mid-flight and retry
+  silently deleted the inbox file" for the symptom and retrospective fix.
+- **Pre-computed `ts` closes a sub-second drift window (CRITICAL).** Old
+  Step 9's bash snippet generated its own `ts` at move time; old Step 5's
+  source-page write referenced `<YYYY-MM-DD-HHMMSS>` without a mandate to
+  reuse the same value. In practice the two steps executed milliseconds
+  apart and usually agreed, but nothing forced that — an ingest that
+  straddled a second boundary would commit a source page whose
+  `original_file:` and provenance footnotes pointed at a raw filename one
+  second off from the actually-written file, producing a dangling provenance
+  trail on the first try. The fix (Step 5 pre-compute + Step 6 / Step 7
+  consume) makes agreement structural rather than probabilistic.
+- **B-preamble step references renumbered.** `!! ingest all`'s B-preamble
+  cross-references the main Steps by number in six places (B3, B3.6, B5,
+  B6, B7). All six were rewritten to point at the new step numbers: B3's
+  index read maps to Step 8; B3.6's "Steps 11/12 only run when at least one
+  file is actually ingested" becomes Steps 12/13; B5's per-file range
+  `[main-steps 5, 6, 7, 8, 9, 10]` becomes `[main-steps 5, 6, 7, 8, 9, 10,
+  11]` and its skip list `[main-steps 1, 3, 4, 11, 12]` becomes
+  `[main-steps 1, 3, 4, 12, 13]`, with the first-file index read and mutation
+  referring to Steps 8 / 10; B6's end-of-batch `[main-steps 11 and 12]`
+  becomes `[main-steps 12 and 13]`; B7's per-file log append points at Step
+  11; U4's "Steps 5–12 unchanged" becomes "Steps 5–13 unchanged". Step 0's
+  two internal references to Step 5 (slug derivation rules, regeneration
+  branch) retarget to Step 7. Every cross-reference in the op is now
+  consistent with the new numbering.
+- **Hash Canonicalization: code-block indentation caveat documented (Q1).**
+  Step 3 of the canonicalizer collapses intra-line whitespace runs, which
+  also flattens code-block indentation for hashing purposes — a known and
+  intentional tradeoff (absorbing fetcher-level indent drift is the whole
+  point of the normalizer) but undefended in the docs. A new paragraph in
+  the Hash Canonicalization section calls this out explicitly: two sources
+  differing *only* in code-block indentation hash identically, and a source
+  whose sole real change is an indentation refactor will not be detected.
+  For personal-wiki use this is the right tradeoff; a code-aware downstream
+  would want a language-sensitive normalizer. No code change — this is a
+  documentation fix to close a "Question for Clarification" from the audit.
+- **`token-reference.md` grew rows for blueprint docs (W2).** The cost
+  table previously listed only `wiki/`- and `scheduled-tasks/`-level files;
+  `README.md`, `setup-guide.md`, `user-guide.md`, `troubleshooting.md`,
+  `CHANGELOG.md`, and `LICENSE` were missing, which meant `!! audit all`
+  and any blueprint-edit operation had to be estimated from scratch each
+  time. Six rows added (with a note that they apply only to
+  blueprint-authoring sessions). A corresponding note documents that
+  `!! ingest all` pays the `token-reference.md` self-cost once per batch,
+  not per file.
+- **Ingest Estimate Formula made complete (W3).** The formula previously
+  read `raw source read + (500 × pages to create) + (200 × pages to update)
+  + 500 overhead`, omitting the fixed reads every ingest pays (`log.md`
+  tail at Step 1, `index.md` at Step 8, and `token-reference.md` self-cost
+  at the Step 4 approval). Rewritten to include those terms and a concrete
+  ~2,455-token fixed floor before variable reads.
+- **`!! audit all` envelope recalibrated (W1).** Documented envelope was
+  `~20,000–25,000` tokens; measured on 2026-04-18 it ran ~33,000 (34%
+  over). Bumped to `~25,000–35,000` in both `ops/audit.md` Notes and
+  `user-guide.md`'s Token Awareness table. The Notes entry now points at
+  the blueprint-doc rows in `token-reference.md` as the source of truth
+  for recalibration.
+- **`!! ready` drafts surfacing guarded for blueprint-authoring mode (W4).**
+  `CLAUDE.md`'s `!! ready` Step 5 previously surfaced "in-progress drafts
+  from `drafts/`" without checking whether `drafts/` exists. On a
+  blueprint-only checkout (the case `!! audit` most often runs in),
+  `drafts/` is absent alongside `wiki/`, and the drafts surface could
+  produce a noisy `ls drafts/` error that slips past the existing
+  blueprint-authoring guard. A single `[ -d drafts ]` check now skips the
+  surface transparently in that mode, matching the pattern the rest of the
+  blueprint-authoring mode guards already use.
+- **`setup-guide.md` Step 8 now actually surfaces changelog-monitor
+  scheduling status (C1).** Step 3 has always told the AI operator to
+  "surface in the Step 8 readiness announcement" if `changelog-monitor.md`
+  is not yet on a scheduled-tasks cadence, but Step 8 had no corresponding
+  instruction to do anything with that flag. Step 8 now has an explicit
+  conditional block adding a quoted note to the readiness announcement
+  when the scheduling gap exists, closing a dead cross-reference that had
+  been silently ignored for the entire v2.0.x series.
+
 ## v2.0.3 — 2026-04-18
 
 ### Follow-ups (audit-driven, third pass)

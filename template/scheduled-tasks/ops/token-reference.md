@@ -5,7 +5,7 @@ Format: `~N tokens (R read / W write)`
 
 > **Estimates only:** Every number in this file is `chars ÷ 4`. Real token usage depends on the model's tokenizer, exact file contents, and runtime overhead (tool calls, system prompt) — treat these as rough planning figures, not precise accounting. Quote them as approximate when citing in approval requests.
 
-> **Self-cost note:** This file itself is ~1,130 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,130-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
+> **Self-cost note:** This file itself is ~1,500 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,500-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
 
 > **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
 
@@ -21,16 +21,24 @@ Format: `~N tokens (R read / W write)`
 | `wiki/log.md` full | audit only — unbounded | — |
 | `scheduled-tasks/refresh-hot.md` | ~4,100 | ~1,030 |
 | `scheduled-tasks/changelog-monitor.md` | ~6,100 | ~1,530 |
-| `ops/ingest.md` | ~12,300 | ~3,080 |
+| `ops/ingest.md` | ~14,500 | ~3,630 |
 | `ops/lint.md` | ~2,500 | ~630 |
 | `ops/query.md` | ~2,100 | ~530 |
 | `ops/update.md` | ~1,400 | ~350 |
 | `ops/conventions.md` | ~5,000 | ~1,250 |
 | `ops/audit.md` | ~6,300 | ~1,580 |
-| `ops/token-reference.md` | ~4,500 | ~1,130 |
+| `ops/token-reference.md` | ~6,000 | ~1,500 |
+| `blueprint/README.md` | ~5,100 | ~1,280 |
+| `blueprint/setup-guide.md` | ~12,700 | ~3,180 |
+| `blueprint/user-guide.md` | ~16,600 | ~4,150 |
+| `blueprint/troubleshooting.md` | ~27,000 | ~6,750 |
+| `blueprint/CHANGELOG.md` | ~27,500 | ~6,880 |
+| `blueprint/LICENSE` | ~1,200 | ~300 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
 | Raw source document | varies | ~1,000–8,000 |
+
+> **Blueprint-doc rows apply only to blueprint-authoring sessions** (working inside `blueprint/` itself). A regular end-user wiki never reads these files — they ship with the distribution but live above `wiki/`. Include them in audit / blueprint-edit estimates only.
 
 ## Write Cost Estimates
 
@@ -46,7 +54,16 @@ Format: `~N tokens (R read / W write)`
 > **`!! wrap` / `!! ready` true session cost.** The per-touch costs above cover *only* the `memory.md` operation itself. Both commands also execute the full `hot.md` refresh flow (read `refresh-hot.md` ~1,030 + re-read `wiki/index.md` ~200 + re-read `wiki/log.md` tail ~625) and append one entry to `log.md` (~100). `!! ready` additionally reads the full `memory.md` (~750 when the summary is present) before wiping it. Realistic per-command cost when none of those files are already cached is ~2,700 tokens for `!! wrap` and ~2,800 for `!! ready`, not the raw ~50–900 range from the table above. Quote ~2,700 when asked unless the relevant reads are warm from a prior op in the same session. `!! wrap` and `!! ready` are **not** approval-gated (they are documented exceptions in `CLAUDE.md`'s Approval Rule), so `token-reference.md` itself does not need to be re-read for either command.
 
 ## Ingest Estimate Formula
-`raw source read + (500 × pages to create) + (200 × pages to update) + 500 overhead`
+
+`raw source read + log-tail + index read + token-reference self-cost + (500 × pages to create) + (200 × pages to update) + 500 overhead`
+
+Concretely, the fixed-cost reads for a single-file ingest sum to roughly:
+- `wiki/log.md` tail (Step 1) — ~625
+- `wiki/index.md` (Step 8, first-file read under B3 cache) — ~200
+- `ops/token-reference.md` self-cost (Step 4 approval, once per op) — ~1,500
+- overhead for approval + acknowledgments — ~500
+
+That fixed floor is ~2,825 tokens **before** the raw source and per-page writes are counted. Add the variable terms on top: raw source read (typically 1,000–8,000) plus 500 × new pages plus 200 × updated pages. `!! ingest all` pays the ~1,500 `token-reference.md` cost once for the whole batch (not per file), but pays the raw-source-read and per-page write terms once per file.
 
 ## Recalibration Rule
 

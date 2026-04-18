@@ -91,7 +91,7 @@ The agent always reports findings first and asks approval before fixing anything
 
 Runs a strict, Senior-Software-Architect-style audit of the blueprint files themselves (the schema, the ops files, the guides). Unlike `!! lint` (which targets your wiki pages), audit targets only `blueprint/` — the distribution template and its docs.
 
-- `!! audit all` — audit every file under `blueprint/` (~20,000–25,000 tokens)
+- `!! audit all` — audit every file under `blueprint/` (~25,000–35,000 tokens)
 - `!! audit [page-name]` — audit one matched file (~1,000–5,000 tokens)
 
 **What audit checks:**
@@ -212,7 +212,7 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | Lint all | ~8,000–12,000 (scales with page count) |
 | Simple query (wiki) | ~2,000–4,000 |
 | Audit a single blueprint file | ~1,000–5,000 |
-| Audit all (full blueprint) | ~20,000–25,000 |
+| Audit all (full blueprint) | ~25,000–35,000 |
 | `!! wrap` (realistic) | ~2,700 |
 | `!! ready` (realistic) | ~2,800 |
 

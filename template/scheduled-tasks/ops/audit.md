@@ -68,5 +68,5 @@ Use the prompt below **verbatim** as the operating instructions when reading the
 
 - Audits of instructional markdown are still meaningful: rules can contradict each other, state machines can have unreachable branches, approval paths can leak, documented token estimates can drift from reality. Treat these as the analog of "logic errors" for this codebase.
 - Keep the severity bar high. If the blueprint is sound, say so.
-- For `!! audit all`, expect ~20,000–25,000 tokens of reads. Warn the user up front if the session is already close to context limits.
+- For `!! audit all`, expect ~25,000–35,000 tokens of reads (envelope measured 2026-04-18 after blueprint docs grew through v2.0.x). Warn the user up front if the session is already close to context limits. Recalibrate this range by summing the blueprint-doc rows in `token-reference.md` whenever those rows move.
 - For `!! audit [Page Name]`, expect ~1,000–5,000 tokens depending on file size.

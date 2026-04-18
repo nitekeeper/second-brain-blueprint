@@ -238,7 +238,7 @@ Triggered when user says: `!! ready`
      *(empty — use `!! wrap` at the end of a session to save a summary here)*
      ```
    - Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md` so the `Last op:` field reflects the memory read.
-   - Confirm: "Memory cleared. Ready to work." Then surface any in-progress drafts from `drafts/` (same as normal startup Step 4) so resuming via `!! ready` never drops drafts that a non-`!! ready` startup would have announced.
+   - Confirm: "Memory cleared. Ready to work." Then surface any in-progress drafts from `drafts/` (same as normal startup Step 4) so resuming via `!! ready` never drops drafts that a non-`!! ready` startup would have announced. **Blueprint-authoring mode:** if `wiki/` is absent at the working folder root, `drafts/` is almost certainly absent too — skip the drafts surface transparently (same guard as Blueprint-authoring Mode below; a single `[ -d drafts ]` check avoids prompting or erroring on a nonexistent directory).
 
 ---
 
