@@ -3,6 +3,87 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.9 — 2026-04-18
+
+### Follow-ups (audit-driven, ninth pass)
+
+- **`CHANGELOG.md` row recalibrated (S1).** Measured `wc -c` 43,457
+  against documented Chars 44,000 — 1.25% headroom, well below the
+  Recalibration Rule's 10% convention and by far the most drifted file
+  in the table. Same drift class as audits #5 S2 (ops/audit.md), #7 W1
+  (token-reference.md:54 prose), and #8 S1 (ops/audit.md again);
+  CHANGELOG.md is the most churn-prone file in the blueprint (new
+  section per version bump), so early recalibration is higher-value
+  here than elsewhere. *Two-pass recalibration:* the first pass set the
+  row to `~47,800 / ~11,950` (110% of 43,457 ≈ 47,800), but adding the
+  v2.0.9 changelog entry itself (this one) grew the file to 46,832
+  chars — which left only 2.07% headroom against the fresh 47,800
+  target, below the newly-codified 3% soft trigger (see Q1 below). The
+  final row is **`~51,500 / ~12,880`** (110% of 46,832 ≈ 51,500; tokens
+  51,500 ÷ 4 = 12,875 rounded to nearest 10 = 12,880), giving ~9.97%
+  headroom against the post-patch measured actual. The meta-lesson: a
+  recalibration patch must account for its own content growth in the
+  target-measurement baseline, not just the pre-patch `wc -c` figure.
+  Calibration date header stays 2026-04-18.
+- **Recalibration-Rule trigger amended with a soft 3%-headroom threshold
+  (Q1).** Three consecutive audits (#7 W1, #8 S1, #9 S1) each caught a
+  single file drifting past ~2% headroom and flagged it as a pre-emptive
+  STYLE finding. That pattern was effectively the audit layer *acting as*
+  a soft threshold that the written rule didn't encode — meaning catching
+  the drift required a full audit pass rather than routine maintenance.
+  Updated the **Recalibration trigger** paragraph in `token-reference.md:72`
+  to add "Also fire pre-emptively when any file's remaining headroom drops
+  below ~3% of its measured actual" with an explicit pointer to audits
+  #5 S2, #7 W1, #8 S1, #9 S1 as the documented precedent. The hard
+  trigger (measured ≥ documented) and the post-INGEST routine pass are
+  unchanged. `update.md` (7.28%) and `ingest.md` (8.79%) stay well clear
+  of the soft trigger, so no non-CHANGELOG file required recalibration
+  for audit #9.
+- **`token-reference.md` row recalibrated as a self-trigger side-effect
+  (Q1 cascade).** Adding the Q1 + Q2 prose (this entry and the two
+  paragraphs above/below) to `token-reference.md` grew the file from
+  6,095 chars (at the start of audit #9) to 6,664 chars after the Q1/Q2
+  edits — leaving only 2.04% headroom against its pre-patch documented
+  Chars 6,800, below the newly-codified 3% soft trigger. Recalibrated
+  the row from `~6,800 / ~1,700` to **`~7,300 / ~1,830`** (110% of 6,664
+  ≈ 7,300; tokens 7,300 ÷ 4 = 1,825 rounded to nearest 10 = 1,830).
+  Propagated the `~1,700 → ~1,830` self-cost figure to the two
+  instances in the Self-cost note (line 8) and the two instances in the
+  Ingest Estimate Formula section (lines 62, 64/66); fixed-floor
+  computation moved `~3,025 → ~3,155` to match (625 + 200 + 1,830 +
+  500). Same mechanical propagation pattern as audit #7 W1 (`refresh-
+  hot.md` table-vs-prose reconciliation).
+- **Recalibration-Rule Step 5 amended with a ~2%-cushion envelope floor
+  (Q2).** As the Tokens column grows and per-file recalibrations land,
+  the envelope's cushion shrinks even when every individual file stays
+  within its own 10% headroom. Pre-v2.0.9 rule widened the envelope
+  only when the documented sum *exceeded* the upper bound, meaning the
+  cushion could get arbitrarily thin before the trigger fired. Added a
+  second widening condition to Step 5: widen when the cushion drops
+  below ~2% of the upper bound (~1,000 tokens on a 48,000-token
+  envelope), even if the sum is still inside. Under the new rule,
+  after the S1 + Q1-cascade recalibrations this patch applied,
+  blueprint-doc sum moved 27,060 → 28,940 (+1,880 from the CHANGELOG.md
+  row) and template-side sum moved 18,245 → 18,375 (+130 from the
+  token-reference.md row). New total 47,315. Against the existing
+  48,000 upper bound that would have left ~1.43% cushion — below the
+  new 2% floor — so the envelope itself was widened from `~30,000–
+  48,000` to **`~30,000–50,000`** per the widening formula (sum +
+  ~1,500–3,000 cushion; 47,315 + 2,685 → 50,000 nearest-thousand).
+  Cascaded to the three `!! audit all` mentions: `ops/audit.md:71`,
+  `user-guide.md:94` (command reference), and `user-guide.md:215`
+  (cost table). `ops/audit.md`'s envelope-history parenthetical was
+  updated to include the v2.0.9 widen alongside the v2.0.6 and v2.0.7
+  events. `token-reference.md` Step 5's own envelope literal was
+  updated the same way. Post-patch cushion is 2,685 tokens ≈ 5.4% of
+  the new upper bound — comfortably above the 2% floor.
+
+*Pre-existing cold-start figures (`~5,530` / `~6,280` / `~5,475`) do
+not change — neither `CHANGELOG.md` nor the envelope literal factors
+into cold start. `README.md`, `setup-guide.md`, and `CLAUDE.md` do not
+quote the envelope or `CHANGELOG.md`'s row directly, so no further
+prose cascade is required.*
+
 ## v2.0.8 — 2026-04-18
 
 ### Follow-ups (audit-driven, eighth pass)
