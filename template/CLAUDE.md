@@ -97,7 +97,16 @@ Library/
 │   ├── user-guide.md
 │   ├── troubleshooting.md
 │   └── template/
-│       └── CLAUDE.md
+│       ├── CLAUDE.md
+│       └── scheduled-tasks/
+│           ├── refresh-hot.md
+│           └── ops/
+│               ├── ingest.md
+│               ├── lint.md
+│               ├── query.md
+│               ├── update.md
+│               ├── conventions.md
+│               └── token-reference.md
 ├── scheduled-tasks/            ← Reusable task and ops instruction files
 │   ├── refresh-hot.md
 │   └── ops/
@@ -196,11 +205,12 @@ Hot: [5 most recently updated page titles]
 ## log.md Format
 
 Append-only. Each entry: `## [YYYY-MM-DD] operation | title`
+**Max 500 chars per entry** (title + any body). Compress detail — per-file line-number noise belongs in commits, not the log. This cap bounds `tail (5 entries)` read cost at ~2,500 chars / ~625 tokens.
 Grep tip: `grep "^## \[" log.md | tail -5`
 **Always read tail only — never full file unless auditing.**
 
 ---
 
-*Schema version: 1.7 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 1.8 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format. Also replace `[YourName]` in line 3 above.

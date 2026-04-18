@@ -11,14 +11,15 @@ Format: `~N tokens (R read / W write)`
 | `memory.md` | ~500 (when full) | ~125 |
 | `CLAUDE.md` | ~7,775 | ~1,945 |
 | `wiki/index.md` | ~800 (grows with pages) | ~200 |
-| `wiki/log.md` tail (5 entries) | ~1,760 (grows with activity — recalibrate) | ~440 |
-| `wiki/log.md` full | ~4,085 (grows with activity — recalibrate) | ~1,020 |
+| `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
+| `wiki/log.md` full | audit only — unbounded | — |
 | `scheduled-tasks/refresh-hot.md` | ~1,735 | ~435 |
 | `ops/ingest.md` | ~1,760 | ~440 |
 | `ops/lint.md` | ~1,185 | ~295 |
 | `ops/query.md` | ~1,455 | ~365 |
 | `ops/update.md` | ~1,050 | ~260 |
 | `ops/conventions.md` | ~1,555 | ~390 |
+| `ops/token-reference.md` | ~1,900 | ~475 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
 | Raw source document | varies | ~1,000–8,000 |
