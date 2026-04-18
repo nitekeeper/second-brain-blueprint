@@ -73,6 +73,7 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 | `blueprint/template/scheduled-tasks/ops/update.md` | `scheduled-tasks/ops/update.md` |
 | `blueprint/template/scheduled-tasks/ops/conventions.md` | `scheduled-tasks/ops/conventions.md` |
 | `blueprint/template/scheduled-tasks/ops/token-reference.md` | `scheduled-tasks/ops/token-reference.md` |
+| `blueprint/template/scheduled-tasks/ops/audit.md` | `scheduled-tasks/ops/audit.md` |
 
 ---
 
@@ -195,7 +196,7 @@ Instruct the user to do this manually in Obsidian (you cannot do this via file e
 >
 > This prevents Obsidian from creating stray pages at the vault root when clicking unresolved wiki links.
 
-> **Note on `.obsidian/`:** The blueprint's `.gitignore` excludes the entire `.obsidian/` folder by default. If you want the "Default location for new notes = pages" setting (and any other Obsidian settings you care about) to travel with the blueprint when sharing, remove the `.obsidian/` line from `.gitignore` and commit the specific settings files you want to track (e.g. `.obsidian/app.json`). Most users don't need to do this — but it's your call.
+> **Note on `.obsidian/`:** The blueprint's `.gitignore` ignores `.obsidian/` directories *inside the `blueprint/` repo*. Your actual Obsidian vault lives at `wiki/.obsidian/`, **outside** `blueprint/`, so this rule does not affect your personal vault settings — you do not need to edit `.gitignore` for your own use. (If you are distributing the blueprint to others and want to ship pre-configured vault settings along with it, you would need to bundle them at `blueprint/template/.obsidian/`, remove the `.obsidian/` line from `.gitignore`, and add a Step 2 copy rule that deploys `blueprint/template/.obsidian/` into the new `wiki/.obsidian/` on setup. This blueprint does not include that machinery today — most users don't need it.)
 
 ---
 
@@ -223,7 +224,7 @@ Check the following and report status to the user:
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry
 - [ ] `wiki/hot.md` exists with today's date
-- [ ] All 6 ops files exist in `scheduled-tasks/ops/`
+- [ ] All 7 ops files exist in `scheduled-tasks/ops/`
 - [ ] `scheduled-tasks/refresh-hot.md` exists
 - [ ] `raw/` folder exists
 - [ ] `drafts/` folder exists
@@ -244,6 +245,7 @@ Then display the standard footer:
 ```
 📥 !! ingest: [URL | Page Name | All]
 🧹 !! lint: [Page Name | All]
+🔍 !! audit: [Page Name | All]
 💾 !! wrap: [save session summary to memory]
 🔄 !! ready: [load session summary at start of new session]
 
