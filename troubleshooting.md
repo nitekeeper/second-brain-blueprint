@@ -234,6 +234,18 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 ---
 
+## Ingest interrupted mid-flight and retry silently deleted the inbox file
+
+**Symptom:** On a schema v2.0.0–v2.0.3 wiki, an `!! ingest` run was interrupted (context exhaustion, crash, or cancellation) partway through — after the source page was written but before the raw file was moved out of `wiki/inbox/`. On the next session, you re-ran the same ingest and got `No change since last ingest — skipped.`, and the inbox file silently disappeared. The source page exists with a `source_hash:` in its frontmatter, but `raw/` has no matching snapshot — the provenance trail is broken.
+
+**Cause:** In v2.0.0 through v2.0.3, the ingest op wrote the source page (with `source_hash:` committed) **before** moving the inbox file to `raw/`. A crash between those two steps left the wiki in a state where `source_hash:` was present but no raw file existed. On retry, Step 0's hash check compared the still-present inbox content against the committed `source_hash:`, matched, and executed the rerun-proof short-circuit: delete inbox file, print `No change since last ingest — skipped.`, exit cleanly. The deletion was correct for the "rerun of a completed ingest" case, but in this crash-recovery case it destroyed the only remaining copy of the source.
+
+**Fix (retrospective):** If you can still recover the source (re-clip it, re-download it, grep it out of a Web Clipper cache), do so and run `!! ingest` again. The new run will see a mismatched hash (different raw body vs. stored hash — or if the body is byte-identical, the hash will match and you'll be back to the same skip, but now with a raw file actually landing). If you cannot recover the source, the source page's `original_file:` pointer dangles permanently — either accept it as a known-broken provenance link, or delete the `source_hash:` line from the source page's frontmatter so the next ingest of that slug triggers a full regeneration.
+
+**Prevention:** Schema v2.0.4+ reorders the ingest op. Step 6 now moves the inbox file to `raw/` **before** Step 7 writes the source page. A mid-flight failure between the two now leaves the inbox file already moved to `raw/` (if the crash was after Step 6) — the source page write on retry will see the pre-moved raw file and behave correctly — or leaves the inbox file untouched (if the crash was before Step 6) — a clean retry from Step 0 with no phantom `source_hash:` to trip the hash check. Either way, the inbox file is never silently deleted after a partial-write state. The pre-computed `ts` from Step 5 guarantees that Step 7's `original_file:` frontmatter and footnote paths reference the exact filename Step 6 wrote — no drift between the two.
+
+---
+
 ## `raw/` directory keeps growing
 
 **Symptom:** `raw/` accumulates multiple `<slug>-<timestamp>.md` files per source — sometimes dozens if a source changes frequently.

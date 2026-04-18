@@ -251,6 +251,10 @@ Tell the user:
 >
 > For daily usage, see `blueprint/user-guide.md`."
 
+**If Step 3 flagged that `changelog-monitor.md` is not yet on a daily scheduled-tasks cadence,** append this line to the readiness announcement (quoted block, inline with the rest):
+
+> "One loose end: `scheduled-tasks/changelog-monitor.md` is in place but nothing is scheduling it yet. When you're ready to turn on daily changelog monitoring, register it with the scheduled-tasks MCP at whatever cadence you like (the file itself is written for a daily run). The wiki works fine without it — this is an optional quality-of-life addition."
+
 Then display the standard footer:
 ```
 📥 !! ingest: [URL | Page Name | All]
