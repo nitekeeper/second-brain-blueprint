@@ -3,6 +3,68 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.2 — 2026-04-18
+
+### Follow-ups (audit-driven, second pass)
+
+- **Canonical hash pipeline.** Both `ops/ingest.md` Step 0 and
+  `changelog-monitor.md` Step 3 now feed the source body through a deterministic
+  canonicalizer (preamble-strip-if-present → line-ending normalization →
+  intra-line whitespace collapse → blank-line collapse → trim) before SHA-256.
+  Before this change, Clipper-ingested source pages stored a hash of
+  Clipper-normalized markdown while the monitor computed a hash of
+  WebFetch-normalized markdown for the same URL — the two pipelines produced
+  different markdown by design (Clipper strips more HTML boilerplate), so the
+  monitor's hash could never match a Clipper-stored `source_hash:` even for
+  byte-identical underlying pages. This broke v2.0's rerun-proof guarantee for
+  every Clipper-ingested page in the wiki. The canonicalizer bridges both paths.
+  LLM-mediated WebFetch nondeterminism is still out of scope by design — see
+  `troubleshooting.md`'s new entry for the caveat and manual-verification
+  workflow.
+- **Blueprint-authoring mode threaded through startup and audit.**
+  `template/CLAUDE.md`'s Blueprint-authoring Mode section now covers the
+  unconditional `wiki/hot.md` read at Startup step 2 and the `drafts/` probe at
+  step 3 — before this, a fresh blueprint-only clone would hit missing-file
+  errors at startup. `ops/audit.md` steps 5 and 6 also gain an explicit
+  blueprint-authoring callout — the log-append and `hot.md` refresh are now
+  skipped transparently in blueprint-authoring workspaces rather than implicitly
+  relying on CLAUDE.md's rule being cached. Same root cause as the v2.0 fix for
+  other ops; v2.0 forgot to thread the rule through startup and audit.
+- **`changelog-monitor.md` prose cleanup.** Three hardcoded "four"s (intro, step
+  2, Slack-format note) replaced with language that references the
+  `## Monitored Sources` table, so adding or removing rows no longer invalidates
+  the prose. Slack message format gains an explicit rule: `🆕 items:` and
+  `🆘 items:` trailing hint lines emit only when at least one matching row is
+  present; messages containing only ✅ / ❌ rows omit both.
+- **Blueprint Sync Rule `New scheduled task` row now mandates `CHANGELOG.md`.**
+  Framed as "treat any new scheduled task as at minimum a patch version bump,
+  so the Schema-version-bump row applies" — closes the gap that let the
+  changelog monitor ship with a CHANGELOG entry in v2.0 despite the file never
+  existing, and the follow-up in v2.0.1 get its own section only because the
+  audit caught it.
+- **Source-hash field doc updated.** `ops/conventions.md` now describes
+  `source_hash:` as the hash of the *canonicalized* body with a pointer to the
+  new `ops/ingest.md` §Hash Canonicalization section, and calls out that the
+  same canonicalizer runs in the changelog monitor.
+- **CHANGELOG v2.0 `### Estimate re-baselining` backfilled.** The
+  `ops/ingest.md` ~7,900 → ~10,000 Chars jump that shipped with v2.0 now has a
+  documented audit trail in v2.0's own section (flagged by the re-audit as
+  persisting from the earlier audit-report).
+- **Troubleshooting.** New entry "Changelog monitor reports 🆕 for a page I
+  know hasn't changed" covers (i) legacy pre-v2.0.2 hashes that self-heal on
+  next ingest, and (ii) the LLM-WebFetch nondeterminism caveat with a
+  fetcher-swap recipe.
+- **Token-reference recalibration.** Applied where any file's measured Chars
+  crossed its documented value after this pass.
+
+### Migration note
+Source pages whose `source_hash:` was computed before v2.0.2 will produce a
+one-shot hash mismatch on their next ingest or their next monitor comparison
+(the canonicalized hash differs from the raw-body hash). The system
+self-corrects: re-ingest once and the new canonical hash lands in the
+frontmatter; the monitor will report ✅ from then on. No bulk migration
+required.
+
 ## v2.0.1 — 2026-04-18
 
 ### Follow-ups (audit-driven)
@@ -48,6 +110,9 @@
 
 ### Force re-ingest escape hatch
 If you need to regenerate a source page *without* the underlying content having changed (e.g. the previous generation was poorly worded and you want a do-over), delete the `source_hash:` line from the source page's frontmatter. The next ingest will treat the missing hash as a mismatch and regenerate. No `--force` flag, no ops change — the escape hatch is the absence of the field.
+
+### Estimate re-baselining
+- **`ops/ingest.md` recalibrated.** The new Step 0 hash-check + B3.5 batch-level pre-read + B3.6 batch hash-check + `source_hash:` discipline together pushed the file past its v1.14 headroom. Chars column bumped from ~7,900 → ~10,000; Tokens ~1,980 → ~2,500. *(This subsection was backfilled in v2.0.2 after `!! audit all` flagged the audit-trail gap — the Chars change itself shipped with v2.0 but was not accompanied by a changelog entry.)*
 
 ### New file
 - **`scheduled-tasks/changelog-monitor.md` restored.** The original trigger for this migration. A daily scheduled task that fetches four monitored documentation pages, computes content hashes, compares against wiki state, and reports findings via Slack DM. Read-only — never writes files. The user runs `!! ingest` manually after reviewing the Slack summary.

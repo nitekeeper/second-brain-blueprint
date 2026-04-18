@@ -268,6 +268,24 @@ The above lists files safe to delete; re-run wrapped in `xargs rm` once you've v
 
 ---
 
+## Changelog monitor reports 🆕 for a page I know hasn't changed
+
+**Symptom:** A daily Slack DM from the changelog monitor flags a source with 🆕 CHANGED, but when you open the URL nothing is visibly different from your last ingest. Running `!! ingest <URL>` regenerates the page anyway rather than printing `No change since last ingest — skipped.`
+
+**Cause:** Two possibilities — verify which one applies before acting:
+
+1. **Legacy hash from before schema v2.0.2.** Source pages ingested before v2.0.2 used a pre-canonicalization `source_hash:` (SHA-256 over the raw body, no whitespace or line-ending normalization). The v2.0.2 monitor applies the Hash Canonicalization pipeline (see `scheduled-tasks/ops/ingest.md`) to its fetched body before hashing, so the canonicalized hash cannot match a pre-canonicalization stored hash even when the content is byte-identical. This is a one-shot mismatch per source — the next ingest writes a canonical hash in place and future monitor runs will report ✅.
+2. **LLM-mediated WebFetch nondeterminism.** The canonicalizer handles whitespace, line-ending, preamble, and intra-line formatting drift. It does NOT handle prose rewriting. If the fetcher is backed by an LLM that rephrases or reorders content across runs (Claude/Cowork's WebFetch is LLM-mediated, as are many equivalents), the canonicalized hash will vary even when the underlying HTML is byte-identical. This is a limitation of LLM-based fetch, not of the canonicalizer.
+
+**Fix:**
+
+- Case (1) — re-ingest the source once via your normal path (Clipper or URL). Next monitor run should report ✅. If it doesn't, you're in case (2).
+- Case (2) — verify the change manually before re-ingesting. Open the URL, compare against `raw/<slug>-<most-recent>.md`, and only re-ingest if there's a real change. If case (2) is dominating your monitor's signal-to-noise, swap the fetcher to a deterministic HTML-to-markdown converter (e.g. readability-lxml, trafilatura, pandoc in a pinned mode) and re-point `ops/ingest.md` U1 (URL fetch) and `changelog-monitor.md` step 2 (monitor fetch) at it. The `!! ingest` op is fetcher-pluggable — it just requires an HTML-to-markdown transformer. Pinning a deterministic fetcher is the architecturally correct fix for a heavy case-(2) workload; keeping the LLM fetcher is fine if false-positive rate is low enough to tolerate manual verification.
+
+**Prevention:** Case (1) self-heals on first re-ingest per source and is expected during the v2.0.2 transition. Case (2) requires choosing a deterministic fetcher if the monitor's signal matters. There is no way to make an LLM fetcher hash-stable purely via normalization — the variation is semantic, not formatting.
+
+---
+
 ## Want to force re-ingest an unchanged source
 
 **Symptom:** `!! ingest <source>` prints `No change since last ingest — skipped.` but you want the source page rewritten anyway — e.g. the prior generation's wording was poor, or you want fresh LLM output after a model upgrade.
