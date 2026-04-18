@@ -61,6 +61,8 @@ All subsequent shell commands in this setup run with `WORKDIR` as cwd. If a late
 
 ## Step 2 — Copy Template Files
 
+> **Reminder:** if this runs in a new sandbox, re-run `cd "$WORKDIR"` first — see Step 1.
+
 Show approval request, then copy all files from `blueprint/template/` to their correct locations:
 
 | From | To |
@@ -82,14 +84,15 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 In `CLAUDE.md`, make the following replacements:
 - Replace `[YourName]` with the name the user gave in the pre-flight check (appears in the top-of-file greeting)
 - Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
-- If the user's Cowork working folder is **not** named `Library`, run a whole-file find-and-replace in `CLAUDE.md` changing every occurrence of `@Library/` to `@<folder>/`. The `/` is important: only the path-prefix instances get rewritten, not the explanatory prose. After this substitution every path in the Ops File Reminder table, the Approval Rule, and any future additions will line up with the user's actual folder.
 - Remove the `> **Setup note:** …` block at the very end of `CLAUDE.md` (immediately under the `Schema version:` footer). It is scaffolding for this setup step only — once the replacements above are done, it has no further purpose and will otherwise sit as stale cruft in the live file.
 
-> **Important:** The `@`-prefix in the Ops File Reminder table and the Approval Rule must match the name of the folder the user selected in Cowork. If the folder is named `Library`, no change is needed. If it has a different name (e.g. `MyWiki`), every `@Library/` reference is rewritten to `@MyWiki/` — these references live in `CLAUDE.md` only. The ops files themselves use working-folder-relative paths and do not require changes. The explanatory note directly under the table is already written to be stable across any folder name, so it does not need manual editing.
+> **Note:** The `@`-prefixed paths in `CLAUDE.md` (Ops File Reminder table, Approval Rule) are working-folder-relative and resolve correctly regardless of the folder's name — no find-and-replace is needed during setup.
 
 ---
 
 ## Step 4 — Initialize Wiki Files
+
+> **Reminder:** if this runs in a new sandbox, re-run `cd "$WORKDIR"` first — see Step 1.
 
 Show approval request, then create these four files:
 
@@ -215,6 +218,8 @@ Instruct the user to do this manually in the Chrome extension settings:
 ---
 
 ## Step 7 — Verify Setup
+
+> **Reminder:** if this runs in a new sandbox, re-run `cd "$WORKDIR"` first — see Step 1.
 
 Check the following and report status to the user:
 

@@ -2,6 +2,21 @@
 
 Triggered when the user drops a new source and says "ingest this."
 
+## If `!! ingest <URL>`
+
+Triggered when the user passes a URL (e.g. `!! ingest https://example.com/article`).
+
+U1. Fetch the URL using an HTML-to-markdown fetcher (WebFetch or equivalent) — read-only, no approval needed. Abort with a clear error if the fetch fails or returns empty.
+U2. Derive a slug from the page title (lowercase-hyphenated); fall back to the URL's last path segment if the title is unusable. Proposed filename: `wiki/inbox/<slug>.md`.
+U3. Prepend a short YAML preamble with `source_url:` and `fetched:` (today's date) to the fetched markdown, held in working memory. Do NOT write yet.
+U4. Run main **Steps** as follows:
+    - Step 1 (log tail read) — unchanged.
+    - Step 2 — source content is already in working memory; skip the `wiki/inbox/` read.
+    - Step 3 (discuss takeaways) — use the in-memory content.
+    - Step 4 (approval) — to-do list **must** include "Save fetched article to `wiki/inbox/<slug>.md`" as the first item; the rest (source page create, index/log update, inbox→raw move, etc.) is identical to a filename-based ingest.
+    - On approval, write the inbox file first, then run Steps 5–12 unchanged.
+U5. Note to the user once (inline, not gated): "URL ingest is ~40–60% more expensive in tokens than a Web Clipper clip. Either path works — clipping is cheaper for future sources."
+
 ## If `!! ingest all`
 
 > Step numbers inside square brackets (e.g. `[main-step 5]`) refer to the numbered items in the **Steps** section below. The items in *this* batch preamble are numbered B1–B7 to keep the two lists from colliding.

@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~4,255 tokens** (~4,380 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~4,255 tokens** (~5,005 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
 
@@ -38,16 +38,16 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 | Operation | Read before starting |
 |---|---|
-| Ingest a source | `@Library/scheduled-tasks/ops/ingest.md` |
-| Lint the wiki | `@Library/scheduled-tasks/ops/lint.md` |
-| Audit the blueprint | `@Library/scheduled-tasks/ops/audit.md` |
-| Answer a question (wiki/web) | `@Library/scheduled-tasks/ops/query.md` |
-| Update a page | `@Library/scheduled-tasks/ops/update.md` |
-| Create or edit any page | `@Library/scheduled-tasks/ops/conventions.md` |
-| Any write action (approval) | `@Library/scheduled-tasks/ops/token-reference.md` |
-| After any wiki-state change (Ingest/Lint/Update/filed Query/`!! wrap`/`!! ready`) | `@Library/scheduled-tasks/refresh-hot.md` |
+| Ingest a source | `@scheduled-tasks/ops/ingest.md` |
+| Lint the wiki | `@scheduled-tasks/ops/lint.md` |
+| Audit the blueprint | `@scheduled-tasks/ops/audit.md` |
+| Answer a question (wiki/web) | `@scheduled-tasks/ops/query.md` |
+| Update a page | `@scheduled-tasks/ops/update.md` |
+| Create or edit any page | `@scheduled-tasks/ops/conventions.md` |
+| Any write action (approval) | `@scheduled-tasks/ops/token-reference.md` |
+| After any wiki-state change (Ingest/Lint/Update/filed Query/`!! wrap`/`!! ready`) | `@scheduled-tasks/refresh-hot.md` |
 
-> **Note:** The `@`-prefixed path segment in the table above refers to your Cowork working folder. At setup time the unconfigured template uses a placeholder working-folder name; the placeholder is rewritten to match the folder the user actually selected — so whatever name you see here is expected. If you ever rename the working folder, search-and-replace the `@`-prefix throughout this file only; the ops files use working-folder-relative paths and do not require changes.
+> **Note:** `@`-prefixed paths above are working-folder-relative — they resolve against whichever Cowork folder you selected at setup, regardless of its name. No setup-time rewriting is required, and renaming the folder later does not break these references.
 
 > **Approval cost reminder:** Each approval request itself consumes the token-reference.md read. The current self-cost is documented in `token-reference.md`'s header — read it once per op, cache the value, and factor it into every quoted estimate in that op.
 
@@ -59,7 +59,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 Before any file create, edit, or delete — stop and present:
 1. One-line summary of what you are about to do
-2. Token estimate using `@Library/scheduled-tasks/ops/token-reference.md`
+2. Token estimate using `@scheduled-tasks/ops/token-reference.md`
 3. To-do list of every file affected
 4. "Shall I proceed?"
 
@@ -88,6 +88,7 @@ All other write actions — Blueprint Sync writes, and the log appends + `hot.md
 |---|---|
 | Schema or startup change | `blueprint/README.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md` |
 | Operation step change | `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md`, `blueprint/template/scheduled-tasks/ops/[op].md` |
+| Refresh-hot.md change | `blueprint/template/scheduled-tasks/refresh-hot.md`, `blueprint/template/CLAUDE.md` (hot.md Format block), `blueprint/setup-guide.md` (initial hot.md snippet) |
 | New known issue or fix | `blueprint/troubleshooting.md` |
 | Schema change that introduces a new footgun | `blueprint/troubleshooting.md` in addition to the Schema row above — document the old behavior, the fix, and the version it was fixed in |
 | Setup step change | `blueprint/setup-guide.md` |
@@ -170,7 +171,10 @@ User invocation is implicit approval for both commands, subject to the safeguard
 ### `!! wrap`
 Triggered when user says: `!! wrap`
 
-1. **Pre-write safeguard:** Read `memory.md` first. If it already contains `MEMORY_STATE: WRAPPED`, warn the user: "A previous session summary is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — and wait for explicit confirmation.
+1. **Pre-write safeguard:** Read `memory.md` first.
+   - If it contains `MEMORY_STATE: WRAPPED`, warn the user: "A previous session summary is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — and wait for explicit confirmation.
+   - If it contains `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED`, warn the user: "A preserved (truncated) summary from a prior session is still in memory.md — you opted to keep it via `!! ready` → `keep`. Overwriting will destroy it. Proceed? (yes/no)" — and wait for explicit confirmation.
+   - If it contains `MEMORY_STATE: EMPTY` (or the file is missing/blank), proceed without a prompt.
 2. Ask: "Anything specific you'd like included in the summary?"
 3. Write a detailed summary to `memory.md`, overwriting any existing content. Structure:
    ```
@@ -223,7 +227,7 @@ Triggered when user says: `!! ready`
 
 ## Response Footer
 
-**CRITICAL: Every single response — without exception — must end with all six lines below (five command hints + the 💡 Web Clipper tip). Missing any line is an error.**
+**CRITICAL: Every single response — without exception — must end with the footer block exactly as shown: 5 command-hint lines, then a blank separator, then the 💡 tip line (7 physical lines total). Missing any content line is an error.**
 
 ```
 📥 !! ingest: [URL | Page Name | All]
@@ -235,7 +239,7 @@ Triggered when user says: `!! ready`
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
 ```
 
-**CRITICAL: All five command lines and the 💡 tip line are required in every response. Missing any line is an error.**
+**CRITICAL: All 5 command-hint lines and the 💡 tip line are required in every response. Missing any content line is an error.**
 
 Show brackets literally. No query command — handled automatically via waterfall.
 
@@ -268,6 +272,6 @@ Grep tip (portable, extended regex): `grep -E "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 1.12 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 1.13 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format. Also replace `[YourName]` in line 3 above.

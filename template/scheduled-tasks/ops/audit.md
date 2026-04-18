@@ -35,7 +35,7 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
 3. Apply the **Audit Prompt** below verbatim as your operating instructions while reviewing.
 4. Report findings to the user. No approval request is needed to run the audit — it is read-only.
 5. If the user asks for any fix to be applied:
-   - Read `@scheduled-tasks/ops/conventions.md` before editing any page.
+   - Blueprint files are not wiki pages — `ops/conventions.md` does not apply. Edit blueprint files directly; the Blueprint Sync Rule bullet below governs any downstream propagation.
    - Show a normal approval request (summary + token estimate including the `token-reference.md` self-cost (see `@scheduled-tasks/ops/token-reference.md` header) + to-do list of affected files).
    - After approval, apply fixes.
    - If any fix touches the schema, startup behavior, operations, or conventions, follow the Blueprint Sync Rule in `CLAUDE.md` — update every downstream doc the table lists before closing the op.
