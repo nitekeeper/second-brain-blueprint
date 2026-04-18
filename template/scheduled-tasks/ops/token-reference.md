@@ -25,6 +25,7 @@ Format: `~N tokens (R read / W write)`
 | `ops/query.md` | ~2,100 | ~520 |
 | `ops/update.md` | ~1,400 | ~350 |
 | `ops/conventions.md` | ~2,500 | ~620 |
+| `ops/audit.md` | ~4,900 | ~1,230 |
 | `ops/token-reference.md` | ~3,400 | ~850 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
@@ -40,6 +41,8 @@ Format: `~N tokens (R read / W write)`
 | Overwrite `hot.md` | ~100 |
 | Write `memory.md` (`!! wrap`) | ~150–250 |
 | Wipe `memory.md` (`!! ready`) | ~50 |
+
+> **`!! wrap` / `!! ready` true session cost.** The raw write costs above cover *only* the `memory.md` touch. Both commands also execute the full `hot.md` refresh flow (read `refresh-hot.md` ~1,020 + re-read `wiki/index.md` ~200 + re-read `wiki/log.md` tail ~625) and append one entry to `log.md` (~100). Realistic per-command cost when none of those files are already cached is ~2,000 tokens, not ~50–250. Quote ~2,000 when asked unless the relevant reads are warm from a prior op in the same session. `!! wrap` and `!! ready` are **not** approval-gated (they are documented exceptions in `CLAUDE.md`'s Approval Rule), so `token-reference.md` itself does not need to be re-read for either command.
 
 ## Ingest Estimate Formula
 `raw source read + (500 × pages to create) + (200 × pages to update) + 500 overhead`

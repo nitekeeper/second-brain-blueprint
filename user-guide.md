@@ -81,6 +81,23 @@ The agent always reports findings first and asks approval before fixing anything
 
 ---
 
+### Blueprint Audit — `!! audit`
+
+Runs a strict, Senior-Software-Architect-style audit of the blueprint files themselves (the schema, the ops files, the guides). Unlike `!! lint` (which targets your wiki pages), audit targets only `blueprint/` — the distribution template and its docs.
+
+- `!! audit all` — audit every file under `blueprint/` (~20,000–25,000 tokens)
+- `!! audit [page-name]` — audit one matched file (~1,000–5,000 tokens)
+
+**What audit checks:**
+- Logic contradictions (rules that conflict, unreachable branches, missing edge cases in state machines)
+- Security / safety footguns (approval bypasses, silent overwrites, data-loss paths)
+- Performance / token waste (redundant reads, cold-start bloat, tiered-read violations)
+- Blueprint-sync drift (the template and its downstream docs falling out of step)
+
+Audits are **read-only by default** — no approval needed to run one. If the audit surfaces fixes you want applied, the agent will go through the normal approval flow before writing anything. Each finding comes with quoted evidence and a severity label (CRITICAL / WARNING / STYLE); if nothing is wrong the audit says so instead of padding the list.
+
+---
+
 ### Updating Pages — `!! update`
 
 You don't need a special command to trigger an update — just make a correction or add context mid-conversation. The agent detects it and runs the update op automatically.
@@ -109,18 +126,19 @@ If you start a session without saying `!! ready`, the summary stays in `memory.m
 
 ## Footer Commands
 
-Every agent response ends with five lines — four command hints plus the Web Clipper tip:
+Every agent response ends with six lines — five command hints plus the Web Clipper tip:
 
 ```
 📥 !! ingest: [URL | Page Name | All]
 🧹 !! lint: [Page Name | All]
+🔍 !! audit: [Page Name | All]
 💾 !! wrap: [save session summary to memory]
 🔄 !! ready: [load session summary at start of new session]
 
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
 ```
 
-These are hints showing what the commands accept. Just type them naturally — e.g. `!! ingest my-article.md`, `!! lint all`, `!! wrap`, or `!! ready`.
+These are hints showing what the commands accept. Just type them naturally — e.g. `!! ingest my-article.md`, `!! lint all`, `!! audit all`, `!! wrap`, or `!! ready`.
 
 ---
 
@@ -160,6 +178,9 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | Ingest a long document | ~8,000–15,000 |
 | Lint all (23 pages) | ~8,000–12,000 |
 | Simple query (wiki) | ~2,000–4,000 |
+| Audit a single blueprint file | ~1,000–5,000 |
+| Audit all (full blueprint) | ~20,000–25,000 |
+| `!! wrap` or `!! ready` (realistic) | ~2,000 |
 
 If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~4,005 tokens to re-orient.
 
