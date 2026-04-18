@@ -83,7 +83,12 @@ This canonicalizer survives: Clipper-vs-WebFetch whitespace differences, CRLF/LF
     mv "$file" "$dest"
     ```
     `WORKDIR`, `file`, `slug`, and `ts` must all be exported in the **same** Bash invocation as the snippet — env vars do not persist across Cowork Bash calls. The `${…:?}` guards refuse to run if any variable is unset rather than silently operating on the wrong path.
-7. Write (or regenerate) a source summary page in `wiki/pages/sources/`. The frontmatter MUST include `source_hash: <8-char-hex>` — the same hash computed in Step 0 — and `original_file: raw/<slug>-<ts>.md` using the Step-5 `ts`. Every `[^n]:` provenance footnote in the Key Takeaways section must cite the same `raw/<slug>-<ts>.md` path. `source_hash:` is the dedupe primitive; a missing or stale `source_hash:` will cause the next ingest to trigger a full regeneration. On hash mismatch, fully regenerate the page from the new raw content — do not attempt to merge with the prior page body.
+7. Write (or regenerate) a source summary page in `wiki/pages/sources/`. The frontmatter MUST include:
+    - `source_hash: <8-char-hex>` — the same hash computed in Step 0. Dedupe primitive; a missing or stale `source_hash:` will cause the next ingest to trigger a full regeneration.
+    - `original_file: raw/<slug>-<ts>.md` — using the Step-5 `ts`. Every `[^n]:` provenance footnote in the Key Takeaways section must cite the same `raw/<slug>-<ts>.md` path.
+    - `source_url: <URL>` — the canonical URL this source was pulled from. For URL ingest, reuse the value U3 already prepended. For filename (Clipper) ingest, pull the URL from the Clipper's own preamble (Obsidian Web Clipper writes `source:` by default; accept that, `url:`, or any equivalent field that carries the origin URL) and propagate it verbatim into `source_url:`. If no URL is recoverable from the Clipper preamble, write `source_url: unknown` and note the gap in the approval request so the user can correct it post-ingest. This field is the stable join key that `@scheduled-tasks/changelog-monitor.md` Step 1 uses to reverse-look-up stored hashes; a source page missing `source_url:` (or with `unknown`) will be invisible to the monitor and will report 🆘 UNINGESTED there. Mandatory as of schema v2.0.10 — see `troubleshooting.md` "Changelog monitor reports 🆘 UNINGESTED for a source I know I ingested" for the pre-v2.0.10 failure mode this invariant eliminates.
+
+    On hash mismatch, fully regenerate the page from the new raw content — do not attempt to merge with the prior page body.
 8. Read `wiki/index.md` to identify all affected concept/entity pages
 9. Update affected pages; create any new concept or entity pages warranted
 10. Update `wiki/index.md` with new and modified entries
@@ -97,5 +102,5 @@ This canonicalizer survives: Clipper-vs-WebFetch whitespace differences, CRLF/LF
 
 - A single source typically touches 5–15 pages. Be thorough.
 - Read `@scheduled-tasks/ops/conventions.md` before creating or editing any pages.
-- Source pages must include: `original_file:` and `source_hash:` frontmatter, Key Takeaways section, Connections section, and `[^n]:` provenance footnotes on every curated bullet.
+- Source pages must include: `original_file:`, `source_hash:`, and `source_url:` frontmatter; Key Takeaways section; Connections section; and `[^n]:` provenance footnotes on every curated bullet. The `source_url:` invariant is load-bearing for the changelog monitor — see Step 7 for the field's role and the fallback path when no URL is recoverable.
 - Rerun-proof guarantee: running the same ingest twice produces zero state change. See Step 0.

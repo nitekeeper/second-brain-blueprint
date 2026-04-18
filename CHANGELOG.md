@@ -3,6 +3,119 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.10 — 2026-04-18
+
+### Follow-ups (audit-driven, tenth pass — final audit)
+
+- **`changelog-monitor.md` Step 1 rewritten as `source_url:` reverse-lookup
+  (W1).** Audit #10 identified a long-standing specification gap: Step 1
+  instructed the monitor to look up each source page using "the same slug
+  derivation rules as `ops/ingest.md` Step 0" — a rule whose valid inputs
+  are H1, filename stem, or page title (for URL ingest, via U2). The
+  monitor has none of those pre-fetch: Step 1 runs **before** Step 2's
+  WebFetch, so the only available inputs are the monitored URL and the
+  Source Title column of the `## Monitored Sources` table. The rule was
+  literally unexecutable at the call site. Implementations had to silently
+  improvise, typically using URL last-segment or lowercase-hyphenated
+  Source Title — which matched ingest-time slugs for the four current
+  monitored sources by coincidence (their URL last-segments happened to
+  equal the ingested H1 slug) but would diverge on any future source
+  whose fetched title didn't round-trip through `lowercase-hyphenated`
+  to the URL's last segment. Divergence silently misclassified an
+  ingested source as 🆘 UNINGESTED in the Slack DM, and acting on that
+  hint by running `!! ingest <URL>` would create a duplicate source page
+  under the monitor's computed slug — fragmenting the wiki. The bug was
+  latent (never fired in production) but architecturally real. **Fix:**
+  Step 1 now builds a URL → source-page map once per run by enumerating
+  `wiki/pages/sources/*.md` and reading each file's `source_url:`
+  frontmatter, then looks up each monitored URL in the map by exact
+  string match. UNINGESTED is reported when no page matches; the new
+  AMBIGUOUS status is reported when more than one page matches (should
+  not occur absent wiki corruption, but failing loudly is cheaper than
+  silent miscomparison). Pages with `source_url: unknown` or missing
+  `source_url:` are excluded from the map.
+- **`source_url:` frontmatter made mandatory on every source page
+  (W1 prerequisite).** The W1 fix depends on `source_url:` being a
+  reliable join key on source pages, but pre-v2.0.10 `ops/ingest.md`
+  Step 7 only mandated `source_hash:` and `original_file:` — U3 already
+  prepended `source_url:` for URL ingest, but Clipper-ingested pages
+  had no such guarantee. Step 7 now lists three mandatory frontmatter
+  fields (`source_hash:`, `original_file:`, `source_url:`) and
+  documents the fallback: for URL ingest, reuse U3's value; for
+  Clipper ingest, pull the URL from the Clipper preamble (Obsidian
+  Web Clipper's `source:`, or `url:`, or equivalent) and propagate;
+  if no URL is recoverable, write `source_url: unknown` and note the
+  gap in the approval request so the user can correct post-ingest.
+  The Notes-section bullet listing frontmatter requirements was
+  updated to match.
+- **New monitor status: AMBIGUOUS (⚠️).** Added to the `Classify each
+  source` list in `changelog-monitor.md` Step 4, to the Slack message
+  emoji legend (pointer: "run `!! lint` to surface the duplicate"),
+  and to the trailing-hint-lines rule (⚠️ rows omit both trailing
+  hints since their inline action hint is in the legend, not a
+  batched directive). The example Slack message body also picked up
+  a sample ⚠️ row.
+- **Troubleshooting added two new entries.** `troubleshooting.md` now
+  documents (i) "Changelog monitor reports 🆘 UNINGESTED for a source
+  I know I ingested" — covering both the pre-v2.0.10 slug-drift case
+  (upgrade to v2.0.10+ to self-heal most sources) and the `source_url:`-
+  missing-or-unknown case (backfill by hand, no re-ingest needed);
+  and (ii) "Changelog monitor reports ⚠️ AMBIGUOUS for a source" —
+  covering the duplicate-page scenario and the `!! lint` recovery
+  flow.
+- **Four token-reference rows recalibrated (hard trigger, all four
+  exceeded documented Chars post-edit).** The edits above grew four
+  files past their v2.0.9-calibrated documented bounds — not just the
+  3% soft trigger but the hard "measured ≥ documented" trigger.
+  Measured `wc -c` after the edits: `ingest.md` 15,399 (documented
+  15,500 → within bound, but 0.66% headroom, below soft trigger);
+  `changelog-monitor.md` 7,758 (documented 6,100 → hard trigger,
+  +27% over); `troubleshooting.md` 30,220 (documented 27,900 → hard
+  trigger, +8% over); `CHANGELOG.md` 55,170 (documented 51,500 →
+  hard trigger, +7% over). Recalibrating each row at 110% of
+  post-edit actual, rounded to nearest 100 for Chars and nearest 10
+  for Tokens (chars ÷ 4):
+
+  | File | Before | After |
+  |---|---|---|
+  | `scheduled-tasks/changelog-monitor.md` | `~6,100 / ~1,530` | `~8,500 / ~2,130` |
+  | `scheduled-tasks/ops/ingest.md` | `~15,500 / ~3,880` | `~17,000 / ~4,250` |
+  | `blueprint/troubleshooting.md` | `~27,900 / ~6,980` | `~33,200 / ~8,300` |
+  | `blueprint/CHANGELOG.md` | `~51,500 / ~12,880` | `~60,700 / ~15,180` |
+
+  Calibration date header stays 2026-04-18 (same-day recalibration,
+  per the routine-pass pattern).
+
+- **Envelope widened from `~30,000–50,000` to `~30,000–54,000`
+  (Step 5 trigger: sum exceeded the upper bound).** Post-recalibration
+  Tokens sum: blueprint-doc rows = README (1,280) + setup-guide (3,350)
+  + user-guide (4,150) + troubleshooting (8,300) + CHANGELOG (15,180)
+  + LICENSE (300) = **32,560**; template-side rows = CLAUDE (5,475) +
+  refresh-hot (1,100) + changelog-monitor (2,130) + ingest (4,250) +
+  lint (630) + query (530) + update (350) + conventions (1,250) +
+  audit (1,800) + token-reference (1,830) = **19,345**. Total
+  **51,905** — which **exceeds** the v2.0.9 `~30,000–50,000` upper
+  bound by ~1,905 tokens. Widened per the Step 5 formula
+  (sum + ~1,500–3,000 cushion, rounded to nearest 1,000) to
+  **`~30,000–54,000`** (51,905 + 2,095 = 54,000; cushion = 2,095 =
+  3.88% of upper bound, above the 2% floor). Cascaded to
+  `ops/audit.md:71`, `user-guide.md:94`, and `user-guide.md:215`.
+  The envelope growth this pass (~4,000 tokens) is the largest since
+  the v2.0.4 widen — a reflection of the scale of the W1 fix, which
+  touched four of the sixteen tracked files.
+
+### Outcome
+
+Closes the last latent specification gap in the blueprint. The
+written Recalibration Rule now owns the detection pattern for all
+file-level drift (hard, soft, and envelope-cushion triggers). The
+written Blueprint Sync Rule owns downstream propagation. Audit #10's
+closing framing (final audit in the series; blueprint has reached a
+steady state) is recorded in `audit-report-2026-04-18-10.md`. Future
+recalibrations should fire via the rule, not via an audit pass.
+
+---
+
 ## v2.0.9 — 2026-04-18
 
 ### Follow-ups (audit-driven, ninth pass)
