@@ -6,7 +6,7 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~3,950 tokens)
+1. `CLAUDE.md` — its operating instructions (~4,200 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~55 tokens)
 
 **Total cold-start cost: ~4,255 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
@@ -116,7 +116,7 @@ At the start of your next session, say `!! ready` as your first message. The age
 
 **Mid-session safeguard:** If you accidentally say `!! ready` in the middle of a session (not as the first message), the agent will refuse to wipe memory without explicit `!! ready confirm`. This prevents the older footgun where a casual "ready" wiped a saved summary.
 
-**Truncation detection:** If `!! wrap` was interrupted before writing the completion marker, `!! ready` will display what's present, warn that the summary appears truncated, and ask whether to keep or clear — it will never silently wipe truncated content.
+**Truncation detection:** If `!! wrap` was interrupted before writing the completion marker, `!! ready` will display what's present, warn that the summary appears truncated, and ask you to choose one of three options — `clear` (wipe back to empty), `keep` (mark the partial summary as acknowledged so the warning stops firing), or `edit` (hand the file back untouched for manual repair). It will never silently wipe truncated content.
 
 If you start a session without saying `!! ready`, the summary stays in `memory.md` untouched until you explicitly ask for it. It won't be read automatically.
 
