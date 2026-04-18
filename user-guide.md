@@ -151,7 +151,7 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | Lint all (23 pages) | ~8,000–12,000 |
 | Simple query (wiki) | ~2,000–4,000 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~1,880 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~2,000 tokens to re-orient.
 
 ---
 
@@ -172,5 +172,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~1,880 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~2,000 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.

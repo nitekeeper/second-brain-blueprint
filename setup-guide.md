@@ -86,7 +86,7 @@ Show approval request, then create these four files:
 ```markdown
 # Wiki Index
 
-> Master catalog of all pages. Updated on every ingest, query, or lint pass.
+> Master catalog of all pages. Updated on every ingest or lint pass, and when a query results in a filed analysis page.
 > To find pages relevant to a query, read this file first, then drill into specific pages.
 
 **Stats:** 0 pages | Last updated: YYYY-MM-DD
@@ -201,8 +201,8 @@ Instruct the user to do this manually in the Chrome extension settings:
 
 Check the following and report status to the user:
 
-- [ ] `CLAUDE.md` exists at the Library root and contains the user's name
-- [ ] `memory.md` exists at the Library root (empty)
+- [ ] `CLAUDE.md` exists at the working folder root and contains the user's name
+- [ ] `memory.md` exists at the working folder root (empty)
 - [ ] `wiki/inbox/` folder exists
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry

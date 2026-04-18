@@ -54,7 +54,7 @@ for f in pathlib.Path("wiki/pages").rglob("*.md"):
 **Fix:**
 1. Delete the stray files from the vault root
 2. Go to **Obsidian Settings → Files and links → Default location for new notes**
-3. Set it to `wiki/pages` (or a subfolder like `wiki/pages/concepts/`)
+3. Set it to `pages` (or a subfolder like `pages/concepts/`) — this is vault-relative, and the Obsidian vault root is `wiki/`
 
 This prevents Obsidian from creating notes in the wrong location in future.
 

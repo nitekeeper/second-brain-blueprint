@@ -7,7 +7,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 ## Startup (Every Session)
 
 1. Read `CLAUDE.md` (this file) — ~1,945 tokens
-2. Read `wiki/hot.md` — ~60 tokens
+2. Read `wiki/hot.md` — ~55 tokens
 3. Check `drafts/` — list any files present (negligible tokens)
 4. Check if the user's opening message is `!! ready`:
    - **If yes:** follow the **Session Memory Commands** section — skip the normal readiness announcement below
