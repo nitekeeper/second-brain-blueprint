@@ -25,16 +25,22 @@ If you saved a session summary with `!! wrap`, say `!! ready` at the start of yo
 3. Tell the agent: `!! ingest [filename]`
 
 **What happens:**
-- Agent discusses 3–5 key takeaways with you
-- Shows you a to-do list of every page it will create or update
-- Shows a token cost estimate
-- Waits for your approval before writing anything
-- After approval: creates/updates wiki pages, moves the source file from `wiki/inbox/` to `raw/` (immutable archive), refreshes hot.md, recalibrates token estimates
+- **Hash check first.** Before any work, the agent computes an 8-char SHA-256 hash of the source body and compares it against the stored `source_hash:` on the existing source page (if one exists). If the hashes match, the agent prints `No change since last ingest — skipped.`, deletes the inbox file, and stops. No log entry, no page edits, no cost. This is the rerun-proof guarantee.
+- If the hash differs (or there's no existing source page), the agent proceeds:
+  - Discusses 3–5 key takeaways with you
+  - Shows you a to-do list of every page it will create or update
+  - Shows a token cost estimate
+  - Waits for your approval before writing anything
+- After approval: creates or **regenerates** the source page (no in-place merge — a hash mismatch means the content actually changed, so the page is rewritten from scratch with a new `source_hash:`), updates affected concept/entity pages, then moves the source file from `wiki/inbox/` to `raw/<slug>-<YYYY-MM-DD-HHMMSS>.md`. Every successful ingest writes a new timestamped snapshot — `raw/` is a monotonically growing archive you can prune manually if desired.
 
-> You can also say `!! ingest all` to process every file currently in `wiki/inbox/` at once.
+> You can also say `!! ingest all` to process every file currently in `wiki/inbox/` at once. The batch flow also hash-checks each file up front and silently skips any that haven't changed, so re-running `!! ingest all` after an interruption is safe.
 
 **Web Clipper or URL — your choice:**
 You can also pass a URL directly: `!! ingest https://example.com/article`. The agent fetches the page, saves it to `wiki/inbox/` with URL provenance, and runs the same ingest flow. URL ingest is ~40–60% more expensive in tokens than a Web Clipper clip because the fetch pulls HTML boilerplate that Clipper strips beforehand. Either path works — pick whichever fits your session.
+
+**Rerun safety (new in v2.0):** Same input → zero state change. You can re-run any ingest — manually, or as part of a scheduled task — without worrying about duplicates, drift, or log pollution. If you *want* to force a re-ingest (e.g. the page wording matters to you and the source hasn't changed but the previous page output was poor), delete the `source_hash:` line from the source page's frontmatter — the next ingest will treat it as a mismatch and regenerate. This is the documented force-reingest escape hatch.
+
+**Provenance footnotes:** Source pages now cite their raw snapshot on every curated bullet in Key Takeaways — `[^1]: raw/<filename> — fetched YYYY-MM-DD`. When a page is regenerated from a newer snapshot, the footnotes point to the new filename; older snapshots stay in `raw/` as immutable archives.
 
 ---
 

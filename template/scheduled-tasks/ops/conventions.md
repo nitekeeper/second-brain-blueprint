@@ -30,13 +30,34 @@ sources: [source-slug-1, source-slug-2]
 ---
 ```
 
-Source pages also include: `original_file:` pointing to the raw file.
+Source pages also include:
+- `original_file:` pointing to the raw file (timestamped: `raw/<slug>-<YYYY-MM-DD-HHMMSS>.md`)
+- `source_hash: <8-char-hex>` — 8-char SHA-256 hex prefix of the raw content body (preamble-stripped). Required. This is the dedupe primitive used by Step 0 of the ingest op. Deleting or blanking this line will force a full regeneration on the next ingest — that is the documented "force re-ingest" escape hatch.
+
 Analysis pages also include: `query:` with the original question.
 
 ## Page Body
 - Use `[[Wiki Links]]` for all cross-references
 - Aim for dense, useful content — no padding
 - End every page with a `## Related Pages` section listing key links
+
+## Provenance Footnotes (source pages)
+
+Every curated bullet in a source page's `## Key Takeaways` section MUST end with a footnote reference that cites the raw snapshot it came from. This lets a reader answer "where did this fact come from, and when was it fetched?" without leaving the page.
+
+Format:
+
+```markdown
+- Agentic coding: the agent plans, edits across files, runs commands, and verifies results[^1]
+- Supports hooks before/after actions for deterministic enforcement[^1]
+
+[^1]: raw/claude-code-overview-2026-04-18-091532.md — fetched 2026-04-18
+```
+
+Rules:
+- One footnote per raw snapshot, reused across bullets that derive from the same snapshot.
+- When a source page is regenerated from a newer raw snapshot (hash-mismatch regeneration), the footnotes point to the NEW raw filename. The old raw file stays in `raw/` as an immutable archive but is no longer cited by the source page.
+- Format the date as ISO 8601 (YYYY-MM-DD), not locale-dependent formats.
 
 ## Bulk File Edits
 Always use Python — never `sed -i`. The `sed -i` command leaves `XX*` temp files that Obsidian cannot open.
@@ -69,3 +90,5 @@ The agent should always print the edit count and the resolved root path before c
 
 ## Immutable Files
 Never modify anything in `raw/` — these are the original source documents.
+
+`raw/` files use timestamped naming: `<slug>-<YYYY-MM-DD-HHMMSS>.md`. Every successful ingest writes a new timestamped snapshot — filenames are physically unique at second precision, so the directory grows monotonically. The user is free to prune `raw/` manually (e.g. keep only the most recent snapshot per slug) — the agent must not prune autonomously. A missing raw file only breaks the footnote trail for that specific snapshot; it does not affect the source page's `source_hash:` dedupe behavior.

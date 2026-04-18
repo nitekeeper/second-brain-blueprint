@@ -118,7 +118,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 <WorkingFolder>/
 ├── CLAUDE.md                   ← This file. Auto-read every session. Lean core schema.
 ├── memory.md                   ← Session memory. Written by `!! wrap`, read+wiped by `!! ready`.
-├── raw/                        ← Immutable source documents. NEVER modify.
+├── raw/                        ← Timestamped source snapshots — naming: <slug>-<YYYY-MM-DD-HHMMSS>.md. Immutable. User may prune manually.
 ├── drafts/                     ← In-progress planning files. Claude's scrapbook.
 ├── blueprint/                  ← Setup guide and templates for sharing this system
 │   ├── LICENSE
@@ -282,6 +282,6 @@ Grep tip (portable, extended regex): `grep -E "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 1.14 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 2.0 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format. Also replace `[YourName]` in line 3 above.
