@@ -5,7 +5,7 @@ Format: `~N tokens (R read / W write)`
 
 > **Estimates only:** Every number in this file is `chars ÷ 4`. Real token usage depends on the model's tokenizer, exact file contents, and runtime overhead (tool calls, system prompt) — treat these as rough planning figures, not precise accounting. Quote them as approximate when citing in approval requests.
 
-> **Self-cost note:** This file itself is ~1,700 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,700-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
+> **Self-cost note:** This file itself is ~1,830 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,830-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
 
 > **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
 
@@ -27,12 +27,12 @@ Format: `~N tokens (R read / W write)`
 | `ops/update.md` | ~1,400 | ~350 |
 | `ops/conventions.md` | ~5,000 | ~1,250 |
 | `ops/audit.md` | ~7,200 | ~1,800 |
-| `ops/token-reference.md` | ~6,800 | ~1,700 |
+| `ops/token-reference.md` | ~7,300 | ~1,830 |
 | `blueprint/README.md` | ~5,100 | ~1,280 |
 | `blueprint/setup-guide.md` | ~13,400 | ~3,350 |
 | `blueprint/user-guide.md` | ~16,600 | ~4,150 |
 | `blueprint/troubleshooting.md` | ~27,900 | ~6,980 |
-| `blueprint/CHANGELOG.md` | ~44,000 | ~11,000 |
+| `blueprint/CHANGELOG.md` | ~51,500 | ~12,880 |
 | `blueprint/LICENSE` | ~1,200 | ~300 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
@@ -60,21 +60,21 @@ Format: `~N tokens (R read / W write)`
 Concretely, the fixed-cost reads for a single-file ingest sum to roughly:
 - `wiki/log.md` tail (Step 1) — ~625
 - `wiki/index.md` (Step 8, first-file read under B3 cache) — ~200
-- `ops/token-reference.md` self-cost (Step 4 approval, once per op) — ~1,700
+- `ops/token-reference.md` self-cost (Step 4 approval, once per op) — ~1,830
 - overhead for approval + acknowledgments — ~500
 
-That fixed floor is ~3,025 tokens **before** the raw source and per-page writes are counted. Add the variable terms on top: raw source read (typically 1,000–8,000) plus 500 × new pages plus 200 × updated pages. `!! ingest all` pays the ~1,700 `token-reference.md` cost once for the whole batch (not per file), but pays the raw-source-read and per-page write terms once per file.
+That fixed floor is ~3,155 tokens **before** the raw source and per-page writes are counted. Add the variable terms on top: raw source read (typically 1,000–8,000) plus 500 × new pages plus 200 × updated pages. `!! ingest all` pays the ~1,830 `token-reference.md` cost once for the whole batch (not per file), but pays the raw-source-read and per-page write terms once per file.
 
 ## Recalibration Rule
 
 **Headroom convention:** Chars column is set to ~110% of measured actual at calibration time, rounded to nearest 100. Tokens = chars ÷ 4, rounded to nearest 10. The 10% headroom absorbs small edits so the table doesn't need to move on every change.
 
-**Recalibration trigger:** Fire immediately when any file's measured actual exceeds its documented Chars value — the headroom has been consumed. Also recalibrate after every INGEST operation as a routine pass.
+**Recalibration trigger:** Fire immediately when any file's measured actual exceeds its documented Chars value — the headroom has been fully consumed. Also fire pre-emptively when any file's remaining headroom drops below ~3% of its measured actual, so the trigger catches drift before it hard-fires mid-op (this codifies the pattern caught by audits #5 S2, #7 W1, #8 S1, and #9 S1). Also recalibrate after every INGEST operation as a routine pass.
 
 **Steps:**
 1. Run `wc -c` on all key files listed above
 2. For each file, set Chars to 110% of measured actual, rounded to nearest 100
 3. Recalculate Tokens column (chars ÷ 4, rounded to nearest 10)
 4. Propagate changes to any cascading cold-start estimates (CLAUDE.md, user-guide.md, README.md)
-5. Re-sum the blueprint-doc and template-side Tokens-column rows and verify the result still fits inside the `!! audit all` envelope quoted at `ops/audit.md:71` (currently `~30,000–48,000`). If the updated sum exceeds the upper bound, widen the envelope (documented sum + ~1,500–3,000 cushion, rounded to nearest 1,000) and cascade to every `!! audit all` mention — `ops/audit.md:71`, `user-guide.md` (both the command reference and the cost table), and the CHANGELOG entry for this patch. If the updated sum is still inside the bound, no envelope edit is needed.
+5. Re-sum the blueprint-doc and template-side Tokens-column rows and verify the result still fits inside the `!! audit all` envelope quoted at `ops/audit.md:71` (currently `~30,000–50,000`). If the updated sum exceeds the upper bound, widen the envelope (documented sum + ~1,500–3,000 cushion, rounded to nearest 1,000) and cascade to every `!! audit all` mention — `ops/audit.md:71`, `user-guide.md` (both the command reference and the cost table), and the CHANGELOG entry for this patch. Additionally, widen the envelope when the cushion (upper bound minus documented sum) drops below ~2% of the upper bound (~1,000 tokens on a 50,000-token envelope), even if the sum is still inside the bound — this prevents the cushion from being exhausted by ordinary churn before the next calibration. If both the sum stays inside the bound AND the cushion stays above ~2%, no envelope edit is needed.
 6. Update the calibration date in the header
