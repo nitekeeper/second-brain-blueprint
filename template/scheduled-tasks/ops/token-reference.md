@@ -26,7 +26,7 @@ Format: `~N tokens (R read / W write)`
 | `ops/query.md` | ~2,100 | ~530 |
 | `ops/update.md` | ~1,400 | ~350 |
 | `ops/conventions.md` | ~5,000 | ~1,250 |
-| `ops/audit.md` | ~6,600 | ~1,650 |
+| `ops/audit.md` | ~7,200 | ~1,800 |
 | `ops/token-reference.md` | ~6,800 | ~1,700 |
 | `blueprint/README.md` | ~5,100 | ~1,280 |
 | `blueprint/setup-guide.md` | ~13,400 | ~3,350 |

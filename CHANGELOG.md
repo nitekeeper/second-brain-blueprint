@@ -3,6 +3,53 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.8 — 2026-04-18
+
+### Follow-ups (audit-driven, eighth pass)
+
+- **`user-guide.md:216–217` cascade miss fixed (W1).** v2.0.7's W1 entry
+  bumped the realistic `!! wrap` / `!! ready` costs inside
+  `token-reference.md:54` (`~2,700` → `~2,800` and `~2,800` → `~2,825`
+  respectively) with the new per-read arithmetic spelled out, but the
+  propagation stopped there. The user-guide cost table at lines 216–217
+  duplicates both figures as user-facing planning numbers and was left at
+  the stale values — a doc-vs-doc contradiction of the source-of-truth
+  invariant declared in `token-reference.md`'s header ("Any quoted cost in
+  CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be
+  re-derivable from this table — re-propagate when this table changes").
+  Same cascade-miss class as audit #6's W1 (`user-guide.md:14` cold-start
+  prose missed by v2.0.5) and #6's W2 (`user-guide.md:94` envelope prose
+  missed by v2.0.5). Two-number string replacement; `!! wrap` → `~2,800`,
+  `!! ready` → `~2,825`. No other files touched.
+- **`CLAUDE.md:58` "two documented exceptions" → "three" (W2).** The
+  Approval Rule header declared "two documented exceptions listed below"
+  while the bullet list at lines 68–71 enumerated three (`!! wrap`,
+  `!! ready`, `!! audit`). CHANGELOG v1.14 ("README `!! audit` exception
+  drift fixed") documents that `!! audit` was deliberately added to the
+  list at that time — but the intro sentence's count was never updated, and
+  the drift has persisted through every subsequent schema bump. `README.md`
+  and `user-guide.md` both correctly enumerate all three via fuzzy
+  wording ("`!! wrap`, `!! ready`, and `!! audit`"); only `CLAUDE.md`'s own
+  intro still said "two" — inside an **IMPORTANT**-tagged rule the agent
+  re-reads every cold start, the worst possible place for a numeric
+  contradiction to live. Single-word fix. No cascade — README and
+  user-guide don't depend on the count.
+- **`ops/audit.md` row pre-emptively recalibrated (S1).** Measured
+  `wc -c` 6,482 against documented Chars 6,600 — 1.8% headroom, well
+  below the Recalibration Rule's 10% convention. Same drift pattern audit
+  #5 flagged as S2 on the same file; v2.0.7's own W2 + S2 edits
+  (envelope-justification prose and the Note rewrite on line 71) pushed
+  it back toward the trigger. Bumped row from `~6,600 / ~1,650` to
+  `~7,200 / ~1,800` (110% of 6,482 = 7,130, rounded up to 7,200; tokens
+  7,200 ÷ 4 = 1,800). Template-side sum moves 18,095 → 18,245; blueprint-
+  doc sum unchanged at 27,060; new total ~45,305 — still inside the
+  widened `~48,000` envelope upper bound with ~5.9% cushion. Per
+  Recalibration Rule Step 5, since the updated sum stays inside the
+  bound, no envelope edit is needed. Cold-start figures
+  (`~5,530` / `~6,280` / `~5,475`) do not change — the `ops/audit.md`
+  row does not factor into cold start. Calibration date header stays
+  2026-04-18. Pre-emptive housekeeping, not a bug fix.
+
 ## v2.0.7 — 2026-04-18
 
 ### Follow-ups (audit-driven, seventh pass)

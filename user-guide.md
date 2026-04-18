@@ -213,8 +213,8 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | Simple query (wiki) | ~2,000–4,000 |
 | Audit a single blueprint file | ~1,000–5,000 |
 | Audit all (full blueprint) | ~30,000–48,000 |
-| `!! wrap` (realistic) | ~2,700 |
-| `!! ready` (realistic) | ~2,800 |
+| `!! wrap` (realistic) | ~2,800 |
+| `!! ready` (realistic) | ~2,825 |
 
 If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~5,530 tokens to re-orient.
 
