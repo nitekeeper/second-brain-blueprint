@@ -155,7 +155,7 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 **Fix:** The previous summary is gone and cannot be recovered.
 
-**Prevention:** Schema v1.10+ requires explicit user confirmation when `!! wrap` detects a prior `MEMORY_STATE: WRAPPED` marker in `memory.md`. If you see the overwrite warning, say `no` if you need to preserve the existing summary first — consume it with `!! ready` in the current session, then `!! wrap` fresh.
+**Prevention:** Schema v1.10+ requires explicit user confirmation when `!! wrap` detects a prior `MEMORY_STATE: WRAPPED` marker in `memory.md`. The current schema also catches `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED` — a summary you preserved via `!! ready` → `keep` — with the same overwrite warning, so `keep` is no longer a one-shot preservation that the next `!! wrap` can silently destroy. If you see the overwrite warning, say `no` if you need to preserve the existing content first — consume it with `!! ready` in the current session, then `!! wrap` fresh.
 
 ---
 

@@ -11,7 +11,7 @@ Every new chat session starts cold — the agent has no memory. It re-orients it
 
 **Total cold-start cost: ~4,255 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~4,380 tokens total when the summary is full).
+If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~5,005 tokens total when the summary is full).
 
 ---
 
@@ -33,8 +33,8 @@ If you saved a session summary with `!! wrap`, say `!! ready` at the start of yo
 
 > You can also say `!! ingest all` to process every file currently in `wiki/inbox/` at once.
 
-**Why Web Clipper instead of URL:**
-Clipped markdown files are 40–60% cheaper to ingest than raw URLs — no HTML boilerplate, no navigation noise.
+**Web Clipper or URL — your choice:**
+You can also pass a URL directly: `!! ingest https://example.com/article`. The agent fetches the page, saves it to `wiki/inbox/` with URL provenance, and runs the same ingest flow. URL ingest is ~40–60% more expensive in tokens than a Web Clipper clip because the fetch pulls HTML boilerplate that Clipper strips beforehand. Either path works — pick whichever fits your session.
 
 ---
 
@@ -110,7 +110,7 @@ You can also say it explicitly: `!! update [page-name]` or `"Update the Claude C
 
 **This is temporary, intentional memory — designed to bridge one session to the next. It is not a permanent log.**
 
-At the end of a productive session, say `!! wrap`. The agent will ask if there's anything specific to include, then write a detailed summary to `memory.md` — covering what was worked on, key decisions, files changed, and open next steps. Each `!! wrap` overwrites the previous summary, so only one summary exists at a time. **If a prior wrapped summary is still in `memory.md`, the agent will warn you before overwriting** — reply `no` to cancel and consume the existing summary first.
+At the end of a productive session, say `!! wrap`. The agent will ask if there's anything specific to include, then write a detailed summary to `memory.md` — covering what was worked on, key decisions, files changed, and open next steps. Each `!! wrap` overwrites the previous summary, so only one summary exists at a time. **If a prior wrapped summary — or a truncated summary you preserved via `!! ready` → `keep` — is still in `memory.md`, the agent will warn you before overwriting.** Reply `no` to cancel, then consume or clear the existing content first.
 
 At the start of your next session, say `!! ready` as your first message. The agent will display the summary in full (verbatim) to bring you back up to speed, then immediately wipe `memory.md` and confirm it's clear. From that point, the session proceeds normally.
 
@@ -126,7 +126,7 @@ If you start a session without saying `!! ready`, the summary stays in `memory.m
 
 ## Footer Commands
 
-Every agent response ends with six lines — five command hints plus the Web Clipper tip:
+Every agent response ends with the footer block: five command hints, a blank separator, and the 💡 Web Clipper tip (7 physical lines total):
 
 ```
 📥 !! ingest: [URL | Page Name | All]
@@ -173,14 +173,14 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | Action | Estimated tokens |
 |---|---|
 | Cold start | ~4,255 |
-| Cold start with `!! ready` (full memory) | ~4,380 |
+| Cold start with `!! ready` (full memory) | ~5,005 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all | ~8,000–12,000 (scales with page count) |
 | Simple query (wiki) | ~2,000–4,000 |
 | Audit a single blueprint file | ~1,000–5,000 |
 | Audit all (full blueprint) | ~20,000–25,000 |
-| `!! wrap` or `!! ready` (realistic) | ~2,000 |
+| `!! wrap` or `!! ready` (realistic) | ~2,700 |
 
 If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~4,255 tokens to re-orient.
 
