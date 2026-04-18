@@ -64,7 +64,7 @@ Read-only actions do not require approval.
 
 ## Blueprint Sync Rule
 
-**IMPORTANT: Whenever the schema, operations, or conventions are updated, the blueprint files must also be updated.**
+**CRITICAL: Whenever the schema, operations, or conventions are updated, the blueprint files must also be updated. Skipping this step causes template drift and breaks new wiki setups.**
 
 | Change type | Files to update |
 |---|---|
@@ -117,16 +117,18 @@ Library/
 
 ## Response Footer
 
-Every response must end with:
+**CRITICAL: Every single response — without exception — must end with all three lines below. Missing any line is an error.**
 
 ```
 📥 ingest: [URL | Page Name | All]
 🧹 lint: [Page Name | All]
 ```
 
-Show brackets literally. No query command — handled automatically via waterfall.
-
 > 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
+
+**CRITICAL: The 💡 tip line above is required. It is part of the footer, not an optional note. Do not omit it.**
+
+Show brackets literally. No query command — handled automatically via waterfall.
 
 ---
 
@@ -156,4 +158,4 @@ Grep tip: `grep "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 1.4 | Created: [YYYY-MM-DD] | Updated: [YYYY-MM-DD]*
+*Schema version: 1.5 | Created: [YYYY-MM-DD] | Updated: [YYYY-MM-DD]*
