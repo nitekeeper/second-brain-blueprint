@@ -4,14 +4,16 @@ Triggered when the user drops a new source and says "ingest this."
 
 ## If `!! ingest all`
 
-Before starting steps below:
-1. List all files in `wiki/inbox/` (Bash: `ls wiki/inbox/`)
-2. If empty, tell the user "Nothing in wiki/inbox/ to ingest." and stop
-3. Read `wiki/log.md` tail and `wiki/index.md` **ONCE** for the whole batch (do not re-read per file)
-4. Show a combined approval request listing every filename, estimated total token cost, and all pages to be created/updated across the batch. The combined estimate must include **one** (not per-file) read of `token-reference.md` — use the same per-approval cost as a single-file ingest.
-5. Process each file in sequence using **per-file steps 2 and 5–10 below** (skip the batch-level steps 1, 3, 4, 11, 12)
-6. After all files are processed, run **steps 11 and 12 ONCE** at the end of the batch (not per file)
-7. Write one log entry per file during step 10 (not one combined entry)
+> Step numbers inside square brackets (e.g. `[main-step 5]`) refer to the numbered items in the **Steps** section below. The items in *this* batch preamble are numbered B1–B7 to keep the two lists from colliding.
+
+Before running the main Steps:
+B1. List all files in `wiki/inbox/` (Bash: `ls wiki/inbox/`)
+B2. If empty, tell the user "Nothing in wiki/inbox/ to ingest." and stop
+B3. Read `wiki/log.md` tail and `wiki/index.md` **ONCE** for the whole batch (do not re-read per file) — this stands in for `[main-step 1]` and the index read inside `[main-step 6]`
+B4. Show a combined approval request listing every filename, estimated total token cost, and all pages to be created/updated across the batch. The combined estimate must include **one** (not per-file) read of `token-reference.md` — use the same per-approval cost as a single-file ingest. This stands in for `[main-steps 3 and 4]`
+B5. Process each file in sequence using **`[main-steps 2, 5, 6, 7, 8, 9, 10]`** per file — skip `[main-steps 1, 3, 4, 11, 12]`, which are handled at batch level (B3, B4, B6). Within `[main-step 6]`, reuse the cached `index.md` contents from B3 instead of re-reading the file
+B6. After all files are processed, run `[main-steps 11 and 12]` **ONCE** at the end of the batch (not per file)
+B7. Write one log entry per file during `[main-step 10]` (not one combined entry)
 
 ---
 

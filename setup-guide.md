@@ -70,11 +70,12 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 ## Step 3 — Personalize CLAUDE.md
 
 In `CLAUDE.md`, make the following replacements:
-- Replace `[YourName]` with the name the user gave in the pre-flight check
+- Replace `[YourName]` with the name the user gave in the pre-flight check (appears in the top-of-file greeting)
 - Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
-- Replace every `@Library/` occurrence in `CLAUDE.md` with the actual name of the user's Cowork working folder, if it differs from `Library`. These appear in both the Ops File Reminder table and the Approval Rule section — replacing only the table leaves a stale reference behind.
+- If the user's Cowork working folder is **not** named `Library`, run a whole-file find-and-replace in `CLAUDE.md` changing every occurrence of `@Library/` to `@<folder>/`. The `/` is important: only the path-prefix instances get rewritten, not the explanatory prose. After this substitution every path in the Ops File Reminder table, the Approval Rule, and any future additions will line up with the user's actual folder.
+- Remove the `> **Setup note:** …` block at the very end of `CLAUDE.md` (immediately under the `Schema version:` footer). It is scaffolding for this setup step only — once the replacements above are done, it has no further purpose and will otherwise sit as stale cruft in the live file.
 
-> **Important:** The `@Library` prefix in `CLAUDE.md` must match the name of the folder the user selected in Cowork. If the folder is named `Library`, no change is needed. If it has a different name (e.g. `MyWiki`), every `@Library/` reference must be updated to `@MyWiki/` — these references appear in `CLAUDE.md` only. The ops files use working-folder-relative paths and do not require changes.
+> **Important:** The `@`-prefix in the Ops File Reminder table and the Approval Rule must match the name of the folder the user selected in Cowork. If the folder is named `Library`, no change is needed. If it has a different name (e.g. `MyWiki`), every `@Library/` reference is rewritten to `@MyWiki/` — these references live in `CLAUDE.md` only. The ops files themselves use working-folder-relative paths and do not require changes. The explanatory note directly under the table is already written to be stable across any folder name, so it does not need manual editing.
 
 ---
 
@@ -139,7 +140,7 @@ To see recent activity, read `log.md`.
 
 ## [YYYY-MM-DD] init | Wiki created
 
-- Vault folder selected and confirmed
+- Cowork working folder selected and confirmed (Obsidian vault is configured separately to point at `wiki/`)
 - Folder structure created: raw/, drafts/, wiki/inbox/, wiki/pages/{concepts,entities,sources,analyses}/, scheduled-tasks/ops/
 - CLAUDE.md schema installed from blueprint template
 - Scheduled-tasks ops files installed

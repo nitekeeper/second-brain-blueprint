@@ -19,8 +19,8 @@ Format: `~N tokens (R read / W write)`
 | `wiki/index.md` | ~800 (grows with pages) | ~200 |
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
-| `scheduled-tasks/refresh-hot.md` | ~2,800 | ~700 |
-| `ops/ingest.md` | ~3,300 | ~830 |
+| `scheduled-tasks/refresh-hot.md` | ~3,300 | ~830 |
+| `ops/ingest.md` | ~3,800 | ~950 |
 | `ops/lint.md` | ~1,800 | ~450 |
 | `ops/query.md` | ~1,900 | ~480 |
 | `ops/update.md` | ~1,500 | ~380 |

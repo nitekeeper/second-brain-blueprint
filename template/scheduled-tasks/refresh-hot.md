@@ -6,16 +6,17 @@ Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation th
 
 ## Steps
 
-1. Read `wiki/index.md` — get the current page count from the Stats header line. To identify the 5 pages with the most recent `updated:` dates, collect every entry line across ALL sections (Sources, Concepts, Entities, Analyses), then sort in memory by the `updated: YYYY-MM-DD` field inside each line (ISO-8601 dates are lexicographically sortable) and take the top 5.
+1. Read `wiki/index.md` — get the current page count from the Stats header line. To identify the 5 pages with the most recent `updated:` dates, collect every entry line across ALL sections (Sources, Concepts, Entities, Analyses), then sort in memory by the `updated: YYYY-MM-DD` field inside each line (ISO-8601 dates are lexicographically sortable) and take the top 5. If fewer than 5 total pages exist, list all of them; if none, emit `Hot: none yet`.
 
-   If a shell alternative is needed, extract the date into a leading sort key first — a naive `sort -t: -k2` is unsafe because any colon in a title or summary shifts the key off the date:
+   If a shell alternative is needed, extract the date into a leading sort key first — a naive `sort -t: -k2` is unsafe because any colon in a title or summary shifts the key off the date. Use `sed` (portable across GNU and BSD/macOS) rather than `awk`'s `match(string, regex, array)` three-arg form — that form is a GNU-awk-only extension and silently produces no output on macOS's default BSD awk:
    ```bash
    grep -oE '\[\[[^]]+\]\].*updated: [0-9]{4}-[0-9]{2}-[0-9]{2}' wiki/index.md \
-     | awk 'match($0, /updated: ([0-9-]+)/, m) { print m[1] "\t" $0 }' \
+     | sed -E 's/.*updated: ([0-9]{4}-[0-9]{2}-[0-9]{2}).*/\1\t&/' \
      | sort -r \
      | head -5 \
      | cut -f2-
    ```
+   If you prefer a one-step Python alternative, use `pathlib` + `re.findall` and sort in memory — safer than any shell pipeline when titles may contain unusual punctuation.
 2. Read `wiki/log.md` — get the last log entry (use `grep -E "^## \[" wiki/log.md | tail -1`) and the most recent open gaps list from the latest lint entry. If no lint entry exists yet, use `none yet — add sources to discover gaps` as the Gaps value.
 
 ## Output Format
