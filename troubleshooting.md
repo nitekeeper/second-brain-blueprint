@@ -110,6 +110,30 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 ---
 
+## Session ended before `!! wrap` completed
+
+**Symptom:** You tried to save a session summary but the session closed or timed out before the agent finished writing `memory.md`. The file is empty or incomplete next session.
+
+**Cause:** `!! wrap` requires the agent to write a file — if the session ends mid-write, `memory.md` may be blank or contain only partial content.
+
+**Fix:** At the start of the next session, say `!! ready` anyway — the agent will check `memory.md` and if it's empty, it will simply announce readiness normally. No harm done. Then reconstruct what you remember from the previous session manually if needed.
+
+**Prevention:** Say `!! wrap` with enough time left in a session — don't leave it to the very last message.
+
+---
+
+## `!! ready` was triggered mid-session and wiped memory unexpectedly
+
+**Symptom:** You said something like "I'm ready" or typed `!! ready` during a session (not at the start), and the agent read and wiped `memory.md`, destroying the saved summary before you intended.
+
+**Cause:** `!! ready` is designed as a session-start command but is not restricted to it — it will fire any time you say it, even mid-session.
+
+**Fix:** The summary is gone and cannot be recovered. Going forward, only say `!! ready` as the very first message in a new session.
+
+**Prevention:** Be deliberate with `!! ready` — treat it as a session-opening command only, not something to say casually mid-conversation.
+
+---
+
 ## Bulk Edits Reference
 
 Always use Python for any edit touching more than one file:

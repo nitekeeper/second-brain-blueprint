@@ -61,6 +61,7 @@ Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 - **Query waterfall** — answers from training first, then wiki, then web search
 - **Web Clipper optimized** — clipping articles before ingesting saves 40–60% in tokens vs URL fetch
 - **Pros/cons on every suggestion** — agent always shows trade-offs before recommending changes
+- **Session memory** — `!! wrap` saves a detailed summary at session end; `!! ready` loads and clears it next session
 
 ---
 
@@ -68,7 +69,8 @@ Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 
 See `blueprint/user-guide.md` for the full daily workflow.
 
-**The three things you'll do most:**
-- Clip an article → `ingest [filename]`
+**The four things you'll do most:**
+- Clip an article → `!! ingest [filename]`
 - Ask a question → just ask, no command needed
-- Health check → `lint all`
+- Health check → `!! lint all`
+- Save session context → `!! wrap` (end of session) / `!! ready` (start of next session)

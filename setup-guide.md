@@ -75,7 +75,7 @@ In `CLAUDE.md`, replace `[YourName]` with the name the user gave in the pre-flig
 
 ## Step 4 — Initialize Wiki Files
 
-Show approval request, then create these three files:
+Show approval request, then create these four files:
 
 **`wiki/index.md`**
 ```markdown
@@ -128,7 +128,7 @@ To see recent activity, read `log.md`.
 # Wiki Log
 
 > Append-only chronological record of all wiki activity.
-> Grep tip: `grep "^## \[" log.md | tail -10` gives the last 10 entries.
+> Grep tip: `grep "^## \[" log.md | tail -5` gives the last 5 entries.
 
 ---
 
@@ -146,10 +146,17 @@ To see recent activity, read `log.md`.
 ---
 updated: YYYY-MM-DD
 ---
-Pages: 0 | Schema: v1.3 | Updated: YYYY-MM-DD
+Pages: 0 | Schema: v1.6 | Updated: YYYY-MM-DD
 Last op: init YYYY-MM-DD (wiki created, ready for first ingest)
 Gaps: none yet — add sources to discover gaps
 Hot: none yet
+```
+
+**`memory.md`** (at working folder root)
+```markdown
+# Session Memory
+
+*(empty — use `!! wrap` at the end of a session to save a summary here)*
 ```
 
 Replace all `YYYY-MM-DD` placeholders with today's date.
@@ -190,6 +197,7 @@ Instruct the user to do this manually in the Chrome extension settings:
 Check the following and report status to the user:
 
 - [ ] `CLAUDE.md` exists at the Library root and contains the user's name
+- [ ] `memory.md` exists at the Library root (empty)
 - [ ] `wiki/inbox/` folder exists
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry
@@ -207,14 +215,16 @@ Tell the user:
 
 > "Setup complete. Your wiki is ready.
 >
-> **Next step:** Clip an article with Obsidian Web Clipper — it will save to `wiki/inbox/`. Then tell me: `ingest [filename]`
+> **Next step:** Clip an article with Obsidian Web Clipper — it will save to `wiki/inbox/`. Then tell me: `!! ingest [filename]`
 >
 > For daily usage, see `blueprint/user-guide.md`."
 
 Then display the standard footer:
 ```
-📥 ingest: [URL | Page Name | All]
-🧹 lint: [Page Name | All]
+📥 !! ingest: [URL | Page Name | All]
+🧹 !! lint: [Page Name | All]
+💾 !! wrap: [save session summary to memory]
+🔄 !! ready: [load session summary at start of new session]
 
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
 ```

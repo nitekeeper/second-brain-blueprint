@@ -6,10 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~900 tokens)
+1. `CLAUDE.md` — its operating instructions (~1,000 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~100 tokens)
 
-**Total cold-start cost: ~1,000 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~1,100 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+
+If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~1,225 tokens total).
 
 ---
 
@@ -20,7 +22,7 @@ Every new chat session starts cold — the agent has no memory. It re-orients it
 **The recommended path:**
 1. Find an article or document you want to add
 2. Clip it with Obsidian Web Clipper → saves to `wiki/inbox/` as clean markdown
-3. Tell the agent: `ingest [filename]`
+3. Tell the agent: `!! ingest [filename]`
 
 **What happens:**
 - Agent discusses 3–5 key takeaways with you
@@ -29,7 +31,7 @@ Every new chat session starts cold — the agent has no memory. It re-orients it
 - Waits for your approval before writing anything
 - After approval: creates/updates wiki pages, moves the source file from `wiki/inbox/` to `raw/` (immutable archive), refreshes hot.md, recalibrates token estimates
 
-> You can also say `ingest all` to process every file currently in `wiki/inbox/` at once.
+> You can also say `!! ingest all` to process every file currently in `wiki/inbox/` at once.
 
 **Why Web Clipper instead of URL:**
 Clipped markdown files are 40–60% cheaper to ingest than raw URLs — no HTML boilerplate, no navigation noise.
@@ -65,8 +67,8 @@ When working through a complex idea or system change, the agent uses `drafts/` a
 
 Run periodically to keep the wiki clean.
 
-- `lint all` — full wiki health check
-- `lint [page-name]` — check a specific page
+- `!! lint all` — full wiki health check
+- `!! lint [page-name]` — check a specific page
 
 **What lint checks:**
 - Broken wiki links
@@ -79,16 +81,32 @@ The agent always reports findings first and asks approval before fixing anything
 
 ---
 
+### Session Memory — `!! wrap` and `!! ready`
+
+**This is temporary, intentional memory — designed to bridge one session to the next. It is not a permanent log.**
+
+At the end of a productive session, say `!! wrap`. The agent will ask if there's anything specific to include, then write a detailed summary to `memory.md` — covering what was worked on, key decisions, files changed, and open next steps. Each `!! wrap` overwrites the previous summary, so only one summary exists at a time.
+
+At the start of your next session, say `!! ready` instead of anything else. The agent will read the summary aloud to bring you back up to speed, then immediately wipe `memory.md` and confirm it's clear. From that point, the session proceeds normally.
+
+If you start a session without saying `!! ready`, the summary stays in `memory.md` untouched until you explicitly ask for it. It won't be read automatically.
+
+> **Note:** This is not a history log — it's a single-use memory bridge. Once consumed with `!! ready`, the summary is gone. If you need a permanent record of a decision, ingest it or file it as an analysis page.
+
+---
+
 ## Footer Commands
 
 Every agent response ends with:
 
 ```
-📥 ingest: [URL | Page Name | All]
-🧹 lint: [Page Name | All]
+📥 !! ingest: [URL | Page Name | All]
+🧹 !! lint: [Page Name | All]
+💾 !! wrap: [save session summary to memory]
+🔄 !! ready: [load session summary at start of new session]
 ```
 
-These are hints showing what the commands accept. Just type them naturally — e.g. `ingest my-article.md` or `lint all`.
+These are hints showing what the commands accept. Just type them naturally — e.g. `!! ingest my-article.md`, `!! lint all`, `!! wrap`, or `!! ready`.
 
 ---
 
@@ -118,7 +136,8 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~1,000 |
+| Cold start | ~1,100 |
+| Cold start with `!! ready` | ~1,225 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all (23 pages) | ~8,000–12,000 |
@@ -146,3 +165,4 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
 - **New session anytime** — starting fresh costs only ~1,000 tokens; the wiki state is always preserved on disk
+- **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.
