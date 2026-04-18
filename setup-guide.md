@@ -140,7 +140,7 @@ To see recent activity, read `log.md`.
 ## [YYYY-MM-DD] init | Wiki created
 
 - Vault folder selected and confirmed
-- Folder structure created: raw/, wiki/pages/concepts/, entities/, sources/, analyses/
+- Folder structure created: raw/, drafts/, wiki/inbox/, wiki/pages/{concepts,entities,sources,analyses}/, scheduled-tasks/ops/
 - CLAUDE.md schema installed from blueprint template
 - Scheduled-tasks ops files installed
 - Wiki initialized and ready for first ingest
@@ -151,7 +151,7 @@ To see recent activity, read `log.md`.
 ---
 updated: YYYY-MM-DD
 ---
-Pages: 0 | Schema: v1.7 | Updated: YYYY-MM-DD
+Pages: 0 | Schema: v1.9 | Updated: YYYY-MM-DD
 Last op: init YYYY-MM-DD (wiki created, ready for first ingest)
 Gaps: none yet — add sources to discover gaps
 Hot: none yet

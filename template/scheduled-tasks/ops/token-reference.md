@@ -9,7 +9,7 @@ Format: `~N tokens (R read / W write)`
 |---|---|---|
 | `wiki/hot.md` | ~210 | ~55 |
 | `memory.md` | ~500 (when full) | ~125 |
-| `CLAUDE.md` | ~7,775 | ~1,945 |
+| `CLAUDE.md` | ~9,200 | ~2,300 |
 | `wiki/index.md` | ~800 (grows with pages) | ~200 |
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
@@ -40,10 +40,13 @@ Format: `~N tokens (R read / W write)`
 
 ## Recalibration Rule
 
-Recalibrate this table after every INGEST operation, and after any batch of UPDATE operations that significantly change file sizes:
-1. Run `wc -c` on all key files listed above
-2. Update the Chars column with actual values
-3. Recalculate Tokens column (chars ÷ 4)
-4. Update the calibration date in the header
+**Headroom convention:** Chars column is set to ~110% of measured actual at calibration time, rounded to nearest 100. Tokens = chars ÷ 4, rounded to nearest 10. The 10% headroom absorbs small edits so the table doesn't need to move on every change.
 
-Also recalibrate if any tracked file grows by more than 20% since last calibration — regardless of operation type.
+**Recalibration trigger:** Fire immediately when any file's measured actual exceeds its documented Chars value — the headroom has been consumed. Also recalibrate after every INGEST operation as a routine pass.
+
+**Steps:**
+1. Run `wc -c` on all key files listed above
+2. For each file, set Chars to 110% of measured actual, rounded to nearest 100
+3. Recalculate Tokens column (chars ÷ 4, rounded to nearest 10)
+4. Propagate changes to any cascading cold-start estimates (CLAUDE.md, user-guide.md, README.md)
+5. Update the calibration date in the header

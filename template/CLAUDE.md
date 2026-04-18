@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~1,945 tokens
+1. Read `CLAUDE.md` (this file) — ~2,300 tokens
 2. Read `wiki/hot.md` — ~55 tokens
 3. Check `drafts/` — list any files present (negligible tokens)
 4. Check if the user's opening message is `!! ready`:
@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~2,000 tokens** (~2,125 tokens if `!! ready` loads memory.md)
+**Total cold-start cost: ~2,355 tokens** (~2,480 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 ---
 
@@ -92,6 +92,8 @@ Library/
 ├── raw/                        ← Immutable source documents. NEVER modify.
 ├── drafts/                     ← In-progress planning files. Claude's scrapbook.
 ├── blueprint/                  ← Setup guide and templates for sharing this system
+│   ├── LICENSE
+│   ├── .gitignore
 │   ├── README.md
 │   ├── setup-guide.md
 │   ├── user-guide.md
@@ -211,6 +213,6 @@ Grep tip: `grep "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 1.8 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 1.9 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format. Also replace `[YourName]` in line 3 above.

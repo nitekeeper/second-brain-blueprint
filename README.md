@@ -49,7 +49,7 @@ Open Claude Desktop (Cowork) and send this message:
 Read blueprint/setup-guide.md and set up the wiki system for me.
 ```
 
-Claude will execute the full setup — creating folders, copying files, and initializing the wiki. You only need to answer one question: your name.
+Claude will execute the full setup — creating folders, copying files, and initializing the wiki. You only need to answer your name and approve each setup step.
 
 ### 5. Start using it
 Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
@@ -58,7 +58,7 @@ Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 
 ## Key Features
 
-- **Lean startup** — agent cold-starts in ~2,000 tokens; reads only what it needs
+- **Lean startup** — agent cold-starts in ~2,355 tokens; reads only what it needs
 - **Approval before every write** — agent shows a plan + token estimate before touching any file
 - **Query waterfall** — answers from training first, then wiki, then web search
 - **Web Clipper optimized** — clipping articles before ingesting saves 40–60% in tokens vs URL fetch
