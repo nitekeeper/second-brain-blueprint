@@ -20,7 +20,7 @@ Audit every tracked file under `blueprint/` — specifically the files listed be
 - `blueprint/LICENSE`
 - `blueprint/.gitignore`
 - `blueprint/template/CLAUDE.md`
-- `blueprint/template/scheduled-tasks/refresh-hot.md`
+- Every file directly under `blueprint/template/scheduled-tasks/` (currently `refresh-hot.md` and `changelog-monitor.md`; do not recurse into `ops/`)
 - Every file under `blueprint/template/scheduled-tasks/ops/`
 
 ## If `!! audit [Page Name]`
