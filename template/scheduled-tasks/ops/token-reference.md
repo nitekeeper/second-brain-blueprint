@@ -26,7 +26,7 @@ Format: `~N tokens (R read / W write)`
 | `ops/update.md` | ~1,400 | ~350 |
 | `ops/conventions.md` | ~2,500 | ~630 |
 | `ops/audit.md` | ~5,600 | ~1,400 |
-| `ops/token-reference.md` | ~4,200 | ~1,050 |
+| `ops/token-reference.md` | ~4,500 | ~1,130 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
 | Raw source document | varies | ~1,000–8,000 |

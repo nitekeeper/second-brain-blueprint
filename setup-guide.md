@@ -48,7 +48,7 @@ mkdir -p wiki/pages/analyses
 mkdir -p scheduled-tasks/ops
 ```
 
-All subsequent shell commands in this setup run with `WORKDIR` as cwd. If a later step opens a new sandbox, repeat the `cd "$WORKDIR"` line.
+All subsequent shell commands in this setup run with your working folder as cwd. Cowork's Bash tool preserves cwd between commands (env vars like `$WORKDIR` do **not** persist between Bash calls, but cwd does), so no re-cd is required. Verify with `pwd` if uncertain.
 
 **What each folder is for:**
 - `raw/` — immutable source archive; Claude moves files here after ingesting
@@ -61,7 +61,7 @@ All subsequent shell commands in this setup run with `WORKDIR` as cwd. If a late
 
 ## Step 2 — Copy Template Files
 
-> **Reminder:** if this runs in a new sandbox, re-run `cd "$WORKDIR"` first — see Step 1.
+> **Reminder:** cwd persists between Bash commands in Cowork — verify with `pwd` if in doubt. You do not need to re-run `cd`. (Env vars like `$WORKDIR` do not persist; only cwd does.)
 
 Show approval request, then copy all files from `blueprint/template/` to their correct locations:
 
@@ -92,7 +92,7 @@ In `CLAUDE.md`, make the following replacements:
 
 ## Step 4 — Initialize Wiki Files
 
-> **Reminder:** if this runs in a new sandbox, re-run `cd "$WORKDIR"` first — see Step 1.
+> **Reminder:** cwd persists between Bash commands in Cowork — verify with `pwd` if in doubt. You do not need to re-run `cd`. (Env vars like `$WORKDIR` do not persist; only cwd does.)
 
 Show approval request, then create these four files:
 
@@ -219,7 +219,7 @@ Instruct the user to do this manually in the Chrome extension settings:
 
 ## Step 7 — Verify Setup
 
-> **Reminder:** if this runs in a new sandbox, re-run `cd "$WORKDIR"` first — see Step 1.
+> **Reminder:** cwd persists between Bash commands in Cowork — verify with `pwd` if in doubt. You do not need to re-run `cd`. (Env vars like `$WORKDIR` do not persist; only cwd does.)
 
 Check the following and report status to the user:
 
