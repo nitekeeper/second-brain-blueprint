@@ -298,6 +298,36 @@ The above lists files safe to delete; re-run wrapped in `xargs rm` once you've v
 
 ---
 
+## Changelog monitor reports 🆘 UNINGESTED for a source I know I ingested
+
+**Symptom:** The daily Slack DM flags a source as 🆘 UNINGESTED even though `wiki/pages/sources/` contains a page you ingested from exactly that URL. Running `!! ingest <URL>` "to bootstrap" (per the DM's hint) would create a second source page under a different slug — fragmenting the wiki.
+
+**Cause:** Two possibilities — both rooted in the pre-v2.0.10 monitor's slug-matched lookup.
+
+1. **Pre-v2.0.10 monitor with a slug-drift source.** In schema v2.0.0–v2.0.9, `changelog-monitor.md` Step 1 tried to reuse `ops/ingest.md` Step 0's slug-derivation rule (`lowercase-hyphenated from the H1 or filename stem; for URL ingest reuse the U2 slug`). That rule was literally unexecutable pre-fetch because the monitor had no H1 or filename stem available — only the URL and the Source Title column. Implementations silently improvised (typically URL last-segment or lowercase-hyphenated Source Title), which happened to match the ingest-time slug for most sources but diverged whenever the ingested page's H1 or title didn't round-trip through `lowercase-hyphenated` to equal the URL last-segment (e.g. H1 "Selling Partner API: Release Notes" → `selling-partner-api-release-notes` vs URL last-segment `sp-api-release-notes`).
+2. **v2.0.10+ monitor against a pre-v2.0.10 source page.** Schema v2.0.10 replaced the slug-matched lookup with a `source_url:` reverse-lookup. A source page written by pre-v2.0.10 ingest may be missing `source_url:` (URL ingest prepended it via U3, but Clipper-ingested pages had no such guarantee) or may carry `source_url: unknown` if the Clipper preamble lacked a URL. The v2.0.10+ monitor correctly excludes `unknown` / missing values from its reverse-lookup map, so these pages report as 🆘 UNINGESTED even though the page itself exists.
+
+**Fix (retrospective):** Do **not** re-run `!! ingest <URL>` blindly — that would create a duplicate page.
+
+- Case (1) — upgrade to schema v2.0.10+. The new monitor uses `source_url:` reverse-lookup, which is exact. On the first post-upgrade monitor run, sources whose existing page carries a correct `source_url:` (all URL-ingested pages from v2.0 onward, plus Clipper-ingested pages whose preamble carried a URL) will flip from 🆘 to ✅ or 🆕 without any user action. Remaining 🆘 rows fall into case (2).
+- Case (2) — open the source page's frontmatter. If `source_url:` is missing, add the canonical URL manually (one-line edit). If it reads `source_url: unknown`, replace `unknown` with the canonical URL. The next monitor run will match correctly. No re-ingest is required; `source_url:` is pure metadata and doesn't affect the body or the stored hash.
+
+**Prevention:** Schema v2.0.10 makes `source_url:` a mandatory frontmatter field on every source page written by `ops/ingest.md` Step 7 (falling back to `unknown` with an approval-request note only when the Clipper preamble provides no URL). As Clipper-ingested sources without recoverable URLs are backfilled, case (2) clears permanently. Users running v2.0.10+ will only encounter this scenario on pre-upgrade pages; a pre-v2.0.10 user who upgrades mid-wiki should expect a one-time backfill pass to populate `source_url:` on legacy pages.
+
+---
+
+## Changelog monitor reports ⚠️ AMBIGUOUS for a source
+
+**Symptom:** The daily Slack DM flags a source with ⚠️ AMBIGUOUS and the message says "matched N source pages" for some N ≥ 2.
+
+**Cause:** Two or more pages under `wiki/pages/sources/` carry the same `source_url:` in their frontmatter. The v2.0.10+ monitor detects this during Step 1's reverse-lookup and refuses to pick a winner — it reports the anomaly instead. The root cause is almost always a duplicate-ingest situation: either a user acted on a pre-v2.0.10 🆘 UNINGESTED false positive and ran `!! ingest <URL>` on a source whose slug-matched lookup had missed the existing page (creating a duplicate under a new slug), or a manual page duplication / slug-rename that didn't de-duplicate the source set.
+
+**Fix:** Run `!! lint all` — the lint op is designed to surface duplicate pages and orphaned connections. Review the two (or more) source pages the lint flags, decide which one is canonical (usually the newer `source_hash:` + newer `original_file:` timestamp), and delete the rest. If the duplicates have diverged content (e.g. one has better Key Takeaways than the other), merge by hand before deleting. On the next monitor run the AMBIGUOUS flag clears automatically.
+
+**Prevention:** Avoid acting on pre-v2.0.10 🆘 UNINGESTED flags without verifying — upgrade to v2.0.10+ first so the monitor's UNINGESTED signal is reliable. Once on v2.0.10+, AMBIGUOUS should only fire on wiki corruption, manual file duplication, or truly-concurrent ingests (which single-user workflow prevents by construction).
+
+---
+
 ## Want to force re-ingest an unchanged source
 
 **Symptom:** `!! ingest <source>` prints `No change since last ingest — skipped.` but you want the source page rewritten anyway — e.g. the prior generation's wording was poor, or you want fresh LLM output after a model upgrade.
