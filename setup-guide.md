@@ -28,9 +28,16 @@ Before starting, confirm:
 
 ## Step 1 — Create Folder Structure
 
-Show approval request, then execute:
+Show approval request, then execute.
+
+**Important:** The Cowork Bash sandbox does not start its working directory at the user's selected folder — it runs from an isolated session root. Resolve the user's selected Cowork folder as an absolute path, export it as `WORKDIR`, then `cd` into it before running any relative `mkdir`. Without this step the folders end up in the sandbox root instead of the wiki:
 
 ```bash
+# Replace /absolute/path/to/working-folder with the absolute path of the folder
+# the user selected in Cowork (e.g. /Users/you/Library).
+export WORKDIR="/absolute/path/to/working-folder"
+cd "$WORKDIR"
+
 mkdir -p raw
 mkdir -p drafts
 mkdir -p wiki/inbox
@@ -40,6 +47,8 @@ mkdir -p wiki/pages/sources
 mkdir -p wiki/pages/analyses
 mkdir -p scheduled-tasks/ops
 ```
+
+All subsequent shell commands in this setup run with `WORKDIR` as cwd. If a later step opens a new sandbox, repeat the `cd "$WORKDIR"` line.
 
 **What each folder is for:**
 - `raw/` — immutable source archive; Claude moves files here after ingesting

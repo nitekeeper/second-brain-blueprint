@@ -14,13 +14,17 @@ Triggered when the user says "lint the wiki" or "lint [page-name]".
    - Missing cross-references — concept mentioned but not linked
    - Data gaps — important topic with no page and no raw source
 4. Report all findings to the user
-5. Show approval request (summary + token estimate + to-do list) for any fixes — include the cost of re-reading `token-reference.md` itself (~880 tokens) in the estimate
-6. Apply approved fixes
-7. Append entry to `wiki/log.md` — **must be ≤500 chars total**:
-   `## [YYYY-MM-DD] lint | [Summary of findings]`
-   If the summary is long, compress it; the log is a pointer, not a report.
-8. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
-9. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if any file's measured actual now exceeds its documented Chars value
+5. Show approval request (summary + token estimate + to-do list) for any fixes — include the cost of re-reading `token-reference.md` itself (~850 tokens) in the estimate
+6. If any approved fix creates or edits a page, read `@scheduled-tasks/ops/conventions.md` first — lint fixes are page writes and must obey the same conventions as ingest/update
+7. Apply approved fixes
+8. Append entry to `wiki/log.md` — **must be ≤500 chars total** and **must include a canonical `Gaps:` line** so `refresh-hot.md` can parse it deterministically:
+   ```
+   ## [YYYY-MM-DD] lint | [Summary of findings]
+   Gaps: topic-a, topic-b, topic-c
+   ```
+   The `Gaps:` line is mandatory even when there are none — write `Gaps: none` in that case. List only open data gaps (comma-separated, lowercase slugs or short phrases); do not mix in resolved issues. If the whole entry would exceed 500 chars, compress the Summary line first and keep the Gaps line intact — `refresh-hot.md` depends on it.
+9. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
+10. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if any file's measured actual now exceeds its documented Chars value
 
 ## Notes
 
