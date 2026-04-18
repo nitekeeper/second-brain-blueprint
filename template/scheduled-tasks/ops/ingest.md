@@ -8,7 +8,7 @@ Before starting steps below:
 1. List all files in `wiki/inbox/` (Bash: `ls wiki/inbox/`)
 2. If empty, tell the user "Nothing in wiki/inbox/ to ingest." and stop
 3. Read `wiki/log.md` tail and `wiki/index.md` **ONCE** for the whole batch (do not re-read per file)
-4. Show a combined approval request listing every filename, estimated total token cost, and all pages to be created/updated across the batch
+4. Show a combined approval request listing every filename, estimated total token cost, and all pages to be created/updated across the batch. The combined estimate must include **one** (not per-file) read of `token-reference.md` — use the same per-approval cost as a single-file ingest.
 5. Process each file in sequence using **per-file steps 2 and 5–10 below** (skip the batch-level steps 1, 3, 4, 11, 12)
 6. After all files are processed, run **steps 11 and 12 ONCE** at the end of the batch (not per file)
 7. Write one log entry per file during step 10 (not one combined entry)
@@ -20,20 +20,28 @@ Before starting steps below:
 1. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
 2. Read the source file from `wiki/inbox/`
 3. Discuss key takeaways with the user (brief, 3–5 bullets)
-4. Show approval request (summary + token estimate + to-do list) and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~475 tokens) in the estimate
+4. Show approval request (summary + token estimate + to-do list) and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~780 tokens) in the estimate
 5. Write a source summary page in `wiki/pages/sources/`
 6. Read `wiki/index.md` to identify all affected concept/entity pages
 7. Update affected pages; create any new concept or entity pages warranted
 8. Update `wiki/index.md` with new and modified entries
 9. Move the source file from `wiki/inbox/` to `raw/` — **with collision handling**:
     ```bash
-    dest="raw/$(basename "$file")"
+    base=$(basename "$file")
+    dest="raw/$base"
     if [ -e "$dest" ]; then
-      dest="raw/$(date +%Y%m%d-%H%M%S)-$(basename "$file")"
+      ts=$(date +%Y%m%d-%H%M%S)
+      dest="raw/${ts}-${base}"
+      i=0
+      while [ -e "$dest" ]; do
+        i=$((i+1))
+        dest="raw/${ts}-${i}-${base}"
+      done
     fi
-    mv "$file" "$dest"
+    mv -n "$file" "$dest"
+    [ -e "$file" ] && { echo "refusing to overwrite: $dest"; exit 1; }
     ```
-    Never allow an overwrite into `raw/` — it breaks the immutable-archive promise.
+    Never allow an overwrite into `raw/` — it breaks the immutable-archive promise. A bare timestamp isn't enough when two files land in the same second; the counter loop + `mv -n` + post-check together close the race.
 10. Append entry to `wiki/log.md` — **must be ≤500 chars total (header + body)**:
     `## [YYYY-MM-DD] ingest | [Title]`
     If the entry would exceed 500 chars, compress the title/body (or split into a follow-up entry).
