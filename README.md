@@ -18,7 +18,7 @@ This system is different. An AI agent reads your sources, builds a wiki of inter
 
 | Tool | Purpose | Cost |
 |---|---|---|
-| [Claude Desktop (Cowork)](https://claude.ai/download) | The AI agent that maintains your wiki | Claude Pro ($20/mo) |
+| [Claude Desktop (Cowork)](https://claude.ai/download) | The AI agent that maintains your wiki | Paid subscription — see [current Claude pricing](https://www.anthropic.com/pricing) |
 | [Obsidian](https://obsidian.md) | Browse and view your wiki locally | Free |
 | [Obsidian Web Clipper](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf) | Clip web articles as clean markdown | Free (Chrome) |
 
@@ -32,12 +32,15 @@ This system is different. An AI agent reads your sources, builds a wiki of inter
 - Install the **Obsidian Web Clipper** Chrome extension
 
 ### 2. Clone this repo into your vault folder
+
 ```bash
 cd /path/to/your/vault
-git clone https://github.com/nitekeeper/second-brain-blueprint blueprint
+git clone <BLUEPRINT_REPO_URL> blueprint
 ```
 
-> **Verify the URL is accessible** before sharing this blueprint with others. If the repo is private or has moved, update the URL here before distributing.
+Replace `<BLUEPRINT_REPO_URL>` with the location you're distributing this blueprint from — e.g. `https://github.com/<your-username>/second-brain-blueprint`. The canonical reference (if/when published) is linked from the repository README you received this from.
+
+> **Verify the URL is accessible** before sharing this blueprint with others. If the repo is private or has moved, update the URL here before distributing, and make sure anyone cloning it has read access.
 
 ### 3. Select your working folder in Cowork
 In the Cowork window, click **"Select folder"** and choose the folder where you cloned the repo (the parent folder containing `blueprint/`). This is your working directory — **not** `wiki/`.

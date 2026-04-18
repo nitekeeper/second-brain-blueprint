@@ -133,7 +133,7 @@ To see recent activity, read `log.md`.
 # Wiki Log
 
 > Append-only chronological record of all wiki activity.
-> Grep tip: `grep "^## \[" log.md | tail -5` gives the last 5 entries.
+> Grep tip: `grep -E "^## \[" log.md | tail -5` gives the last 5 entries.
 
 ---
 
@@ -147,11 +147,14 @@ To see recent activity, read `log.md`.
 ```
 
 **`wiki/hot.md`**
+
+Read the current schema version from `blueprint/template/CLAUDE.md`'s footer line (`Schema version: X.Y`). Do not hardcode — substitute the live value:
+
 ```markdown
 ---
 updated: YYYY-MM-DD
 ---
-Pages: 0 | Schema: v1.9 | Updated: YYYY-MM-DD
+Pages: 0 | Schema: vX.Y | Updated: YYYY-MM-DD
 Last op: init YYYY-MM-DD (wiki created, ready for first ingest)
 Gaps: none yet — add sources to discover gaps
 Hot: none yet
@@ -159,12 +162,13 @@ Hot: none yet
 
 **`memory.md`** (at working folder root)
 ```markdown
+<!-- MEMORY_STATE: EMPTY -->
 # Session Memory
 
 *(empty — use `!! wrap` at the end of a session to save a summary here)*
 ```
 
-Replace all `YYYY-MM-DD` placeholders with today's date.
+Replace all `YYYY-MM-DD` placeholders with today's date. Replace `vX.Y` in `hot.md` with the schema version read from `CLAUDE.md`.
 
 ---
 
@@ -180,6 +184,8 @@ Instruct the user to do this manually in Obsidian (you cannot do this via file e
 > Set it to `pages`
 >
 > This prevents Obsidian from creating stray pages at the vault root when clicking unresolved wiki links.
+
+> **Note on `.obsidian/`:** The blueprint's `.gitignore` excludes the entire `.obsidian/` folder by default. If you want the "Default location for new notes = pages" setting (and any other Obsidian settings you care about) to travel with the blueprint when sharing, remove the `.obsidian/` line from `.gitignore` and commit the specific settings files you want to track (e.g. `.obsidian/app.json`). Most users don't need to do this — but it's your call.
 
 ---
 

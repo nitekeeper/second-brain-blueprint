@@ -41,13 +41,31 @@ Analysis pages also include: `query:` with the original question.
 ## Bulk File Edits
 Always use Python — never `sed -i`. The `sed -i` command leaves `XX*` temp files that Obsidian cannot open.
 
+**Important: set an absolute root before globbing.** Relative paths like `"wiki/pages"` silently match zero files if cwd is not the working folder root, and the agent will think the edit succeeded.
+
 ```python
-import re, pathlib
-for f in pathlib.Path("wiki/pages").rglob("*.md"):
-    text = f.read_text()
-    text = re.sub(r"pattern", "replacement", text)
-    f.write_text(text)
+import os, re, pathlib
+
+# Anchor to the working folder — pass in explicitly, don't rely on cwd
+ROOT = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
+pages = ROOT / "wiki" / "pages"
+assert pages.is_dir(), f"pages dir not found at {pages}"
+
+edited = 0
+for f in pages.rglob("*.md"):
+    try:
+        text = f.read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError) as e:
+        print(f"skip {f}: {e}")
+        continue
+    new = re.sub(r"pattern", "replacement", text)
+    if new != text:
+        f.write_text(new, encoding="utf-8")
+        edited += 1
+print(f"edited {edited} files under {pages}")
 ```
+
+The agent should always print the edit count and the resolved root path before considering the bulk edit complete — a count of 0 is a red flag, not a success.
 
 ## Immutable Files
 Never modify anything in `raw/` — these are the original source documents.

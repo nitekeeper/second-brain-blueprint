@@ -93,9 +93,13 @@ You can also say it explicitly: `!! update [page-name]` or `"Update the Claude C
 
 **This is temporary, intentional memory — designed to bridge one session to the next. It is not a permanent log.**
 
-At the end of a productive session, say `!! wrap`. The agent will ask if there's anything specific to include, then write a detailed summary to `memory.md` — covering what was worked on, key decisions, files changed, and open next steps. Each `!! wrap` overwrites the previous summary, so only one summary exists at a time.
+At the end of a productive session, say `!! wrap`. The agent will ask if there's anything specific to include, then write a detailed summary to `memory.md` — covering what was worked on, key decisions, files changed, and open next steps. Each `!! wrap` overwrites the previous summary, so only one summary exists at a time. **If a prior wrapped summary is still in `memory.md`, the agent will warn you before overwriting** — reply `no` to cancel and consume the existing summary first.
 
-At the start of your next session, say `!! ready` instead of anything else. The agent will read the summary aloud to bring you back up to speed, then immediately wipe `memory.md` and confirm it's clear. From that point, the session proceeds normally.
+At the start of your next session, say `!! ready` as your first message. The agent will display the summary in full (verbatim) to bring you back up to speed, then immediately wipe `memory.md` and confirm it's clear. From that point, the session proceeds normally.
+
+**Mid-session safeguard:** If you accidentally say `!! ready` in the middle of a session (not as the first message), the agent will refuse to wipe memory without explicit `!! ready confirm`. This prevents the older footgun where a casual "ready" wiped a saved summary.
+
+**Truncation detection:** If `!! wrap` was interrupted before writing the completion marker, `!! ready` will display what's present, warn that the summary appears truncated, and ask whether to keep or clear — it will never silently wipe truncated content.
 
 If you start a session without saying `!! ready`, the summary stays in `memory.md` untouched until you explicitly ask for it. It won't be read automatically.
 
@@ -105,13 +109,15 @@ If you start a session without saying `!! ready`, the summary stays in `memory.m
 
 ## Footer Commands
 
-Every agent response ends with:
+Every agent response ends with five lines — four command hints plus the Web Clipper tip:
 
 ```
 📥 !! ingest: [URL | Page Name | All]
 🧹 !! lint: [Page Name | All]
 💾 !! wrap: [save session summary to memory]
 🔄 !! ready: [load session summary at start of new session]
+
+💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
 ```
 
 These are hints showing what the commands accept. Just type them naturally — e.g. `!! ingest my-article.md`, `!! lint all`, `!! wrap`, or `!! ready`.
@@ -123,11 +129,13 @@ These are hints showing what the commands accept. Just type them naturally — e
 The agent will never edit or create files without showing you a plan first. Every write action comes with:
 
 - A one-line summary of what it's about to do
-- A token cost estimate
+- A token cost estimate (including the ~475-token re-read of `token-reference.md`)
 - A to-do list of every file affected
 - "Shall I proceed?"
 
 Read-only actions (answering questions, reading files) happen without approval.
+
+**Documented exceptions (no separate approval prompt):** `!! wrap` and `!! ready`. Your invocation is implicit approval — but both commands have built-in safeguards: `!! wrap` warns before overwriting an existing summary, and `!! ready` refuses to wipe memory mid-session without explicit `!! ready confirm`.
 
 ---
 

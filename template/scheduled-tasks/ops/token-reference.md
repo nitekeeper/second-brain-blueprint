@@ -3,6 +3,10 @@
 Use this file to estimate token cost before any approval request.
 Format: `~N tokens (R read / W write)`
 
+> **Self-cost note:** This file itself is ~475 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~475-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
+
+> **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
+
 ## File Read Costs (last calibrated: YYYY-MM-DD — recalibrate after each ingest)
 
 | File | Chars | Tokens (~chars÷4) |
