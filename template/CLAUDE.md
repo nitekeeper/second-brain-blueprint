@@ -127,6 +127,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │   ├── setup-guide.md
 │   ├── user-guide.md
 │   ├── troubleshooting.md
+│   ├── CHANGELOG.md
 │   └── template/
 │       ├── CLAUDE.md
 │       └── scheduled-tasks/
@@ -134,9 +135,9 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │           └── ops/
 │               ├── ingest.md
 │               ├── lint.md
+│               ├── audit.md
 │               ├── query.md
 │               ├── update.md
-│               ├── audit.md
 │               ├── conventions.md
 │               └── token-reference.md
 ├── scheduled-tasks/            ← Reusable task and ops instruction files
@@ -144,9 +145,9 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │   └── ops/
 │       ├── ingest.md
 │       ├── lint.md
+│       ├── audit.md
 │       ├── query.md
 │       ├── update.md
-│       ├── audit.md
 │       ├── conventions.md
 │       └── token-reference.md
 └── wiki/                       ← Obsidian vault root (open this folder in Obsidian)
