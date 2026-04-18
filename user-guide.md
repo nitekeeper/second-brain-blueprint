@@ -151,7 +151,7 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | Lint all (23 pages) | ~8,000–12,000 |
 | Simple query (wiki) | ~2,000–4,000 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~1,000 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~1,880 tokens to re-orient.
 
 ---
 

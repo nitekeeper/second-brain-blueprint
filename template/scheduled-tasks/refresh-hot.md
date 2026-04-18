@@ -7,7 +7,7 @@ Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation th
 ## Steps
 
 1. Read `wiki/index.md` — get the current page count from the Stats header line, and identify the 5 pages with the most recent `updated:` dates
-2. Read `wiki/log.md` — get the last log entry (use `grep "^## \[" log.md | tail -1`) and the most recent open gaps list from the latest lint entry
+2. Read `wiki/log.md` — get the last log entry (use `grep "^## \[" log.md | tail -1`) and the most recent open gaps list from the latest lint entry. If no lint entry exists yet, use `none yet — add sources to discover gaps` as the Gaps value.
 
 ## Output Format
 

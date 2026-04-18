@@ -37,7 +37,7 @@ cd /path/to/your/vault
 git clone https://github.com/nitekeeper/second-brain-blueprint blueprint
 ```
 
-> **Verify the URL is accessible** before sharing this blueprint with others. If the repo is private or has moved, update the URL here and in `setup-guide.md` before distributing.
+> **Verify the URL is accessible** before sharing this blueprint with others. If the repo is private or has moved, update the URL here before distributing.
 
 ### 3. Select your working folder in Cowork
 In the Cowork window, click **"Select folder"** and choose the folder where you cloned the repo (the parent folder containing `blueprint/`). This is your working directory — **not** `wiki/`.

@@ -2,6 +2,17 @@
 
 Triggered when the user drops a new source and says "ingest this."
 
+## If `!! ingest all`
+
+Before starting steps below:
+1. List all files in `wiki/inbox/` (Bash: `ls wiki/inbox/`)
+2. If empty, tell the user "Nothing in wiki/inbox/ to ingest." and stop
+3. Show a combined approval request listing every filename, estimated total token cost, and all pages to be created/updated across the batch
+4. Process each file in sequence using steps 1–11 below
+5. Write one log entry per file (not one combined entry)
+
+---
+
 ## Steps
 
 1. Read the source file from `wiki/inbox/`

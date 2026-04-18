@@ -73,7 +73,7 @@ Read-only actions do not require approval.
 
 | Change type | Files to update |
 |---|---|
-| Schema or startup change | `blueprint/README.md`, `blueprint/template/CLAUDE.md` |
+| Schema or startup change | `blueprint/README.md`, `blueprint/setup-guide.md`, `blueprint/template/CLAUDE.md` |
 | Operation step change | `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md` |
 | New known issue or fix | `blueprint/troubleshooting.md` |
 | Setup step change | `blueprint/setup-guide.md` |
