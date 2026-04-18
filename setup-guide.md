@@ -108,8 +108,6 @@ Show approval request, then create these four files:
 > Master catalog of all pages. Updated on every ingest or lint pass, and when a query results in a filed analysis page.
 > To find pages relevant to a query, read this file first, then drill into specific pages.
 
-**Stats:** 0 pages | Last updated: YYYY-MM-DD
-
 ---
 
 ## Sources
