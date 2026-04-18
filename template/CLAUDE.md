@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~2,300 tokens
+1. Read `CLAUDE.md` (this file) — ~3,430 tokens
 2. Read `wiki/hot.md` — ~55 tokens
 3. Check `drafts/` — list any files present (negligible tokens)
 4. Check if the user's opening message is `!! ready`:
@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~2,355 tokens** (~2,480 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~3,485 tokens** (~3,610 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 ---
 
@@ -46,7 +46,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 > **Note:** `@Library` in the paths above refers to your Cowork working folder name. If your folder is named something other than `Library`, replace `@Library` with your actual folder name throughout this file only. The ops files use working-folder-relative paths and do not require changes.
 
-> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~475 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
+> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~780 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
 
 ---
 
@@ -90,7 +90,7 @@ All other write actions (including Blueprint Sync writes, log appends, hot.md re
 | Conventions change | `blueprint/template/scheduled-tasks/ops/conventions.md` |
 | Any schema change | `blueprint/template/CLAUDE.md` always |
 | Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
-| Schema version bump | `blueprint/template/CLAUDE.md` footer, `blueprint/setup-guide.md` hot.md template, `blueprint/template/scheduled-tasks/refresh-hot.md` |
+| Schema version bump | `blueprint/template/CLAUDE.md` footer, `blueprint/setup-guide.md` hot.md template |
 
 After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] update | Blueprint synced — [what changed]` (≤500 chars).
 
@@ -204,7 +204,7 @@ Triggered when user says: `!! ready`
 
      *(empty — use `!! wrap` at the end of a session to save a summary here)*
      ```
-   - Confirm: "Memory cleared. Ready to work."
+   - Confirm: "Memory cleared. Ready to work." Then surface any in-progress drafts from `drafts/` (same as normal startup Step 4) so resuming via `!! ready` never drops drafts that a non-`!! ready` startup would have announced.
 
 ---
 
@@ -217,9 +217,9 @@ Triggered when user says: `!! ready`
 🧹 !! lint: [Page Name | All]
 💾 !! wrap: [save session summary to memory]
 🔄 !! ready: [load session summary at start of new session]
-```
 
-> 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
+💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
+```
 
 **CRITICAL: All four command lines and the 💡 tip line are required in every response. Missing any line is an error.**
 
@@ -239,7 +239,7 @@ Show brackets literally. No query command — handled automatically via waterfal
 ---
 updated: YYYY-MM-DD
 ---
-Pages: N | Schema: vX.X | Updated: YYYY-MM-DD
+Pages: N | Schema: vX.Y | Updated: YYYY-MM-DD
 Last op: [operation] YYYY-MM-DD ([brief result])
 Gaps: [comma-separated open data gaps]
 Hot: [5 most recently updated page titles]

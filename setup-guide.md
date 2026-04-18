@@ -72,7 +72,7 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 In `CLAUDE.md`, make the following replacements:
 - Replace `[YourName]` with the name the user gave in the pre-flight check
 - Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
-- Replace `@Library` throughout the Ops File Reminder table with the actual name of the user's Cowork working folder, if it differs from `Library`
+- Replace every `@Library/` occurrence in `CLAUDE.md` with the actual name of the user's Cowork working folder, if it differs from `Library`. These appear in both the Ops File Reminder table and the Approval Rule section — replacing only the table leaves a stale reference behind.
 
 > **Important:** The `@Library` prefix in `CLAUDE.md` must match the name of the folder the user selected in Cowork. If the folder is named `Library`, no change is needed. If it has a different name (e.g. `MyWiki`), every `@Library/` reference must be updated to `@MyWiki/` — these references appear in `CLAUDE.md` only. The ops files use working-folder-relative paths and do not require changes.
 
