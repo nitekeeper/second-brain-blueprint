@@ -20,7 +20,7 @@ Before starting steps below:
 1. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
 2. Read the source file from `wiki/inbox/`
 3. Discuss key takeaways with the user (brief, 3–5 bullets)
-4. Show approval request (summary + token estimate + to-do list) and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~780 tokens) in the estimate
+4. Show approval request (summary + token estimate + to-do list) and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~880 tokens) in the estimate
 5. Write a source summary page in `wiki/pages/sources/`
 6. Read `wiki/index.md` to identify all affected concept/entity pages
 7. Update affected pages; create any new concept or entity pages warranted

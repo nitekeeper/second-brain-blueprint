@@ -25,7 +25,7 @@ If the wiki does not contain a good answer:
 
 After any Step 2 or Step 3 answer, ask: "Worth filing this as an analysis page?"
 If yes:
-1. Show approval request and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~780 tokens) in the estimate
+1. Show approval request and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~880 tokens) in the estimate
 2. Write to `wiki/pages/analyses/`
 3. Update `wiki/index.md` and append to `wiki/log.md` — **log entry must be ≤500 chars total**
 4. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`

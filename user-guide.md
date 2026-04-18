@@ -129,7 +129,7 @@ These are hints showing what the commands accept. Just type them naturally — e
 The agent will never edit or create files without showing you a plan first. Every write action comes with:
 
 - A one-line summary of what it's about to do
-- A token cost estimate (including the ~780-token re-read of `token-reference.md`)
+- A token cost estimate (including the ~880-token re-read of `token-reference.md`)
 - A to-do list of every file affected
 - "Shall I proceed?"
 
@@ -146,6 +146,8 @@ Whenever the agent recommends a change to your system, it will always show both 
 ---
 
 ## Token Awareness
+
+> **Note:** All token numbers below — and everywhere else in this system — are **estimates** derived from `chars ÷ 4`. Actual usage depends on the model's tokenizer, the exact file contents at read time, and runtime overhead from tool calls and the system prompt, so the real numbers will differ (sometimes noticeably). Use these figures for rough planning, not precise accounting.
 
 The context window is 200,000 tokens per session. The agent tracks estimated costs in `scheduled-tasks/ops/token-reference.md` and recalibrates after every ingest.
 

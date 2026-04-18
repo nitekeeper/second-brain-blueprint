@@ -16,6 +16,8 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 **Total cold-start cost: ~3,485 tokens** (~3,610 tokens when memory.md holds a full summary loaded via `!! ready`)
 
+> **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
+
 ---
 
 ## Tiered Read Structure
@@ -46,7 +48,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 > **Note:** `@Library` in the paths above refers to your Cowork working folder name. If your folder is named something other than `Library`, replace `@Library` with your actual folder name throughout this file only. The ops files use working-folder-relative paths and do not require changes.
 
-> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~780 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
+> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~880 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
 
 ---
 
