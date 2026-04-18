@@ -5,7 +5,7 @@ Format: `~N tokens (R read / W write)`
 
 > **Estimates only:** Every number in this file is `chars ÷ 4`. Real token usage depends on the model's tokenizer, exact file contents, and runtime overhead (tool calls, system prompt) — treat these as rough planning figures, not precise accounting. Quote them as approximate when citing in approval requests.
 
-> **Self-cost note:** This file itself is ~1,500 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,500-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
+> **Self-cost note:** This file itself is ~1,700 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,700-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
 
 > **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
 
@@ -27,12 +27,12 @@ Format: `~N tokens (R read / W write)`
 | `ops/update.md` | ~1,400 | ~350 |
 | `ops/conventions.md` | ~5,000 | ~1,250 |
 | `ops/audit.md` | ~6,600 | ~1,650 |
-| `ops/token-reference.md` | ~6,000 | ~1,500 |
+| `ops/token-reference.md` | ~6,800 | ~1,700 |
 | `blueprint/README.md` | ~5,100 | ~1,280 |
 | `blueprint/setup-guide.md` | ~13,400 | ~3,350 |
 | `blueprint/user-guide.md` | ~16,600 | ~4,150 |
 | `blueprint/troubleshooting.md` | ~27,900 | ~6,980 |
-| `blueprint/CHANGELOG.md` | ~38,500 | ~9,620 |
+| `blueprint/CHANGELOG.md` | ~44,000 | ~11,000 |
 | `blueprint/LICENSE` | ~1,200 | ~300 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
@@ -51,7 +51,7 @@ Format: `~N tokens (R read / W write)`
 | Write `memory.md` (`!! wrap`) | ~600–900 |
 | Wipe `memory.md` (`!! ready`) | ~50 |
 
-> **`!! wrap` / `!! ready` true session cost.** The per-touch costs above cover *only* the `memory.md` operation itself. Both commands also execute the full `hot.md` refresh flow (read `refresh-hot.md` ~1,030 + re-read `wiki/index.md` ~200 + re-read `wiki/log.md` tail ~625) and append one entry to `log.md` (~100). `!! ready` additionally reads the full `memory.md` (~750 when the summary is present) before wiping it. Realistic per-command cost when none of those files are already cached is ~2,700 tokens for `!! wrap` and ~2,800 for `!! ready`, not the raw ~50–900 range from the table above. Quote ~2,700 when asked unless the relevant reads are warm from a prior op in the same session. `!! wrap` and `!! ready` are **not** approval-gated (they are documented exceptions in `CLAUDE.md`'s Approval Rule), so `token-reference.md` itself does not need to be re-read for either command.
+> **`!! wrap` / `!! ready` true session cost.** The per-touch costs above cover *only* the `memory.md` operation itself. Both commands also execute the full `hot.md` refresh flow (read `refresh-hot.md` ~1,100 + re-read `wiki/index.md` ~200 + re-read `wiki/log.md` tail ~625) and append one entry to `log.md` (~100). `!! ready` additionally reads the full `memory.md` (~750 when the summary is present) before wiping it. Realistic per-command cost when none of those files are already cached is ~2,800 tokens for `!! wrap` and ~2,825 for `!! ready`, not the raw ~50–900 range from the table above. All figures quoted here use the documented Tokens column above (so they stay consistent as the table recalibrates). Quote ~2,800 when asked unless the relevant reads are warm from a prior op in the same session. `!! wrap` and `!! ready` are **not** approval-gated (they are documented exceptions in `CLAUDE.md`'s Approval Rule), so `token-reference.md` itself does not need to be re-read for either command.
 
 ## Ingest Estimate Formula
 
@@ -60,10 +60,10 @@ Format: `~N tokens (R read / W write)`
 Concretely, the fixed-cost reads for a single-file ingest sum to roughly:
 - `wiki/log.md` tail (Step 1) — ~625
 - `wiki/index.md` (Step 8, first-file read under B3 cache) — ~200
-- `ops/token-reference.md` self-cost (Step 4 approval, once per op) — ~1,500
+- `ops/token-reference.md` self-cost (Step 4 approval, once per op) — ~1,700
 - overhead for approval + acknowledgments — ~500
 
-That fixed floor is ~2,825 tokens **before** the raw source and per-page writes are counted. Add the variable terms on top: raw source read (typically 1,000–8,000) plus 500 × new pages plus 200 × updated pages. `!! ingest all` pays the ~1,500 `token-reference.md` cost once for the whole batch (not per file), but pays the raw-source-read and per-page write terms once per file.
+That fixed floor is ~3,025 tokens **before** the raw source and per-page writes are counted. Add the variable terms on top: raw source read (typically 1,000–8,000) plus 500 × new pages plus 200 × updated pages. `!! ingest all` pays the ~1,700 `token-reference.md` cost once for the whole batch (not per file), but pays the raw-source-read and per-page write terms once per file.
 
 ## Recalibration Rule
 
@@ -76,4 +76,5 @@ That fixed floor is ~2,825 tokens **before** the raw source and per-page writes 
 2. For each file, set Chars to 110% of measured actual, rounded to nearest 100
 3. Recalculate Tokens column (chars ÷ 4, rounded to nearest 10)
 4. Propagate changes to any cascading cold-start estimates (CLAUDE.md, user-guide.md, README.md)
-5. Update the calibration date in the header
+5. Re-sum the blueprint-doc and template-side Tokens-column rows and verify the result still fits inside the `!! audit all` envelope quoted at `ops/audit.md:71` (currently `~30,000–48,000`). If the updated sum exceeds the upper bound, widen the envelope (documented sum + ~1,500–3,000 cushion, rounded to nearest 1,000) and cascade to every `!! audit all` mention — `ops/audit.md:71`, `user-guide.md` (both the command reference and the cost table), and the CHANGELOG entry for this patch. If the updated sum is still inside the bound, no envelope edit is needed.
+6. Update the calibration date in the header
