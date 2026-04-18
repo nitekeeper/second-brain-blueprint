@@ -61,7 +61,7 @@ Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 
 ## Key Features
 
-- **Lean startup** — agent cold-starts in ~5,255 tokens; reads only what it needs
+- **Lean startup** — agent cold-starts in ~5,530 tokens; reads only what it needs
 - **Approval before every wiki write** — `!! wrap`, `!! ready`, and `!! audit` are the only exceptions (`!! wrap` and `!! ready` are each gated by built-in safeguards; `!! audit` is read-only by default, and any fix you request afterward goes through the normal approval flow); every other write pauses with a plan + token estimate before touching a file
 - **Query waterfall** — answers from training first, then wiki, then web search
 - **Self-auditing blueprint** — `!! audit` runs a strict architect-style review of the blueprint files themselves, so the schema and ops stay internally consistent as they evolve

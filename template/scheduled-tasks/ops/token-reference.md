@@ -15,24 +15,24 @@ Format: `~N tokens (R read / W write)`
 |---|---|---|
 | `wiki/hot.md` | ~210 | ~55 |
 | `memory.md` | ~3,000 (when full) | ~750 |
-| `CLAUDE.md` | ~20,800 | ~5,200 |
+| `CLAUDE.md` | ~21,900 | ~5,475 |
 | `wiki/index.md` | ~800 (grows with pages) | ~200 |
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
-| `scheduled-tasks/refresh-hot.md` | ~4,100 | ~1,030 |
+| `scheduled-tasks/refresh-hot.md` | ~4,400 | ~1,100 |
 | `scheduled-tasks/changelog-monitor.md` | ~6,100 | ~1,530 |
-| `ops/ingest.md` | ~14,500 | ~3,630 |
+| `ops/ingest.md` | ~15,500 | ~3,880 |
 | `ops/lint.md` | ~2,500 | ~630 |
 | `ops/query.md` | ~2,100 | ~530 |
 | `ops/update.md` | ~1,400 | ~350 |
 | `ops/conventions.md` | ~5,000 | ~1,250 |
-| `ops/audit.md` | ~6,300 | ~1,580 |
+| `ops/audit.md` | ~6,600 | ~1,650 |
 | `ops/token-reference.md` | ~6,000 | ~1,500 |
 | `blueprint/README.md` | ~5,100 | ~1,280 |
-| `blueprint/setup-guide.md` | ~12,700 | ~3,180 |
+| `blueprint/setup-guide.md` | ~13,400 | ~3,350 |
 | `blueprint/user-guide.md` | ~16,600 | ~4,150 |
-| `blueprint/troubleshooting.md` | ~27,000 | ~6,750 |
-| `blueprint/CHANGELOG.md` | ~27,500 | ~6,880 |
+| `blueprint/troubleshooting.md` | ~27,900 | ~6,980 |
+| `blueprint/CHANGELOG.md` | ~38,500 | ~9,620 |
 | `blueprint/LICENSE` | ~1,200 | ~300 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
