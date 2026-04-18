@@ -25,7 +25,7 @@ Format: `~N tokens (R read / W write)`
 | `ops/lint.md` | ~2,500 | ~630 |
 | `ops/query.md` | ~2,100 | ~530 |
 | `ops/update.md` | ~1,400 | ~350 |
-| `ops/conventions.md` | ~4,600 | ~1,150 |
+| `ops/conventions.md` | ~5,000 | ~1,250 |
 | `ops/audit.md` | ~6,300 | ~1,580 |
 | `ops/token-reference.md` | ~4,500 | ~1,130 |
 | Average concept page | ~2,000 | ~500 |

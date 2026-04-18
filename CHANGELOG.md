@@ -3,6 +3,44 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.3 — 2026-04-18
+
+### Follow-ups (audit-driven, third pass)
+
+- **`Pages: N` counter is now derived, not stored.** `refresh-hot.md` Step 1
+  previously read the page count from a `**Stats:** N pages` header line in
+  `wiki/index.md`, but no op file (ingest / lint / update / query-filing) was
+  ever specified to bump that counter when pages were added or removed. Without
+  explicit instruction, a strict agent would add entry rows to `index.md` and
+  leave the Stats counter stale, causing `hot.md`'s `Pages: N` to silently go
+  wrong. Step 1 now derives the count from the length of the `^- [[` entry list
+  it already collects for the `Hot:` field — same read, same parse, one fewer
+  invariant to maintain. `setup-guide.md`'s `wiki/index.md` template drops the
+  Stats header line accordingly; the Field Reference row in `refresh-hot.md`
+  updates to reflect the derived source.
+- **Blueprint Sync Rule: versioning split made explicit.** A new note under
+  the matrix states that the CLAUDE.md footer and `hot.md`'s `Schema:` field
+  track only major.minor (`X.Y`), while patches (`X.Y.Z`) add a CHANGELOG
+  section without moving either. The split was implicit in practice (v2.0.1 and
+  v2.0.2 both landed without touching the footer) but not documented — a new
+  operator reading the Sync Rule could reasonably have inferred that a patch
+  should also rewrite the footer. The note closes that interpretation gap.
+- **`ops/conventions.md` recalibrated.** Measured 4,500 chars against a
+  documented 4,600 (2.2% headroom, well under the 10% headroom convention in
+  `token-reference.md`). Documented value bumped to 5,000 / ~1,250 tokens
+  (110% of measured, rounded to nearest 100). The file grew during v2.0.2's
+  `source_hash:` frontmatter-doc expansion but was not re-calibrated at that
+  time because the recalibration trigger fires on exceedance, not drift; this
+  pass reclaims the headroom pre-emptively so the next small edit doesn't
+  force an unplanned recalibration.
+
+### Not applied
+- **Q1 (per-file schema footers).** `changelog-monitor.md` carries a
+  `*Schema: v2.0 | Created: 2026-04-18*` footer while `refresh-hot.md` and
+  `ops/*.md` carry none. Left as a question rather than a fix — either
+  direction (add footers everywhere for parity, or drop `changelog-monitor`'s
+  for symmetry) is defensible, and the audit could not determine intent.
+
 ## v2.0.2 — 2026-04-18
 
 ### Follow-ups (audit-driven, second pass)

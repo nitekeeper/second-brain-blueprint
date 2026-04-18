@@ -6,7 +6,7 @@ Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation th
 
 ## Steps
 
-1. Read `wiki/index.md` — get the current page count from the Stats header line. To identify the 5 pages with the most recent `updated:` dates, collect every entry line across ALL sections (Sources, Concepts, Entities, Analyses), then sort in memory by the `updated: YYYY-MM-DD` field inside each line (ISO-8601 dates are lexicographically sortable) and take the top 5. If fewer than 5 total pages exist, list all of them; if none, emit `Hot: none yet`.
+1. Read `wiki/index.md` — collect every entry line across ALL sections (Sources, Concepts, Entities, Analyses) by matching `^- \[\[`. The page count for `Pages: N` is the length of that list (not a separate counter anywhere in `index.md` — derived from the entries themselves so it cannot go stale). To identify the 5 pages with the most recent `updated:` dates, sort the same list in memory by the `updated: YYYY-MM-DD` field inside each line (ISO-8601 dates are lexicographically sortable) and take the top 5. If fewer than 5 total pages exist, list all of them; if none, emit `Hot: none yet` and `Pages: 0`.
 
    If a shell alternative is needed, extract the date into a leading sort key first — a naive `sort -t: -k2` is unsafe because any colon in a title or summary shifts the key off the date. Use `awk`'s **1-argument** `match(str, regex)` form (portable across GNU and BSD/macOS awk — it sets `RSTART` and `RLENGTH` on both). Avoid the 3-argument form `match(str, regex, array)`, which is a GNU-awk-only extension and silently produces no output on macOS's default BSD awk. Avoid `sed -E '... \t ...'` too — BSD sed does not interpret `\t` as a tab in the replacement string, so downstream `cut -f` breaks. Emitting the tab from awk guarantees a real tab byte:
    ```bash
@@ -44,7 +44,7 @@ Hot: [comma-separated titles of 5 most recently updated pages]
 | Field | Source |
 |-------|--------|
 | `updated` | Today's date (YYYY-MM-DD) |
-| `Pages: N` | Stats line in index.md |
+| `Pages: N` | Count of `^- [[` entry lines across all sections of index.md (derived, not stored) |
 | `Schema: vX.Y` | Current schema version in CLAUDE.md footer |
 | `Updated: YYYY-MM-DD` | Today's date |
 | `Last op` | Most recent `## [date] operation \| title` line in log.md |
