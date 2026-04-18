@@ -35,12 +35,30 @@ B7. Write one log entry per file during `[main-step 10]` (not one combined entry
 
 ---
 
+## Hash Canonicalization
+
+Both Step 0 of this op and Step 3 of `@scheduled-tasks/changelog-monitor.md` feed the source body through this canonical pipeline **before** computing the SHA-256. Applying the same normalizer in both places is what makes the hash comparable across Clipper ingest, URL ingest, and the read-only monitor fetch — three paths that would otherwise produce visibly different markdown for identical underlying content.
+
+Steps (applied in order, producing the hash input):
+
+1. **Strip any YAML preamble if present.** If the body begins with a `---` fence, drop everything from that fence through the next `---` fence (inclusive). Covers both the Clipper-saved frontmatter and the U3-prepended `source_url:` / `fetched:` block; a no-op if no preamble is present.
+2. **Normalize line endings.** Convert CRLF and lone CR to LF.
+3. **Collapse intra-line whitespace runs.** Replace any run of spaces or tabs with a single space.
+4. **Collapse blank-line runs.** Replace any run of two or more consecutive blank lines with exactly one blank line.
+5. **Trim.** Drop leading and trailing whitespace from the whole body.
+6. **Hash.** Compute SHA-256 over the UTF-8 bytes of the result; take the first 8 hex characters as the source hash.
+
+Do **not** lowercase, strip punctuation, or strip HTML tags in this pipeline. Case and punctuation are legitimate content signals; HTML tag leakage is an upstream fetcher bug and should be fixed there, not absorbed here.
+
+This canonicalizer survives: Clipper-vs-WebFetch whitespace differences, CRLF/LF drift, trailing-whitespace jitter, and indentation-normalization differences. It does **not** survive: real content edits, CDN-driven body variation (timestamps, visitor counters, CSRF tokens leaking into markdown), or LLM-based WebFetch prose rewriting — all of which will correctly produce hash mismatches. See `troubleshooting.md` "Changelog monitor reports 🆕 for a page I know hasn't changed" for the LLM-WebFetch caveat.
+
+---
+
 ## Steps
 
 0. **Hash check (no-op guard).** First action of every ingest, before any other reads or writes:
     - Load the raw source body into working memory. For filename ingest: read `wiki/inbox/<file>`. For URL ingest: content is already in memory from U1 (this step does not re-read).
-    - Strip any YAML preamble (e.g. the `source_url:` / `fetched:` block prepended in U3) — hash only the content body so the hash is stable across re-fetches of the same content.
-    - Compute the 8-char SHA-256 hex prefix of the body.
+    - Run the body through the **Hash Canonicalization** pipeline above (preamble-strip if present → line-ending normalization → whitespace collapse → trim). Compute SHA-256 over the canonicalized bytes and take the first 8 hex characters as the computed hash. The same pipeline is used by `changelog-monitor.md` Step 3 so cross-path hashes (Clipper ingest vs URL monitor fetch) are directly comparable.
     - Derive the expected source-page slug — same rules as Step 5 (lowercase-hyphenated from the H1 or filename stem; for URL ingest reuse the U2 slug).
     - If `wiki/pages/sources/<slug>.md` exists, read its `source_hash:` frontmatter.
     - **If stored `source_hash:` matches the computed hash:** delete the inbox file (if present), print `No change since last ingest — skipped.` to the user, and exit cleanly. Do NOT continue to Step 1. Do NOT append to `log.md`. Do NOT refresh `hot.md`. Do NOT recalibrate. This is the rerun-proof guarantee — same input, zero state change.

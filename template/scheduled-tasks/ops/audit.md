@@ -40,8 +40,9 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
    - Show a normal approval request (summary + token estimate including the `token-reference.md` self-cost (see `@scheduled-tasks/ops/token-reference.md` header) + to-do list of affected files).
    - After approval, apply fixes.
    - If any fix touches the schema, startup behavior, operations, or conventions, follow the Blueprint Sync Rule in `CLAUDE.md` — update every downstream doc the table lists before closing the op.
+   - **Blueprint-authoring mode:** if `wiki/` is absent at the working folder root, skip the `wiki/log.md` append below AND step 6's `hot.md` refresh — see `@template/CLAUDE.md` Blueprint-authoring Mode. Check once (single `[ -e wiki/log.md ]` or equivalent) and skip transparently without prompting. The audit is the op most likely to run in this mode (it's the only op that makes sense on a blueprint-only checkout), so this check is load-bearing.
    - Append one entry to `wiki/log.md` (≤500 chars): `## [YYYY-MM-DD] audit | [fix summary]` — this label supersedes the `sync | …` entry from CLAUDE.md's Blueprint Sync Rule for audit-driven edits. Do not write both; the single `audit` entry preserves audit provenance and covers the sync side-effect implicitly.
-6. If a fix was applied in step 5, refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`. The log-append is a wiki-state mutation, so `hot.md`'s `Last op` must reflect it. If no fix was applied (read-only audit), skip — the audit leaves no trace.
+6. If a fix was applied in step 5, refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`. The log-append is a wiki-state mutation, so `hot.md`'s `Last op` must reflect it. If no fix was applied (read-only audit), skip — the audit leaves no trace. **Blueprint-authoring mode:** also skip — no `hot.md` to refresh when `wiki/` is absent.
 7. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if an applied fix changed a tracked file's size enough to exceed its documented Chars value.
 
 ---

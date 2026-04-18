@@ -32,7 +32,7 @@ sources: [source-slug-1, source-slug-2]
 
 Source pages also include:
 - `original_file:` pointing to the raw file (timestamped: `raw/<slug>-<YYYY-MM-DD-HHMMSS>.md`)
-- `source_hash: <8-char-hex>` — 8-char SHA-256 hex prefix of the raw content body (preamble-stripped). Required. This is the dedupe primitive used by Step 0 of the ingest op. Deleting or blanking this line will force a full regeneration on the next ingest — that is the documented "force re-ingest" escape hatch.
+- `source_hash: <8-char-hex>` — 8-char SHA-256 hex prefix of the **canonicalized** source body (see `@scheduled-tasks/ops/ingest.md` §Hash Canonicalization for the normalizer spec: preamble-strip-if-present + line-ending normalization + whitespace collapse + trim). Required. This is the dedupe primitive used by Step 0 of the ingest op and by Step 3 of `changelog-monitor.md` — both apply the same canonicalizer so Clipper-ingested and URL-fetched versions of the same source converge on the same hash. Deleting or blanking this line will force a full regeneration on the next ingest — that is the documented "force re-ingest" escape hatch.
 
 Analysis pages also include: `query:` with the original question.
 

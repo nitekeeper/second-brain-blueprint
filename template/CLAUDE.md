@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~4,580 tokens
+1. Read `CLAUDE.md` (this file) — ~5,200 tokens
 2. Read `wiki/hot.md` — ~55 tokens
 3. Check `drafts/` — list filenames only, up to 20 (negligible tokens at that cap; if more than 20 files exist, list the 20 most recently modified and note the overflow count)
 4. Check if the user's opening message is `!! ready`:
@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~4,635 tokens** (~5,385 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~5,255 tokens** (~6,005 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
 
@@ -97,7 +97,7 @@ All other write actions — Blueprint Sync writes, and the log appends + `hot.md
 | Any schema change | `blueprint/template/CLAUDE.md` always |
 | Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
 | Schema version bump | `blueprint/CHANGELOG.md` (new section documenting the version) in addition to any rows above that the change triggers |
-| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (scope) + `ops/token-reference.md` (file-size row) + `setup-guide.md` (Step 2 copy / Step 3 personalize if placeholders / Step 7 verify) + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure |
+| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (scope) + `ops/token-reference.md` (file-size row) + `setup-guide.md` (Step 2 copy / Step 3 personalize if placeholders / Step 7 verify) + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md` (new section — treat any new scheduled task as at minimum a patch version bump, so the Schema-version-bump row applies) |
 
 After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blueprint synced — [what changed]` (≤500 chars). The `sync` op label is distinct from wiki-page `update` entries so `grep`/`tail` can separate them.
 
@@ -108,6 +108,8 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 ## Blueprint-authoring Mode
 
 **CRITICAL: If `wiki/` does not exist at the working folder root, the agent is in blueprint-authoring mode — e.g. operating on a blueprint-only checkout, not a live wiki.** In this mode, skip every `wiki/log.md` append and `wiki/hot.md` refresh across all ops. Do not bootstrap either file — they do not belong in a blueprint-authoring workspace. This rule applies to Ingest, Lint, Update, filed Query, Audit-with-fix, `!! wrap`, and `!! ready`. Check once per op (single `[ -e wiki/log.md ]` or equivalent) before the append/refresh step; if the file is absent, skip transparently without prompting.
+
+**Startup in blueprint-authoring mode.** The Startup sequence above reads `wiki/hot.md` (step 2) and probes `drafts/` (step 3) unconditionally. In blueprint-authoring mode these paths will be missing. Behave defensively: if `wiki/hot.md` is missing, skip step 2 and announce readiness from `CLAUDE.md` alone (no hot.md summary line); if `drafts/` is missing, skip step 3 (do not announce drafts). Only `!! audit` is expected to run in this mode — other ops will fail on missing `wiki/` subpaths by design, and that is the correct behavior. Announce "Blueprint-authoring mode — no wiki/ at working-folder root; only `!! audit` is expected to run." as the one-line readiness summary when entering this mode.
 
 ---
 

@@ -6,12 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~4,580 tokens)
+1. `CLAUDE.md` — its operating instructions (~5,200 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~55 tokens)
 
-**Total cold-start cost: ~4,635 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~5,255 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~5,385 tokens total when the summary is full).
+If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~6,005 tokens total when the summary is full).
 
 ---
 
@@ -25,7 +25,7 @@ If you saved a session summary with `!! wrap`, say `!! ready` at the start of yo
 3. Tell the agent: `!! ingest [filename]`
 
 **What happens:**
-- **Hash check first.** Before any work, the agent computes an 8-char SHA-256 hash of the source body and compares it against the stored `source_hash:` on the existing source page (if one exists). If the hashes match, the agent prints `No change since last ingest — skipped.`, deletes the inbox file, and stops. No log entry, no page edits, no cost. This is the rerun-proof guarantee.
+- **Hash check first.** Before any work, the agent runs the source body through a deterministic canonicalizer (preamble-strip + whitespace / line-ending normalization) and computes an 8-char SHA-256 hash of the canonicalized content. It compares this against the stored `source_hash:` on the existing source page (if one exists). The same canonicalizer runs in the ingest op and in the daily changelog monitor, so the same underlying source produces the same hash whether you ingested it via Clipper or via URL, or whether the monitor fetched it directly. If the hashes match, the agent prints `No change since last ingest — skipped.`, deletes the inbox file, and stops. No log entry, no page edits, no cost. This is the rerun-proof guarantee.
 - If the hash differs (or there's no existing source page), the agent proceeds:
   - Discusses 3–5 key takeaways with you
   - Shows you a to-do list of every page it will create or update
@@ -205,8 +205,8 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~4,635 |
-| Cold start with `!! ready` (full memory) | ~5,385 |
+| Cold start | ~5,255 |
+| Cold start with `!! ready` (full memory) | ~6,005 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all | ~8,000–12,000 (scales with page count) |
@@ -216,7 +216,7 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | `!! wrap` (realistic) | ~2,700 |
 | `!! ready` (realistic) | ~2,800 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~4,635 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~5,255 tokens to re-orient.
 
 ---
 
@@ -237,5 +237,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~4,635 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~5,255 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.

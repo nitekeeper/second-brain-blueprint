@@ -1,6 +1,6 @@
 # Changelog Monitor
 
-Daily scheduled task. Read-only. Fetches four monitored documentation pages, computes content hashes, compares against the wiki's last-known `source_hash:` values, and reports findings via Slack DM. Never writes files. Never runs ingest automatically.
+Daily scheduled task. Read-only. Fetches every URL listed in `## Monitored Sources` below, computes content hashes, compares against the wiki's last-known `source_hash:` values, and reports findings via Slack DM. Never writes files. Never runs ingest automatically.
 
 The monitor is the detector; `!! ingest` is the writer. This separation is intentional — it guarantees the user retains approval control over every wiki mutation.
 
@@ -25,8 +25,8 @@ Add a source by appending a row here. Remove one by deleting its row. Keep the n
    - Look up the corresponding source page under `wiki/pages/sources/` (slug-matched — reuse the same slug derivation rules as `ops/ingest.md` Step 0).
    - If the source page exists, read its `source_hash:` frontmatter into memory.
    - If the source page does not exist, record the source as UNINGESTED and skip the hash lookup.
-2. **Fetch all URLs in parallel via WebFetch.** Run all four fetches concurrently — the task is otherwise I/O-bound and should complete in under a minute.
-3. **For each fetched source:** compute the 8-char SHA-256 hex prefix of the fetched body (strip any preamble before hashing — use the same body-only hashing rule as `ops/ingest.md` Step 0 so the monitor's hash matches what ingest would compute).
+2. **Fetch all URLs in parallel via WebFetch.** Run every fetch concurrently — one per row in `## Monitored Sources`. The task is otherwise I/O-bound and should complete in under a minute regardless of row count.
+3. **For each fetched source:** run the fetched body through the **Hash Canonicalization** pipeline defined in `@scheduled-tasks/ops/ingest.md` and take the first 8 hex characters of the resulting SHA-256. This is the SAME pipeline the ingest op uses at Step 0, which is what makes cross-path comparison (Clipper-ingested page's stored `source_hash:` vs monitor fetch) meaningful. The canonicalizer cannot fully defeat LLM-mediated WebFetch nondeterminism — see `troubleshooting.md`'s "Changelog monitor reports 🆕 for a page I know hasn't changed" entry for the caveat and manual-verification flow.
 4. **Classify each source:**
    - **NO_CHANGE** — computed hash matches stored `source_hash:`.
    - **NEW_ENTRY** — computed hash differs from stored `source_hash:` (existing source page, content changed).
@@ -70,7 +70,9 @@ Emoji legend:
 | 🆘 | UNINGESTED | No wiki page yet for this source |
 | ❌ | FETCH_FAILED | Network/parse error; retry next run |
 
-If all four sources are ✅, the message still posts — the "silent success" pattern (no message on no change) is rejected because it makes task-failure indistinguishable from task-success-with-nothing-to-report.
+If every row in `## Monitored Sources` reports ✅, the message still posts — the "silent success" pattern (no message on no change) is rejected because it makes task-failure indistinguishable from task-success-with-nothing-to-report.
+
+**Trailing hint lines.** Emit `🆕 items: run \`!! ingest <URL>\` to pull the update` only if the message contains at least one 🆕 row; emit `🆘 items: run \`!! ingest <URL>\` to bootstrap` only if it contains at least one 🆘 row. When the message contains only ✅ and/or ❌ rows, omit both trailing hint lines — there is no action for the user to take on those statuses.
 
 ---
 
