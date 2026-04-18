@@ -42,14 +42,17 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 | Update a page | `@Library/scheduled-tasks/ops/update.md` |
 | Create or edit any page | `@Library/scheduled-tasks/ops/conventions.md` |
 | Any write action (approval) | `@Library/scheduled-tasks/ops/token-reference.md` |
+| After any wiki-state change (Ingest/Lint/Update/filed Query) | `@Library/scheduled-tasks/refresh-hot.md` |
 
 > **Note:** `@Library` in the paths above refers to your Cowork working folder name. If your folder is named something other than `Library`, replace `@Library` with your actual folder name throughout this file only. The ops files use working-folder-relative paths and do not require changes.
+
+> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~475 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
 
 ---
 
 ## Approval Rule
 
-**IMPORTANT: Never perform write or edit actions without explicit user approval.**
+**IMPORTANT: Never perform write or edit actions without explicit user approval — with two documented exceptions listed below.**
 
 Before any file create, edit, or delete — stop and present:
 1. One-line summary of what you are about to do
@@ -58,6 +61,12 @@ Before any file create, edit, or delete — stop and present:
 4. "Shall I proceed?"
 
 Read-only actions do not require approval.
+
+**Documented exceptions (no separate approval request required):**
+- `!! wrap` — user invocation is implicit approval to write `memory.md` (see Session Memory Commands for the pre-write safeguard)
+- `!! ready` — user invocation is implicit approval to wipe `memory.md`, but only if the mid-session guard in Session Memory Commands passes
+
+All other write actions (including Blueprint Sync writes, log appends, hot.md refreshes) require explicit approval.
 
 ---
 
@@ -73,20 +82,26 @@ Read-only actions do not require approval.
 
 | Change type | Files to update |
 |---|---|
-| Schema or startup change | `blueprint/README.md`, `blueprint/setup-guide.md`, `blueprint/template/CLAUDE.md` |
-| Operation step change | `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md` |
+| Schema or startup change | `blueprint/README.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md` |
+| Operation step change | `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md`, `blueprint/template/scheduled-tasks/ops/[op].md` |
 | New known issue or fix | `blueprint/troubleshooting.md` |
 | Setup step change | `blueprint/setup-guide.md` |
+| File-size or cost change | `blueprint/template/scheduled-tasks/ops/token-reference.md` (and re-propagate cold-start totals to CLAUDE.md, README.md, user-guide.md) |
+| Conventions change | `blueprint/template/scheduled-tasks/ops/conventions.md` |
 | Any schema change | `blueprint/template/CLAUDE.md` always |
+| Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
+| Schema version bump | `blueprint/template/CLAUDE.md` footer, `blueprint/setup-guide.md` hot.md template, `blueprint/template/scheduled-tasks/refresh-hot.md` |
 
-After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] update | Blueprint synced — [what changed]`
+After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] update | Blueprint synced — [what changed]` (≤500 chars).
 
 ---
 
 ## Directory Structure
 
+> `<WorkingFolder>` below is whatever the user named their Cowork working folder (e.g. `Library`, `MyWiki`). Substitute mentally — this diagram is layout-only, not a literal path.
+
 ```
-Library/
+<WorkingFolder>/
 ├── CLAUDE.md                   ← This file. Auto-read every session. Lean core schema.
 ├── memory.md                   ← Session memory. Written by `!! wrap`, read+wiped by `!! ready`.
 ├── raw/                        ← Immutable source documents. NEVER modify.
@@ -135,32 +150,58 @@ Library/
 ## Session Memory Commands
 
 **Temporary, intentional memory — designed to bridge one session to the next, not to accumulate over time.**
-User invocation is implicit approval for both commands. No separate approval request needed.
+User invocation is implicit approval for both commands, subject to the safeguards below. No separate approval request needed if the safeguards pass.
+
+### Explicit state markers
+`memory.md` uses HTML-comment markers so state is unambiguous (no whitespace-sensitive placeholder matching):
+
+- Empty state begins with: `<!-- MEMORY_STATE: EMPTY -->`
+- A valid wrapped summary begins with `<!-- MEMORY_STATE: WRAPPED -->` and ends with `<!-- MEMORY_WRAP_COMPLETE -->`
+
+**Truncation detection:** If the file contains `MEMORY_STATE: WRAPPED` but is missing `MEMORY_WRAP_COMPLETE`, the file is treated as truncated. `!! ready` must NOT wipe truncated content — see `!! ready` step 4 below.
 
 ### `!! wrap`
 Triggered when user says: `!! wrap`
 
-1. Ask: "Anything specific you'd like included in the summary?"
-2. Write a detailed summary to `memory.md`, overwriting any existing content:
-   - What was worked on this session
-   - Key decisions made and why
-   - Files created or modified
-   - Open questions or next steps
-3. Append to `log.md`: `## [YYYY-MM-DD] memory | Session summary saved`
-4. Confirm: "Session summary saved. Say `!! ready` next session to load it."
+1. **Pre-write safeguard:** Read `memory.md` first. If it already contains `MEMORY_STATE: WRAPPED`, warn the user: "A previous session summary is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — and wait for explicit confirmation.
+2. Ask: "Anything specific you'd like included in the summary?"
+3. Write a detailed summary to `memory.md`, overwriting any existing content. Structure:
+   ```
+   <!-- MEMORY_STATE: WRAPPED -->
+   # Session Memory — [YYYY-MM-DD]
+
+   ## Worked on
+   …
+
+   ## Key decisions
+   …
+
+   ## Files created / modified
+   …
+
+   ## Open questions / next steps
+   …
+   <!-- MEMORY_WRAP_COMPLETE -->
+   ```
+   The trailing marker must be the last line and must only be written once the body is complete.
+4. Append to `log.md`: `## [YYYY-MM-DD] memory | Session summary saved` (≤500 chars).
+5. Confirm: "Session summary saved. Say `!! ready` next session to load it."
 
 ### `!! ready`
 Triggered when user says: `!! ready`
 
-1. Read `memory.md`
-2. **If empty** (contains only the standard placeholder — no real session summary): announce readiness normally (from `hot.md`)
-3. **If a real session summary exists** (content beyond the standard placeholder text):
-   - Read the summary aloud to the user
-   - Append to `log.md`: `## [YYYY-MM-DD] memory | Session summary consumed`
+1. **Mid-session guard:** `!! ready` is a session-opening command. If this is NOT the first user message of the session (i.e. any prior user message has been received in the current session), do NOT consume or wipe memory. Instead, reply: "`!! ready` is meant as a session-opening command. You seem to be mid-session — say `!! ready confirm` if you really want me to read and wipe the summary now." Only proceed on `!! ready confirm`.
+2. Read `memory.md`.
+3. **If `MEMORY_STATE: EMPTY` is present** (or file is missing/blank): announce readiness normally (from `hot.md`). Do not wipe.
+4. **If `MEMORY_STATE: WRAPPED` is present but `MEMORY_WRAP_COMPLETE` is MISSING:** the file is truncated. Display what is present, warn the user it appears incomplete, and do NOT wipe. Ask whether to keep or clear.
+5. **If both markers are present (valid wrapped summary):**
+   - Display the full summary verbatim to the user (do not paraphrase, do not truncate).
+   - Append to `log.md`: `## [YYYY-MM-DD] memory | Session summary consumed` (≤500 chars).
    - Wipe `memory.md` — restore to exactly this content:
      ```
+     <!-- MEMORY_STATE: EMPTY -->
      # Session Memory
-     
+
      *(empty — use `!! wrap` at the end of a session to save a summary here)*
      ```
    - Confirm: "Memory cleared. Ready to work."
@@ -207,12 +248,12 @@ Hot: [5 most recently updated page titles]
 ## log.md Format
 
 Append-only. Each entry: `## [YYYY-MM-DD] operation | title`
-**Max 500 chars per entry** (title + any body). Compress detail — per-file line-number noise belongs in commits, not the log. This cap bounds `tail (5 entries)` read cost at ~2,500 chars / ~625 tokens.
-Grep tip: `grep "^## \[" log.md | tail -5`
+**Max 500 chars per entry** (title + any body). Every op's append step MUST verify the entry length before writing — if it would exceed 500 chars, compress the title/body or split into a follow-up entry on the next line. Compress detail — per-file line-number noise belongs in commits, not the log. This cap bounds `tail (5 entries)` read cost at ~2,500 chars / ~625 tokens.
+Grep tip (portable, extended regex): `grep -E "^## \[" log.md | tail -5`
 **Always read tail only — never full file unless auditing.**
 
 ---
 
-*Schema version: 1.9 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 1.10 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format. Also replace `[YourName]` in line 3 above.

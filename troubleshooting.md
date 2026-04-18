@@ -34,14 +34,27 @@ If this happened across many pages, fix with Python (see Bulk Edits section belo
 find Library/wiki/pages -name "XX*" -delete
 ```
 
-**Prevention:** Always use Python for bulk edits across multiple pages — never `sed -i`:
+**Prevention:** Always use Python for bulk edits across multiple pages — never `sed -i`. Anchor to an absolute root and handle encoding/read errors so a silent zero-match doesn't look like success:
 ```python
-import re, pathlib
-for f in pathlib.Path("wiki/pages").rglob("*.md"):
-    text = f.read_text()
-    text = re.sub(r"old-pattern", "new-value", text)
-    f.write_text(text)
+import os, re, pathlib
+ROOT = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
+pages = ROOT / "wiki" / "pages"
+assert pages.is_dir(), f"pages dir not found at {pages}"
+
+edited = 0
+for f in pages.rglob("*.md"):
+    try:
+        text = f.read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError) as e:
+        print(f"skip {f}: {e}")
+        continue
+    new = re.sub(r"old-pattern", "new-value", text)
+    if new != text:
+        f.write_text(new, encoding="utf-8")
+        edited += 1
+print(f"edited {edited} files under {pages}")
 ```
+A count of 0 means the pattern matched nothing — investigate before assuming success.
 
 ---
 
@@ -126,28 +139,64 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 **Symptom:** You said something like "I'm ready" or typed `!! ready` during a session (not at the start), and the agent read and wiped `memory.md`, destroying the saved summary before you intended.
 
-**Cause:** `!! ready` is designed as a session-start command but is not restricted to it — it will fire any time you say it, even mid-session.
+**Cause:** Older schema versions (≤1.9) did not gate `!! ready` by session position. In schema v1.10+, the agent requires `!! ready confirm` if invoked mid-session.
 
-**Fix:** The summary is gone and cannot be recovered. Going forward, only say `!! ready` as the very first message in a new session.
+**Fix:** The summary is gone and cannot be recovered.
 
-**Prevention:** Be deliberate with `!! ready` — treat it as a session-opening command only, not something to say casually mid-conversation.
+**Prevention:** Keep `CLAUDE.md` on schema v1.10 or newer — the mid-session guard will catch accidental mid-session invocations and require explicit `!! ready confirm`.
+
+---
+
+## `!! wrap` overwrote an existing session summary
+
+**Symptom:** You invoked `!! wrap` and discovered afterward that a previous session summary (that you hadn't consumed with `!! ready`) was overwritten and lost.
+
+**Cause:** Older schema versions (≤1.9) did not check for existing wrapped content before overwriting.
+
+**Fix:** The previous summary is gone and cannot be recovered.
+
+**Prevention:** Schema v1.10+ requires explicit user confirmation when `!! wrap` detects a prior `MEMORY_STATE: WRAPPED` marker in `memory.md`. If you see the overwrite warning, say `no` if you need to preserve the existing summary first — consume it with `!! ready` in the current session, then `!! wrap` fresh.
+
+---
+
+## `memory.md` appears truncated after `!! wrap`
+
+**Symptom:** `!! ready` next session shows only partial content and warns that the summary appears incomplete.
+
+**Cause:** The session ended (or the agent was interrupted) before `!! wrap` finished writing. In schema v1.10+, the trailing `<!-- MEMORY_WRAP_COMPLETE -->` marker is missing, which is how `!! ready` detects truncation.
+
+**Fix:** `!! ready` will NOT auto-wipe truncated memory. It will display what exists and ask whether to keep or clear. Recover what you can, then either clear it or edit it manually.
+
+**Prevention:** Say `!! wrap` earlier in the session — not at the very last message — so the agent has time to finish writing and append the completion marker.
 
 ---
 
 ## Bulk Edits Reference
 
-Always use Python for any edit touching more than one file:
+Always use Python for any edit touching more than one file. Always anchor to an absolute root path (never rely on cwd) and always handle encoding errors explicitly:
 
 ```python
-import re, pathlib
+import os, re, pathlib
+
+ROOT = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
+pages = ROOT / "wiki" / "pages"
+assert pages.is_dir(), f"pages dir not found at {pages}"
 
 # Example: fix tag format across all pages
-for f in pathlib.Path("wiki/pages").rglob("*.md"):
-    text = f.read_text()
-    # Remove # prefix from tags in frontmatter
-    text = re.sub(r"tags: \[#(\w)", r"tags: [\1", text)
-    text = re.sub(r", #(\w)", r", \1", text)
-    f.write_text(text)
+edited = 0
+for f in pages.rglob("*.md"):
+    try:
+        text = f.read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError) as e:
+        print(f"skip {f}: {e}")
+        continue
+    new = text
+    new = re.sub(r"tags: \[#(\w)", r"tags: [\1", new)
+    new = re.sub(r", #(\w)", r", \1", new)
+    if new != text:
+        f.write_text(new, encoding="utf-8")
+        edited += 1
+print(f"edited {edited} files under {pages}")
 ```
 
-Run via the agent's shell sandbox or in your own terminal.
+Run via the agent's shell sandbox or in your own terminal. Always export `WIKI_ROOT` to the absolute working-folder path before running, and always sanity-check the printed edit count. A count of 0 usually means the regex matched nothing — investigate before claiming success.

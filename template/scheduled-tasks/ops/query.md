@@ -9,7 +9,7 @@ If highly confident in the answer, respond directly with citations where relevan
 
 **Step 2 — Check the wiki**
 If not highly confident, or if the question touches topics this wiki covers:
-1. Read the last 5 entries of `wiki/log.md` for recent context
+1. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
 2. Read `wiki/index.md` to find relevant pages
 3. Read those specific pages
 4. Synthesize an answer with `[[wiki link]]` citations
@@ -25,10 +25,10 @@ If the wiki does not contain a good answer:
 
 After any Step 2 or Step 3 answer, ask: "Worth filing this as an analysis page?"
 If yes:
-1. Show approval request and wait for confirmation
+1. Show approval request and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~475 tokens) in the estimate
 2. Write to `wiki/pages/analyses/`
-3. Update `wiki/index.md` and append to `wiki/log.md`
+3. Update `wiki/index.md` and append to `wiki/log.md` — **log entry must be ≤500 chars total**
 4. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
-5. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section)
+5. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if any file's measured actual now exceeds its documented Chars value
 
-Log format: `## [YYYY-MM-DD] query | [Question summary]`
+Log format: `## [YYYY-MM-DD] query | [Question summary]` (≤500 chars)

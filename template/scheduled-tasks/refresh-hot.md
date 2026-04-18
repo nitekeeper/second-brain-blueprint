@@ -6,8 +6,14 @@ Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation th
 
 ## Steps
 
-1. Read `wiki/index.md` — get the current page count from the Stats header line, and identify the 5 pages with the most recent `updated:` dates
-2. Read `wiki/log.md` — get the last log entry (use `grep "^## \[" log.md | tail -1`) and the most recent open gaps list from the latest lint entry. If no lint entry exists yet, use `none yet — add sources to discover gaps` as the Gaps value.
+1. Read `wiki/index.md` — get the current page count from the Stats header line. To identify the 5 pages with the most recent `updated:` dates, collect every entry line across ALL sections (Sources, Concepts, Entities, Analyses), then sort by the `updated: YYYY-MM-DD` field inside each line (ISO-8601 dates are lexicographically sortable) and take the top 5. A minimal shell expression:
+   ```bash
+   grep -oE '\[\[[^]]+\]\] .*updated: [0-9-]+' wiki/index.md \
+     | sort -t: -k2 -r \
+     | head -5
+   ```
+   (The agent may also do this in memory after reading `index.md` — whichever is cheaper.)
+2. Read `wiki/log.md` — get the last log entry (use `grep -E "^## \[" wiki/log.md | tail -1`) and the most recent open gaps list from the latest lint entry. If no lint entry exists yet, use `none yet — add sources to discover gaps` as the Gaps value.
 
 ## Output Format
 
@@ -37,6 +43,7 @@ Hot: [comma-separated titles of 5 most recently updated pages]
 
 ## Rules
 
-- Keep total file size ≤500 characters — truncate Gaps or Hot lists if needed
+- Keep total file size ≤500 characters — truncate Gaps or Hot lists if needed (verify with `wc -c wiki/hot.md` after writing)
 - Never append — always overwrite the entire file
 - Do not add any extra text, commentary, or blank lines beyond the format above
+- Schema version must match the current value in `CLAUDE.md`'s footer — do not hardcode; read it fresh each refresh
