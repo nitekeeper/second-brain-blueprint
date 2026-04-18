@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~1,820 tokens
+1. Read `CLAUDE.md` (this file) — ~1,945 tokens
 2. Read `wiki/hot.md` — ~60 tokens
 3. Check `drafts/` — list any files present (negligible tokens)
 4. Check if the user's opening message is `!! ready`:
@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~1,880 tokens** (~2,005 tokens if `!! ready` loads memory.md)
+**Total cold-start cost: ~2,000 tokens** (~2,125 tokens if `!! ready` loads memory.md)
 
 ---
 
@@ -43,7 +43,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 | Create or edit any page | `@Library/scheduled-tasks/ops/conventions.md` |
 | Any write action (approval) | `@Library/scheduled-tasks/ops/token-reference.md` |
 
-> **Note:** `@Library` in the paths above refers to your Cowork working folder name. If your folder is named something other than `Library`, replace `@Library` with your actual folder name throughout this file and all ops files.
+> **Note:** `@Library` in the paths above refers to your Cowork working folder name. If your folder is named something other than `Library`, replace `@Library` with your actual folder name throughout this file only. The ops files use working-folder-relative paths and do not require changes.
 
 ---
 

@@ -7,18 +7,18 @@ Format: `~N tokens (R read / W write)`
 
 | File | Chars | Tokens (~chars÷4) |
 |---|---|---|
-| `wiki/hot.md` | ~240 | ~60 |
+| `wiki/hot.md` | ~210 | ~55 |
 | `memory.md` | ~500 (when full) | ~125 |
-| `CLAUDE.md` | ~7,280 | ~1,820 |
-| `wiki/index.md` | ~500 (grows with pages) | ~125 |
-| `wiki/log.md` tail (5 entries) | ~800 | ~200 |
-| `wiki/log.md` full | ~2,760 (grows with activity — recalibrate) | ~690+ |
-| `scheduled-tasks/refresh-hot.md` | ~1,600 | ~400 |
-| `ops/ingest.md` | ~1,100 | ~275 |
-| `ops/lint.md` | ~1,200 | ~300 |
-| `ops/query.md` | ~1,100 | ~275 |
-| `ops/update.md` | ~850 | ~215 |
-| `ops/conventions.md` | ~1,500 | ~375 |
+| `CLAUDE.md` | ~7,775 | ~1,945 |
+| `wiki/index.md` | ~800 (grows with pages) | ~200 |
+| `wiki/log.md` tail (5 entries) | ~1,760 (grows with activity — recalibrate) | ~440 |
+| `wiki/log.md` full | ~4,085 (grows with activity — recalibrate) | ~1,020 |
+| `scheduled-tasks/refresh-hot.md` | ~1,735 | ~435 |
+| `ops/ingest.md` | ~1,760 | ~440 |
+| `ops/lint.md` | ~1,185 | ~295 |
+| `ops/query.md` | ~1,455 | ~365 |
+| `ops/update.md` | ~1,050 | ~260 |
+| `ops/conventions.md` | ~1,555 | ~390 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
 | Raw source document | varies | ~1,000–8,000 |
