@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `wiki/CLAUDE.md` (this file) — ~900 tokens
+1. Read `CLAUDE.md` (this file) — ~900 tokens
 2. Read `wiki/hot.md` — ~100 tokens
 3. Check `drafts/` — list any files present (negligible tokens)
 4. Announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
@@ -82,6 +82,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] update | Bl
 
 ```
 Library/
+├── CLAUDE.md                   ← This file. Auto-read every session. Lean core schema.
 ├── raw/                        ← Immutable source documents. NEVER modify.
 ├── drafts/                     ← In-progress planning files. Claude's scrapbook.
 ├── blueprint/                  ← Setup guide and templates for sharing this system
@@ -101,7 +102,6 @@ Library/
 │       ├── conventions.md
 │       └── token-reference.md
 └── wiki/                       ← Obsidian vault root (open this folder in Obsidian)
-    ├── CLAUDE.md               ← This file. Lean core schema.
     ├── index.md                ← Master page catalog
     ├── log.md                  ← Append-only activity log
     ├── hot.md                  ← Orientation snapshot (≤500 chars)
@@ -156,4 +156,4 @@ Grep tip: `grep "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 1.3 | Created: [YYYY-MM-DD] | Updated: [YYYY-MM-DD]*
+*Schema version: 1.4 | Created: [YYYY-MM-DD] | Updated: [YYYY-MM-DD]*

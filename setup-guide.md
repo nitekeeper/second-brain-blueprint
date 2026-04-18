@@ -56,7 +56,7 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 
 | From | To |
 |---|---|
-| `blueprint/template/wiki/CLAUDE.md` | `wiki/CLAUDE.md` |
+| `blueprint/template/CLAUDE.md` | `CLAUDE.md` |
 | `blueprint/template/scheduled-tasks/refresh-hot.md` | `scheduled-tasks/refresh-hot.md` |
 | `blueprint/template/scheduled-tasks/ops/ingest.md` | `scheduled-tasks/ops/ingest.md` |
 | `blueprint/template/scheduled-tasks/ops/lint.md` | `scheduled-tasks/ops/lint.md` |
@@ -69,7 +69,7 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 
 ## Step 3 — Personalize CLAUDE.md
 
-In `wiki/CLAUDE.md`, replace `[YourName]` with the name the user gave in the pre-flight check.
+In `CLAUDE.md`, replace `[YourName]` with the name the user gave in the pre-flight check.
 
 ---
 
@@ -189,7 +189,7 @@ Instruct the user to do this manually in the Chrome extension settings:
 
 Check the following and report status to the user:
 
-- [ ] `wiki/CLAUDE.md` exists and contains the user's name
+- [ ] `CLAUDE.md` exists at the Library root and contains the user's name
 - [ ] `wiki/inbox/` folder exists
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry

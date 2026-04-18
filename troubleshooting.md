@@ -81,7 +81,7 @@ Or wrap the example in a fenced code block so Obsidian doesn't parse it as a lin
 
 **Cause:** The agent is reading the full `log.md` at startup instead of just the tail.
 
-**Fix:** Check `wiki/CLAUDE.md` — the startup section should say to read only `hot.md` at startup, and defer `log.md` to when it's actually needed. The log should only ever be read with `tail -5` unless doing a full audit.
+**Fix:** Check `CLAUDE.md` — the startup section should say to read only `hot.md` at startup, and defer `log.md` to when it's actually needed. The log should only ever be read with `tail -5` unless doing a full audit.
 
 ---
 
@@ -91,7 +91,7 @@ Or wrap the example in a fenced code block so Obsidian doesn't parse it as a lin
 
 **Cause:** The agent started an operation without reading the matching ops file from `scheduled-tasks/ops/`.
 
-**Fix:** Remind the agent: `Before you proceed, read scheduled-tasks/ops/[operation].md`. The ops file reminder table in `wiki/CLAUDE.md` should prevent this — if it keeps happening, check that the table is still present in the schema.
+**Fix:** Remind the agent: `Before you proceed, read scheduled-tasks/ops/[operation].md`. The ops file reminder table in `CLAUDE.md` should prevent this — if it keeps happening, check that the table is still present in the schema.
 
 ---
 

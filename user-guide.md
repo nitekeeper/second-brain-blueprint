@@ -6,7 +6,7 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `wiki/CLAUDE.md` — its operating instructions (~900 tokens)
+1. `CLAUDE.md` — its operating instructions (~900 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~100 tokens)
 
 **Total cold-start cost: ~1,000 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.

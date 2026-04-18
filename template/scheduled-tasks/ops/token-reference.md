@@ -8,7 +8,7 @@ Format: `~N tokens (R read / W write)`
 | File | Chars | Tokens (~chars÷4) |
 |---|---|---|
 | `wiki/hot.md` | ~400 | ~100 |
-| `wiki/CLAUDE.md` | ~4,000 | ~1,000 |
+| `CLAUDE.md` | ~4,000 | ~1,000 |
 | `wiki/index.md` | ~500 (grows with pages) | ~125 |
 | `wiki/log.md` tail (5 entries) | ~1,600 | ~400 |
 | `wiki/log.md` full | ~500 (grows with activity) | ~125 |
