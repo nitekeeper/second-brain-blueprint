@@ -19,7 +19,7 @@ Every new chat session starts cold — the agent has no memory. It re-orients it
 
 **The recommended path:**
 1. Find an article or document you want to add
-2. Clip it with Obsidian Web Clipper → saves to `Library/raw/` as clean markdown
+2. Clip it with Obsidian Web Clipper → saves to `wiki/inbox/` as clean markdown
 3. Tell the agent: `ingest [filename]`
 
 **What happens:**
@@ -27,9 +27,9 @@ Every new chat session starts cold — the agent has no memory. It re-orients it
 - Shows you a to-do list of every page it will create or update
 - Shows a token cost estimate
 - Waits for your approval before writing anything
-- After approval: creates/updates wiki pages, refreshes hot.md, recalibrates token estimates
+- After approval: creates/updates wiki pages, moves the source file from `wiki/inbox/` to `raw/` (immutable archive), refreshes hot.md, recalibrates token estimates
 
-> You can also say `ingest all` to process every uningested file in `Library/raw/` at once.
+> You can also say `ingest all` to process every file currently in `wiki/inbox/` at once.
 
 **Why Web Clipper instead of URL:**
 Clipped markdown files are 40–60% cheaper to ingest than raw URLs — no HTML boilerplate, no navigation noise.
@@ -128,7 +128,7 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 
 ## Tips
 
-- **Clip first, ingest later** — build up a batch of articles in `raw/`, then ingest them in one session
+- **Clip first, ingest later** — build up a batch of articles in `wiki/inbox/`, then ingest them in one session
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
 - **New session anytime** — starting fresh costs only ~1,000 tokens; the wiki state is always preserved on disk

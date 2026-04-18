@@ -98,11 +98,12 @@ Library/
 │       ├── update.md
 │       ├── conventions.md
 │       └── token-reference.md
-└── wiki/
+└── wiki/                       ← Obsidian vault root (open this folder in Obsidian)
     ├── CLAUDE.md               ← This file. Lean core schema.
     ├── index.md                ← Master page catalog
     ├── log.md                  ← Append-only activity log
     ├── hot.md                  ← Orientation snapshot (≤500 chars)
+    ├── inbox/                  ← Drop clipped articles here (Obsidian Web Clipper target)
     └── pages/
         ├── concepts/
         ├── entities/

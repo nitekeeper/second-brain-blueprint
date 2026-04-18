@@ -18,7 +18,7 @@ If the wiki does not contain a good answer:
 1. Search the web for the best available source
 2. Summarize the key findings clearly
 3. Ask the user: "I found a good source on this — want me to ingest it into the wiki?"
-4. If yes, save the source to `raw/` and run the full INGEST operation
+4. If yes, save the source to `wiki/inbox/` and run the full INGEST operation (ingest will move it to `raw/` after processing)
 
 ## Filing Answers
 

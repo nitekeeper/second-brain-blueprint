@@ -4,10 +4,23 @@
 
 ---
 
+## Step 0 — Select the Cowork Working Folder
+
+Before anything else, the user must select a working folder in the Cowork window. This is the folder Claude will read from and write to throughout the session.
+
+Instruct the user:
+
+> In the Cowork window, click **"Select folder"** and choose the folder where your wiki will live (e.g. `Library/`).
+> Once selected, Claude will have access to all files inside it.
+
+Do not proceed until the user confirms the folder is selected.
+
+---
+
 ## Pre-flight Check
 
 Before starting, confirm:
-1. You have access to the vault folder (the Cowork working directory)
+1. You have access to the working folder (the Cowork working directory)
 2. The `blueprint/` folder exists inside it (you are reading this file from there)
 3. Ask the user: **"What is your name? I'll use it to personalize your wiki."** Wait for the answer before proceeding.
 
@@ -19,6 +32,7 @@ Show approval request, then execute:
 
 ```bash
 mkdir -p raw
+mkdir -p wiki/inbox
 mkdir -p wiki/pages/concepts
 mkdir -p wiki/pages/entities
 mkdir -p wiki/pages/sources
@@ -27,7 +41,8 @@ mkdir -p scheduled-tasks/ops
 ```
 
 **What each folder is for:**
-- `raw/` — drop source articles here before ingesting
+- `raw/` — immutable source archive; Claude moves files here after ingesting
+- `wiki/inbox/` — drop clipped articles here; Obsidian Web Clipper saves here
 - `wiki/pages/` — all wiki content organized by type
 - `scheduled-tasks/` — agent operation instruction files
 
@@ -143,8 +158,12 @@ Replace all `YYYY-MM-DD` placeholders with today's date.
 
 Instruct the user to do this manually in Obsidian (you cannot do this via file edits):
 
-> In Obsidian, go to **Settings → Files and links → Default location for new notes**
-> Set it to `wiki/pages`
+> Open Obsidian and select **Open folder as vault**.
+> Choose the **`wiki/`** folder — not the parent working folder.
+> This keeps `raw/`, `blueprint/`, and `scheduled-tasks/` outside the vault so Obsidian only indexes wiki content.
+>
+> Then go to **Settings → Files and links → Default location for new notes**
+> Set it to `pages`
 >
 > This prevents Obsidian from creating stray pages at the vault root when clicking unresolved wiki links.
 
@@ -155,11 +174,12 @@ Instruct the user to do this manually in Obsidian (you cannot do this via file e
 Instruct the user to do this manually in the Chrome extension settings:
 
 > In the Obsidian Web Clipper extension settings:
-> - Set vault to your vault folder
-> - Set save location to `raw/`
+> - Set vault to your `wiki/` folder
+> - Set save location to `inbox`
 > - Set output format to Markdown
 >
-> This ensures clipped articles land in the right place for ingestion, and saves 40–60% in token costs vs fetching URLs directly.
+> Clipped articles will land in `wiki/inbox/`. Claude will read them from there during ingest, then automatically move them to `raw/` (outside the vault) as an immutable archive.
+> This saves 40–60% in token costs vs fetching URLs directly.
 
 ---
 
@@ -168,11 +188,13 @@ Instruct the user to do this manually in the Chrome extension settings:
 Check the following and report status to the user:
 
 - [ ] `wiki/CLAUDE.md` exists and contains the user's name
+- [ ] `wiki/inbox/` folder exists
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry
 - [ ] `wiki/hot.md` exists with today's date
 - [ ] All 6 ops files exist in `scheduled-tasks/ops/`
 - [ ] `scheduled-tasks/refresh-hot.md` exists
+- [ ] `raw/` folder exists
 
 ---
 
@@ -182,7 +204,7 @@ Tell the user:
 
 > "Setup complete. Your wiki is ready.
 >
-> **Next step:** Clip an article with Obsidian Web Clipper — it will save to `raw/`. Then tell me: `ingest [filename]`
+> **Next step:** Clip an article with Obsidian Web Clipper — it will save to `wiki/inbox/`. Then tell me: `ingest [filename]`
 >
 > For daily usage, see `blueprint/user-guide.md`."
 

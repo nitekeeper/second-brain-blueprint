@@ -27,8 +27,8 @@ This system is different. An AI agent reads your sources, builds a wiki of inter
 ## How to Set Up
 
 ### 1. Install the tools
-- Install **Obsidian** and create a new vault (select or create a folder — this becomes your workspace)
-- Install **Claude Desktop**, enable Cowork mode, and select your vault folder as the working directory
+- Install **Obsidian** (you'll point it at `wiki/` after setup — don't create a vault yet)
+- Install **Claude Desktop** and enable Cowork mode
 - Install the **Obsidian Web Clipper** Chrome extension
 
 ### 2. Clone this repo into your vault folder
@@ -37,7 +37,10 @@ cd /path/to/your/vault
 git clone https://github.com/nitekeeper/second-brain-blueprint blueprint
 ```
 
-### 3. Tell your AI to set it up
+### 3. Select your working folder in Cowork
+In the Cowork window, click **"Select folder"** and choose the folder where you cloned the repo (the parent folder containing `blueprint/`). This is your working directory — **not** `wiki/`.
+
+### 4. Tell your AI to set it up
 Open Claude Desktop (Cowork) and send this message:
 
 ```
@@ -46,7 +49,7 @@ Read blueprint/setup-guide.md and set up the wiki system for me.
 
 Claude will execute the full setup — creating folders, copying files, and initializing the wiki. You only need to answer one question: your name.
 
-### 4. Start using it
+### 5. Start using it
 Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 
 ---

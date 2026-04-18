@@ -95,6 +95,21 @@ Or wrap the example in a fenced code block so Obsidian doesn't parse it as a lin
 
 ---
 
+## Stale `wiki/raw/` folder appeared inside the wiki vault
+
+**Symptom:** A `raw/` folder exists inside `wiki/` alongside `pages/`, containing duplicate source files. Obsidian indexes these raw markdown files as wiki pages.
+
+**Cause:** Early schema versions (v1.0) placed raw files at `wiki/raw/`. This was corrected in v1.1 — the canonical raw archive is `raw/` at the working folder root (outside the Obsidian vault). A stale `wiki/raw/` folder is a leftover from that earlier layout.
+
+**Fix:** Delete `wiki/raw/` and all files inside it. The originals are already in `raw/`. In the Cowork session, tell Claude:
+> "Delete wiki/raw/ — it's a stale duplicate."
+
+Claude will request file deletion permission via the Cowork allow-delete prompt, then remove the folder.
+
+**Prevention:** Always open `wiki/` (not the parent working folder) as your Obsidian vault. Raw source files live in `raw/` which is outside the vault and never visible to Obsidian. Clipped articles go to `wiki/inbox/` and are moved to `raw/` by Claude after ingesting.
+
+---
+
 ## Bulk Edits Reference
 
 Always use Python for any edit touching more than one file:
