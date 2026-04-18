@@ -68,6 +68,8 @@ Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 - **Pros/cons on every suggestion** — agent always shows trade-offs before recommending changes
 - **Session memory** — `!! wrap` saves a detailed summary at session end; `!! ready` loads and clears it next session
 
+> **Note on token figures:** The token numbers above and throughout the blueprint (including `token-reference.md`) are **estimates** based on `chars ÷ 4`. Actual token usage depends on the model's tokenizer, exact file contents, and runtime overhead, so real numbers will differ. Treat these as rough planning figures, not precise accounting.
+
 ---
 
 ## Daily Usage

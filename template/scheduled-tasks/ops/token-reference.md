@@ -3,7 +3,9 @@
 Use this file to estimate token cost before any approval request.
 Format: `~N tokens (R read / W write)`
 
-> **Self-cost note:** This file itself is ~780 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~780-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
+> **Estimates only:** Every number in this file is `chars ÷ 4`. Real token usage depends on the model's tokenizer, exact file contents, and runtime overhead (tool calls, system prompt) — treat these as rough planning figures, not precise accounting. Quote them as approximate when citing in approval requests.
+
+> **Self-cost note:** This file itself is ~880 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~880-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
 
 > **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
 
@@ -23,7 +25,7 @@ Format: `~N tokens (R read / W write)`
 | `ops/query.md` | ~1,900 | ~480 |
 | `ops/update.md` | ~1,500 | ~380 |
 | `ops/conventions.md` | ~2,600 | ~650 |
-| `ops/token-reference.md` | ~3,100 | ~780 |
+| `ops/token-reference.md` | ~3,500 | ~880 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
 | Raw source document | varies | ~1,000–8,000 |
