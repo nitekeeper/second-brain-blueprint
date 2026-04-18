@@ -97,6 +97,7 @@ All other write actions — Blueprint Sync writes, and the log appends + `hot.md
 | Any schema change | `blueprint/template/CLAUDE.md` always |
 | Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
 | Schema version bump | `blueprint/CHANGELOG.md` (new section documenting the version) in addition to any rows above that the change triggers |
+| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (scope) + `ops/token-reference.md` (file-size row) + `setup-guide.md` (Step 2 copy / Step 3 personalize if placeholders / Step 7 verify) + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure |
 
 After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blueprint synced — [what changed]` (≤500 chars). The `sync` op label is distinct from wiki-page `update` entries so `grep`/`tail` can separate them.
 
@@ -131,6 +132,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │   └── template/
 │       ├── CLAUDE.md
 │       └── scheduled-tasks/
+│           ├── changelog-monitor.md
 │           ├── refresh-hot.md
 │           └── ops/
 │               ├── ingest.md
@@ -141,6 +143,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │               ├── conventions.md
 │               └── token-reference.md
 ├── scheduled-tasks/            ← Reusable task and ops instruction files
+│   ├── changelog-monitor.md
 │   ├── refresh-hot.md
 │   └── ops/
 │       ├── ingest.md

@@ -104,6 +104,33 @@ Audits are **read-only by default** — no approval needed to run one. If the au
 
 ---
 
+### Staying Current — Changelog Monitor
+
+A daily scheduled task (`scheduled-tasks/changelog-monitor.md`) fetches your monitored documentation pages, content-hashes them against each source page's stored `source_hash:`, and posts a single Slack DM summarizing findings. Strictly read-only — never writes files, never triggers ingest automatically. The monitor is the detector; `!! ingest` stays the writer.
+
+**Slack DM format:**
+
+```
+📅 Changelog monitor — YYYY-MM-DD
+✅ Source A — no change
+🆕 Source B — CHANGED (stored: … → fetched: …)
+🆘 Source C — UNINGESTED (no wiki page yet)
+❌ Source D — fetch failed (retry next run)
+```
+
+**What to do with each status:**
+
+- ✅ — nothing. No change since your last ingest.
+- 🆕 — run `!! ingest <URL>` to pull the update. v2.0's hash-check guarantee makes re-ingest idempotent: if the source didn't actually change, the command exits with `No change since last ingest — skipped.`
+- 🆘 — run `!! ingest <URL>` to bootstrap a new source page.
+- ❌ — transient. Wait for the next daily run before investigating.
+
+**Editing the watch list:** add or remove rows in the `## Monitored Sources` table in `scheduled-tasks/changelog-monitor.md`. The task iterates the table on every run — no scheduler restart needed.
+
+**Scheduling the task:** register the 2-line prompt from the file's `## Invocation` section in your Cowork scheduled-tasks MCP. All logic lives in the file itself so the scheduler contract stays thin and version-controlled.
+
+---
+
 ### Updating Pages — `!! update`
 
 You don't need a special command to trigger an update — just make a correction or add context mid-conversation. The agent detects it and runs the update op automatically.

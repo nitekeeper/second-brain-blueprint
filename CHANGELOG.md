@@ -3,6 +3,34 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.1 — 2026-04-18
+
+### Follow-ups (audit-driven)
+
+- **`scheduled-tasks/changelog-monitor.md` authored.** v2.0's CHANGELOG entry
+  described this file as "restored" but it was not actually landed — `!! audit all`
+  caught the drift. This version lands the file to the spec already documented in
+  `troubleshooting.md`'s "Changelog monitor ran but nothing was ingested." entry.
+  The file ships with `[YOUR_SLACK_USER_ID]` as a personalization placeholder
+  (replaced at setup time per `setup-guide.md` Step 3).
+- **Blueprint Sync Rule row added** in `template/CLAUDE.md` for "New scheduled
+  task" — enumerates the propagation matrix (ops/audit.md scope,
+  token-reference.md file-size row, setup-guide.md copy/personalize/verify,
+  README/user-guide mentions if user-visible, CLAUDE.md Directory Structure).
+  Closes the gap that let v2.0 ship a CHANGELOG entry without the file.
+- **`ops/audit.md` scope generalized** at the `scheduled-tasks/` level — specific
+  filename enumeration replaced with "Every file directly under
+  `scheduled-tasks/`" so future siblings to `refresh-hot.md` and
+  `changelog-monitor.md` land in audit scope automatically.
+- **`setup-guide.md` updated** — Step 2 copy table, Step 3 personalization
+  (renamed to "Personalize Template Files" with `[YOUR_SLACK_USER_ID]`
+  replacement instructions), Step 7 verify checklist.
+- **`README.md` Key Features + `user-guide.md` Daily Workflow** gain a
+  "Changelog monitor" entry.
+- **`token-reference.md`** gains a file-read-cost row for
+  `scheduled-tasks/changelog-monitor.md` (~5,200 chars / ~1,300 tokens at v2.0.1
+  calibration).
+
 ## v2.0 — 2026-04-18
 
 **Theme:** rerun-proofness. The entire ingest pipeline is now idempotent on duplicate input, with a content-hash dedupe primitive and timestamped immutable raw snapshots. This unblocks safe scheduled-task monitoring — a daily changelog monitor can now trigger re-ingests without fear of duplicating state. This is a breaking schema change; upgrades require touching every source page.
