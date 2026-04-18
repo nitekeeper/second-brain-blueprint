@@ -5,7 +5,7 @@ Format: `~N tokens (R read / W write)`
 
 > **Estimates only:** Every number in this file is `chars ÷ 4`. Real token usage depends on the model's tokenizer, exact file contents, and runtime overhead (tool calls, system prompt) — treat these as rough planning figures, not precise accounting. Quote them as approximate when citing in approval requests.
 
-> **Self-cost note:** This file itself is ~880 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~880-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
+> **Self-cost note:** This file itself is ~850 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~850-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
 
 > **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
 
@@ -15,17 +15,17 @@ Format: `~N tokens (R read / W write)`
 |---|---|---|
 | `wiki/hot.md` | ~210 | ~55 |
 | `memory.md` | ~500 (when full) | ~125 |
-| `CLAUDE.md` | ~13,700 | ~3,430 |
+| `CLAUDE.md` | ~15,800 | ~3,950 |
 | `wiki/index.md` | ~800 (grows with pages) | ~200 |
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
-| `scheduled-tasks/refresh-hot.md` | ~3,300 | ~830 |
-| `ops/ingest.md` | ~3,800 | ~950 |
-| `ops/lint.md` | ~1,800 | ~450 |
-| `ops/query.md` | ~1,900 | ~480 |
-| `ops/update.md` | ~1,500 | ~380 |
-| `ops/conventions.md` | ~2,600 | ~650 |
-| `ops/token-reference.md` | ~3,500 | ~880 |
+| `scheduled-tasks/refresh-hot.md` | ~4,100 | ~1,020 |
+| `ops/ingest.md` | ~4,300 | ~1,080 |
+| `ops/lint.md` | ~2,400 | ~600 |
+| `ops/query.md` | ~2,100 | ~520 |
+| `ops/update.md` | ~1,400 | ~350 |
+| `ops/conventions.md` | ~2,500 | ~620 |
+| `ops/token-reference.md` | ~3,400 | ~850 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
 | Raw source document | varies | ~1,000–8,000 |

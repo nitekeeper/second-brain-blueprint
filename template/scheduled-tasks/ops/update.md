@@ -6,7 +6,7 @@ Triggered when the user makes a correction, adds context, or requests a change m
 
 1. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
 2. Identify the relevant page(s) to change
-3. Show approval request (summary + token estimate + to-do list) and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~880 tokens) in the estimate
+3. Show approval request (summary + token estimate + to-do list) and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~850 tokens) in the estimate
 4. Apply the change to the relevant page(s)
 5. Update the `updated:` date in each page's frontmatter
 6. Append entry to `wiki/log.md` — **must be ≤500 chars total**:

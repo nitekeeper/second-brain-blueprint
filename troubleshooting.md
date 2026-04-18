@@ -27,7 +27,7 @@ If this happened across many pages, fix with Python (see Bulk Edits section belo
 
 **Symptom:** Files named `XX5dT39o`, `XXabcdef`, etc. appear in your pages folders. Obsidian cannot open them.
 
-**Cause:** `sed -i` was used for bulk file edits. On some systems, `sed -i` creates temporary backup files with `XX` prefixes. If the command fails or the flag is wrong, these files are left behind.
+**Cause:** `sed -i` was used for bulk file edits. GNU and BSD `sed -i` disagree on arguments — BSD/macOS `sed -i` requires an explicit suffix argument, and a misuse ends up treating a subsequent argument as the suffix or a file name. Depending on the exact invocation (and interplay with shell globbing and temp-file naming used by some sed implementations, editor swap files, or cleanup tools), you can end up with stray `XX*`-prefixed files that Obsidian cannot open. The root cause is always the same: `sed -i` is non-portable and easy to misuse across files.
 
 **Fix:** Delete the `XX*` files. In terminal:
 ```bash
@@ -165,7 +165,7 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 **Cause:** The session ended (or the agent was interrupted) before `!! wrap` finished writing. In schema v1.10+, the trailing `<!-- MEMORY_WRAP_COMPLETE -->` marker is missing, which is how `!! ready` detects truncation.
 
-**Fix:** `!! ready` will NOT auto-wipe truncated memory. It will display what exists and ask whether to keep or clear. Recover what you can, then either clear it or edit it manually.
+**Fix:** `!! ready` will NOT auto-wipe truncated memory. In schema v1.11+, it offers three options: `clear` (wipe back to EMPTY), `keep` (rewrite the opening marker to `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED` so the warning does not re-fire on subsequent `!! ready` calls), or `edit` (hand the file back to you untouched for manual repair). In schema v1.10 there was no `keep` option — repeated `!! ready` calls would loop on the same warning until you manually cleared or edited the file.
 
 **Prevention:** Say `!! wrap` earlier in the session — not at the very last message — so the agent has time to finish writing and append the completion marker.
 

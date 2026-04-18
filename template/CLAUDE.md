@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~3,430 tokens
+1. Read `CLAUDE.md` (this file) — ~3,950 tokens
 2. Read `wiki/hot.md` — ~55 tokens
 3. Check `drafts/` — list any files present (negligible tokens)
 4. Check if the user's opening message is `!! ready`:
@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~3,485 tokens** (~3,610 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~4,005 tokens** (~4,130 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
 
@@ -44,11 +44,11 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 | Update a page | `@Library/scheduled-tasks/ops/update.md` |
 | Create or edit any page | `@Library/scheduled-tasks/ops/conventions.md` |
 | Any write action (approval) | `@Library/scheduled-tasks/ops/token-reference.md` |
-| After any wiki-state change (Ingest/Lint/Update/filed Query) | `@Library/scheduled-tasks/refresh-hot.md` |
+| After any wiki-state change (Ingest/Lint/Update/filed Query/`!! wrap`/`!! ready`) | `@Library/scheduled-tasks/refresh-hot.md` |
 
-> **Note:** The `@`-prefixed path segment above (shown as `@Library/...` in the unconfigured template) refers to your Cowork working folder. At setup time this prefix is rewritten to match the folder the user actually selected — so if you see `@MyWiki/...` here, that is expected. If you ever rename the working folder, search-and-replace the `@`-prefix throughout this file only; the ops files use working-folder-relative paths and do not require changes.
+> **Note:** The `@`-prefixed path segment in the table above refers to your Cowork working folder. At setup time the unconfigured template uses a placeholder working-folder name; the placeholder is rewritten to match the folder the user actually selected — so whatever name you see here is expected. If you ever rename the working folder, search-and-replace the `@`-prefix throughout this file only; the ops files use working-folder-relative paths and do not require changes.
 
-> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~880 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
+> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~850 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
 
 ---
 
@@ -160,6 +160,7 @@ User invocation is implicit approval for both commands, subject to the safeguard
 
 - Empty state begins with: `<!-- MEMORY_STATE: EMPTY -->`
 - A valid wrapped summary begins with `<!-- MEMORY_STATE: WRAPPED -->` and ends with `<!-- MEMORY_WRAP_COMPLETE -->`
+- A user-acknowledged truncated summary begins with `<!-- MEMORY_STATE: TRUNCATED_ACKNOWLEDGED -->` — treated identically to EMPTY for routing purposes (no warning, no auto-wipe trigger)
 
 **Truncation detection:** If the file contains `MEMORY_STATE: WRAPPED` but is missing `MEMORY_WRAP_COMPLETE`, the file is treated as truncated. `!! ready` must NOT wipe truncated content — see `!! ready` step 4 below.
 
@@ -188,15 +189,20 @@ Triggered when user says: `!! wrap`
    ```
    The trailing marker must be the last line and must only be written once the body is complete.
 4. Append to `log.md`: `## [YYYY-MM-DD] memory | Session summary saved` (≤500 chars).
-5. Confirm: "Session summary saved. Say `!! ready` next session to load it."
+5. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md` so the `Last op:` field reflects the memory write instead of the previous unrelated op.
+6. Confirm: "Session summary saved. Say `!! ready` next session to load it."
 
 ### `!! ready`
 Triggered when user says: `!! ready`
 
 1. **Mid-session guard:** `!! ready` is a session-opening command. If this is NOT the first user message of the session (i.e. any prior user message has been received in the current session), do NOT consume or wipe memory. Instead, reply: "`!! ready` is meant as a session-opening command. You seem to be mid-session — say `!! ready confirm` if you really want me to read and wipe the summary now." Only proceed on `!! ready confirm`.
 2. Read `memory.md`.
-3. **If `MEMORY_STATE: EMPTY` is present** (or file is missing/blank): announce readiness normally (from `hot.md`). Do not wipe.
-4. **If `MEMORY_STATE: WRAPPED` is present but `MEMORY_WRAP_COMPLETE` is MISSING:** the file is truncated. Display what is present, warn the user it appears incomplete, and do NOT wipe. Ask whether to keep or clear.
+3. **If `MEMORY_STATE: EMPTY` or `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED` is present** (or file is missing/blank): announce readiness normally (from `hot.md`). Do not wipe. `TRUNCATED_ACKNOWLEDGED` means a prior session already shown the truncated content and the user chose to keep it visible without re-prompting — leave it alone.
+4. **If `MEMORY_STATE: WRAPPED` is present but `MEMORY_WRAP_COMPLETE` is MISSING:** the file is truncated. Display what is present, warn the user it appears incomplete, and do NOT wipe. Offer three options and wait for an explicit choice:
+   - `clear` — wipe back to EMPTY (for when the partial content is useless).
+   - `keep` — rewrite the opening marker from `MEMORY_STATE: WRAPPED` to `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED`, leaving the body intact. This silences the truncation warning on future `!! ready` calls so the loop breaks, while preserving what was recovered.
+   - `edit` — hand control back to the user so they can fix the file manually; do not touch it.
+   Under no circumstances auto-wipe in this branch.
 5. **If both markers are present (valid wrapped summary):**
    - Display the full summary verbatim to the user (do not paraphrase, do not truncate).
    - Append to `log.md`: `## [YYYY-MM-DD] memory | Session summary consumed` (≤500 chars).
@@ -207,6 +213,7 @@ Triggered when user says: `!! ready`
 
      *(empty — use `!! wrap` at the end of a session to save a summary here)*
      ```
+   - Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md` so the `Last op:` field reflects the memory read.
    - Confirm: "Memory cleared. Ready to work." Then surface any in-progress drafts from `drafts/` (same as normal startup Step 4) so resuming via `!! ready` never drops drafts that a non-`!! ready` startup would have announced.
 
 ---
@@ -257,6 +264,6 @@ Grep tip (portable, extended regex): `grep -E "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 1.10 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 1.11 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format. Also replace `[YourName]` in line 3 above.

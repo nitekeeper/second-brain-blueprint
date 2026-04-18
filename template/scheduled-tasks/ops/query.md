@@ -25,10 +25,11 @@ If the wiki does not contain a good answer:
 
 After any Step 2 or Step 3 answer, ask: "Worth filing this as an analysis page?"
 If yes:
-1. Show approval request and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~880 tokens) in the estimate
-2. Write to `wiki/pages/analyses/`
-3. Update `wiki/index.md` and append to `wiki/log.md` — **log entry must be ≤500 chars total**
-4. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
-5. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if any file's measured actual now exceeds its documented Chars value
+1. Read `@scheduled-tasks/ops/conventions.md` before writing the analysis page — this enforces slug, frontmatter, tag, and wiki-link conventions that analysis pages must follow
+2. Show approval request and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~850 tokens) in the estimate
+3. Write to `wiki/pages/analyses/`
+4. Update `wiki/index.md` and append to `wiki/log.md` — **log entry must be ≤500 chars total**
+5. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
+6. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if any file's measured actual now exceeds its documented Chars value
 
 Log format: `## [YYYY-MM-DD] query | [Question summary]` (≤500 chars)
