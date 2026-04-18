@@ -116,7 +116,7 @@ At the start of your next session, say `!! ready` as your first message. The age
 
 **Mid-session safeguard:** If you accidentally say `!! ready` in the middle of a session (not as the first message), the agent will refuse to wipe memory without explicit `!! ready confirm`. This prevents the older footgun where a casual "ready" wiped a saved summary.
 
-**Truncation detection:** If `!! wrap` was interrupted before writing the completion marker, `!! ready` will display what's present, warn that the summary appears truncated, and ask you to choose one of three options — `clear` (wipe back to empty), `keep` (mark the partial summary as acknowledged so the warning stops firing), or `edit` (hand the file back untouched for manual repair). It will never silently wipe truncated content.
+**Truncation detection:** If `!! wrap` was interrupted before writing the completion marker, `!! ready` will display what's present, warn that the summary appears truncated, and ask you to choose one of three options — `clear` (wipe back to empty), `keep` (mark the partial summary as acknowledged so the warning stops firing), or `edit` (hand the file back untouched for manual repair). It will never silently wipe truncated content. In schema v1.14+, `clear` and `keep` each log their recovery choice to `log.md` and refresh `hot.md`, so the audit trail stays intact; `edit` leaves the file untouched and writes nothing.
 
 If you start a session without saying `!! ready`, the summary stays in `memory.md` untouched until you explicitly ask for it. It won't be read automatically.
 
@@ -180,7 +180,8 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | Simple query (wiki) | ~2,000–4,000 |
 | Audit a single blueprint file | ~1,000–5,000 |
 | Audit all (full blueprint) | ~20,000–25,000 |
-| `!! wrap` or `!! ready` (realistic) | ~2,700 |
+| `!! wrap` (realistic) | ~2,700 |
+| `!! ready` (realistic) | ~2,800 |
 
 If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~4,635 tokens to re-orient.
 

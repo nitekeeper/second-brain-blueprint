@@ -226,6 +226,7 @@ Check the following and report status to the user:
 - [ ] `CLAUDE.md` exists at the working folder root and contains the user's name
 - [ ] `memory.md` exists at the working folder root (empty)
 - [ ] `wiki/inbox/` folder exists
+- [ ] `wiki/pages/` subfolders exist: `concepts/`, `entities/`, `sources/`, `analyses/`
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry
 - [ ] `wiki/hot.md` exists with today's date
