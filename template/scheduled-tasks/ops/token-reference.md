@@ -3,7 +3,7 @@
 Use this file to estimate token cost before any approval request.
 Format: `~N tokens (R read / W write)`
 
-## File Read Costs (calibrated at setup — recalibrate after first ingest)
+## File Read Costs (last calibrated: YYYY-MM-DD — recalibrate after each ingest)
 
 | File | Chars | Tokens (~chars÷4) |
 |---|---|---|

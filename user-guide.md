@@ -6,12 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~1,000 tokens)
-2. `wiki/hot.md` — a brief orientation snapshot (~100 tokens)
+1. `CLAUDE.md` — its operating instructions (~1,820 tokens)
+2. `wiki/hot.md` — a brief orientation snapshot (~60 tokens)
 
-**Total cold-start cost: ~1,100 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~1,880 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~1,225 tokens total).
+If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~2,005 tokens total).
 
 ---
 
@@ -144,8 +144,8 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~1,100 |
-| Cold start with `!! ready` | ~1,225 |
+| Cold start | ~1,880 |
+| Cold start with `!! ready` | ~2,005 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all (23 pages) | ~8,000–12,000 |
@@ -172,5 +172,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~1,000 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~1,880 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.

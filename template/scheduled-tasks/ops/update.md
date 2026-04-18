@@ -12,6 +12,7 @@ Triggered when the user makes a correction, adds context, or requests a change m
    `## [YYYY-MM-DD] update | [What changed]`
 6. If the change affects the index summary, update `wiki/index.md`
 7. Refresh `hot.md` if the update is significant — follow `@scheduled-tasks/refresh-hot.md`
+8. Recalibrate token estimates if affected files grew significantly — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section)
 
 ## Notes
 

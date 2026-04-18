@@ -74,7 +74,7 @@ In `CLAUDE.md`, make the following replacements:
 - Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
 - Replace `@Library` throughout the Ops File Reminder table with the actual name of the user's Cowork working folder, if it differs from `Library`
 
-> **Important:** The `@Library` prefix in `CLAUDE.md` and all ops files must match the name of the folder the user selected in Cowork. If the folder is named `Library`, no change is needed. If it has a different name (e.g. `MyWiki`), every `@Library/` reference must be updated to `@MyWiki/` — including inside the ops files in `scheduled-tasks/ops/`.
+> **Important:** The `@Library` prefix in `CLAUDE.md` and all ops files must match the name of the folder the user selected in Cowork. If the folder is named `Library`, no change is needed. If it has a different name (e.g. `MyWiki`), every `@Library/` reference must be updated to `@MyWiki/` — these references appear in `CLAUDE.md` only. The ops files use working-folder-relative paths and do not require changes.
 
 ---
 
@@ -151,7 +151,7 @@ To see recent activity, read `log.md`.
 ---
 updated: YYYY-MM-DD
 ---
-Pages: 0 | Schema: v1.6 | Updated: YYYY-MM-DD
+Pages: 0 | Schema: v1.7 | Updated: YYYY-MM-DD
 Last op: init YYYY-MM-DD (wiki created, ready for first ingest)
 Gaps: none yet — add sources to discover gaps
 Hot: none yet

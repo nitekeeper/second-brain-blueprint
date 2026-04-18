@@ -27,5 +27,6 @@ If yes:
 1. Show approval request and wait for confirmation
 2. Write to `wiki/pages/analyses/`
 3. Update `wiki/index.md` and append to `wiki/log.md`
+4. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
 
 Log format: `## [YYYY-MM-DD] query | [Question summary]`
