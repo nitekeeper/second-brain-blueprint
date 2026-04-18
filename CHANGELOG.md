@@ -3,6 +3,84 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.7 — 2026-04-18
+
+### Follow-ups (audit-driven, seventh pass)
+
+- **`token-reference.md:54` reconciled with the File Read Costs table (W1).**
+  The "true session cost" note at line 54 quoted `refresh-hot.md` as
+  `~1,030` tokens while the same file's table at line 22 documented it as
+  `~1,100`. The 1,030 figure was a stale measured-actual from a prior
+  calibration; today's measured actual is 992 tokens (3,966 chars), so the
+  1,100 documented value is the 110%-headroom-inflated canonical number.
+  Direct intra-file self-contradiction. Fixed by changing `~1,030` →
+  `~1,100` and refreshing the two downstream realistic-cost figures:
+  `!! wrap` ~2,700 → ~2,800 (`1,100 + 200 + 625 + 100 + 600–900` midpoint),
+  `!! ready` ~2,800 → ~2,825 (`1,100 + 200 + 625 + 100 + 750 + 50` exact).
+  Added an explicit note that all figures in the paragraph use the
+  documented Tokens column so they stay coupled to the table on future
+  recalibrations.
+- **CHANGELOG v2.0.6 envelope-justification prose repaired (W2 + S2).** The
+  v2.0.6 entry justifying the 45,000 upper bound said
+  "(≈110% of current documented sum, rounded to nearest 1,000)". Arithmetic:
+  45,000 / 43,575 = 103.3%, not 110%. If the next editor applied that rule
+  literally on the next sum increase, the envelope would balloon far beyond
+  intent (e.g., a sum of 48,000 would produce a 53,000 upper bound rather
+  than the intended ~50,000). Rewrote the parenthetical to match the
+  additive-cushion framing that `audit.md:71` already uses: "documented sum
+  ~42,435 plus a ~2,565-token cushion, rounded to nearest 1,000 — additive
+  cushion, NOT a multiplicative 110% scaling of the sum". Also amended
+  `audit.md:71`'s note to drop the misleading "matching the 110% per-file
+  headroom convention" tail (the 110% convention is per-file only and is
+  already baked into each row's Chars value — re-applying it at the
+  envelope level double-counts). Both docs now use the same methodology
+  (S2 auto-closed).
+- **Recalibration Rule Step 4 extended to cover the envelope cascade (S1).**
+  Previously Step 4 of the Recalibration Rule mentioned only cold-start
+  cascade targets (`CLAUDE.md`, `user-guide.md`, `README.md`) — a future
+  editor following the rule would update the Tokens column and the
+  cold-start figures but could miss that the `!! audit all` envelope at
+  `ops/audit.md:71` is derived from the same column. The v2.0.6 pass caught
+  this by editor judgment, not by following the rule. Added a new Step 5
+  that explicitly re-sums the blueprint-doc + template-side rows, verifies
+  the result still fits inside the documented envelope, and if not, widens
+  the envelope (sum + ~1,000–1,500 cushion, rounded to nearest 1,000) and
+  cascades to every `!! audit all` mention. Original "Update calibration
+  date" step renumbered to Step 6.
+- **Per-file schema footer asymmetry resolved — normalize down (Q1).**
+  `changelog-monitor.md` was the only template file with a trailing
+  `*Schema: v2.0 | Created: 2026-04-18*` footer; `refresh-hot.md` and every
+  file under `ops/` lacked one. Unresolved across audits #3, #4, #5, #6, #7.
+  Dropped the footer to align with the rest of the template tree. The
+  canonical schema version continues to live in `CLAUDE.md`'s footer and in
+  `hot.md`'s `Schema:` header; per-file footers were a parallel source of
+  truth that added drift risk without value. This closes a question that
+  had been carried for five consecutive audits.
+- **`token-reference.md` and `CHANGELOG.md` recalibrated; envelope widened
+  to `~30,000–48,000` (Recalibration-Rule Step 5 exercised).** Post-fix
+  `wc -c` showed two files crossed their documented Chars caps:
+  `token-reference.md` 6,094 (cap 6,000) and `CHANGELOG.md` grew past its
+  38,500 cap as this v2.0.7 entry accumulated. Recalibration trigger fired
+  for both rows. Applied 110% headroom per the convention (rounded
+  liberally so the rows have room to absorb this very entry's growth):
+  `ops/token-reference.md` row bumped from `~6,000/~1,500` to
+  `~6,800/~1,700`; `blueprint/CHANGELOG.md` row bumped from
+  `~38,500/~9,620` to `~44,000/~11,000`. The token-reference self-cost
+  change (~1,500 → ~1,700) cascaded inside `token-reference.md` — the
+  Self-cost note, the Ingest Estimate concrete, and the fixed-floor
+  arithmetic (~2,825 → ~3,025) all updated. No change to cold-start
+  figures (~5,530 / ~6,280 / ~5,475) because `CLAUDE.md` was not touched
+  and the self-cost does not factor into cold start. Blueprint-doc sum
+  moves 25,680 → 27,060 (CHANGELOG row +1,380); template-side sum moves
+  17,895 → 18,095 (token-reference row +200); new total ~45,155 — over
+  the previous 45,000 envelope upper bound by 155 tokens. Per the new
+  Recalibration-Rule Step 5, widened the `!! audit all` envelope from
+  `~30,000–45,000` to `~30,000–48,000` (sum ~45,155 + ~2,845 cushion,
+  rounded to nearest 1,000) and cascaded to `ops/audit.md:71`,
+  `user-guide.md:94`, `user-guide.md:215`, and the Step-5 literal in
+  `token-reference.md:79`. The new cushion is ~6.3% — comparable to
+  v2.0.6's ~5.9%, restoring the pre-recalibration margin.
+
 ## v2.0.6 — 2026-04-18
 
 ### Follow-ups (audit-driven, sixth pass)
@@ -45,12 +123,18 @@
   the directive at measured actuals) because the 110% per-file headroom
   convention already implies per-file Chars values overshoot measured actuals
   by ~10%, so an envelope that contains the sum of Chars values is the
-  internally consistent choice. Widened to `~30,000–45,000` (≈110% of current
-  documented sum, rounded to nearest 1,000) in `audit.md:71`, cascaded to
-  `user-guide.md:215` and `user-guide.md:94` (W2). Amended the `audit.md:71`
-  note to call the 45,000 upper bound "the documented sum plus a small
-  cushion, matching the 110% per-file headroom convention" so the next editor
-  sees *why* the number is 45,000 rather than a hand-tuned figure.
+  internally consistent choice. Widened to `~30,000–45,000` (documented sum
+  ~42,435 plus a ~2,565-token cushion, rounded to nearest 1,000 — additive
+  cushion, NOT a multiplicative 110% scaling of the sum) in `audit.md:71`,
+  cascaded to `user-guide.md:215` and `user-guide.md:94` (W2). Amended the
+  `audit.md:71` note to call the 45,000 upper bound "the documented sum plus
+  a small cushion" so the next editor sees *why* the number is 45,000 rather
+  than a hand-tuned figure. The 110% per-file headroom convention remains
+  per-file only; the envelope is derived from the sum of the already-
+  headroomed Chars values plus a small additional cushion to absorb tool-
+  call and prompt-side overhead (i.e. the 10% headroom is already baked
+  into the per-row figures being summed, so the envelope does NOT apply a
+  second 110% multiplier on top).
 - **`token-reference.md` CHANGELOG row recalibrated to absorb this v2.0.6
   entry.** Post-fix `wc -c` against every row: all other rows stayed within
   headroom (`ingest.md` 14,247 / 15,500; `ops/audit.md` 6,207 / 6,600;

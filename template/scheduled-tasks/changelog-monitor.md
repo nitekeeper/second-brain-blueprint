@@ -86,7 +86,3 @@ Understand the instruction in that file and execute the instructions.
 ```
 
 That prompt is the entire scheduler contract — do not expand it. Any logic added to the scheduler prompt drifts out of version control; keep the logic here in this file.
-
----
-
-*Schema: v2.0 | Created: 2026-04-18*
