@@ -69,7 +69,12 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 
 ## Step 3 — Personalize CLAUDE.md
 
-In `CLAUDE.md`, replace `[YourName]` with the name the user gave in the pre-flight check.
+In `CLAUDE.md`, make the following replacements:
+- Replace `[YourName]` with the name the user gave in the pre-flight check
+- Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
+- Replace `@Library` throughout the Ops File Reminder table with the actual name of the user's Cowork working folder, if it differs from `Library`
+
+> **Important:** The `@Library` prefix in `CLAUDE.md` and all ops files must match the name of the folder the user selected in Cowork. If the folder is named `Library`, no change is needed. If it has a different name (e.g. `MyWiki`), every `@Library/` reference must be updated to `@MyWiki/` — including inside the ops files in `scheduled-tasks/ops/`.
 
 ---
 

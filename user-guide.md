@@ -81,6 +81,14 @@ The agent always reports findings first and asks approval before fixing anything
 
 ---
 
+### Updating Pages — `!! update`
+
+You don't need a special command to trigger an update — just make a correction or add context mid-conversation. The agent detects it and runs the update op automatically.
+
+You can also say it explicitly: `!! update [page-name]` or `"Update the Claude Code page with this new info: …"` The agent will show you a plan and wait for approval before changing anything.
+
+---
+
 ### Session Memory — `!! wrap` and `!! ready`
 
 **This is temporary, intentional memory — designed to bridge one session to the next. It is not a permanent log.**

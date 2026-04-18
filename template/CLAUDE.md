@@ -6,14 +6,15 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~1,000 tokens
-2. Read `wiki/hot.md` — ~100 tokens
+1. Read `CLAUDE.md` (this file) — ~1,820 tokens
+2. Read `wiki/hot.md` — ~60 tokens
 3. Check `drafts/` — list any files present (negligible tokens)
-4. Announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
+4. Check if the user's opening message is `!! ready`:
+   - **If yes:** follow the **Session Memory Commands** section — skip the normal readiness announcement below
+   - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
-6. If user says `!! ready` — follow the **Session Memory Commands** section instead of a normal readiness announcement
 
-**Total cold-start cost: ~1,100 tokens** (~1,225 tokens if `!! ready` loads memory.md)
+**Total cold-start cost: ~1,880 tokens** (~2,005 tokens if `!! ready` loads memory.md)
 
 ---
 
@@ -41,6 +42,8 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 | Update a page | `@Library/scheduled-tasks/ops/update.md` |
 | Create or edit any page | `@Library/scheduled-tasks/ops/conventions.md` |
 | Any write action (approval) | `@Library/scheduled-tasks/ops/token-reference.md` |
+
+> **Note:** `@Library` in the paths above refers to your Cowork working folder name. If your folder is named something other than `Library`, replace `@Library` with your actual folder name throughout this file and all ops files.
 
 ---
 
@@ -138,9 +141,9 @@ Triggered when user says: `!! wrap`
 ### `!! ready`
 Triggered when user says: `!! ready`
 
-1. Check `memory.md` for content
-2. **If empty:** announce readiness normally (from `hot.md`)
-3. **If content exists:**
+1. Read `memory.md`
+2. **If empty** (contains only the standard placeholder — no real session summary): announce readiness normally (from `hot.md`)
+3. **If a real session summary exists** (content beyond the standard placeholder text):
    - Read the summary aloud to the user
    - Append to `log.md`: `## [YYYY-MM-DD] memory | Session summary consumed`
    - Wipe `memory.md` — restore to exactly this content:
@@ -198,4 +201,6 @@ Grep tip: `grep "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 1.6 | Created: [YYYY-MM-DD] | Updated: [YYYY-MM-DD]*
+*Schema version: 1.7 | Created: [created-date] | Updated: [updated-date]*
+
+> **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format. Also replace `[YourName]` in line 3 above.
