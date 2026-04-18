@@ -71,11 +71,11 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 | `blueprint/template/scheduled-tasks/refresh-hot.md` | `scheduled-tasks/refresh-hot.md` |
 | `blueprint/template/scheduled-tasks/ops/ingest.md` | `scheduled-tasks/ops/ingest.md` |
 | `blueprint/template/scheduled-tasks/ops/lint.md` | `scheduled-tasks/ops/lint.md` |
+| `blueprint/template/scheduled-tasks/ops/audit.md` | `scheduled-tasks/ops/audit.md` |
 | `blueprint/template/scheduled-tasks/ops/query.md` | `scheduled-tasks/ops/query.md` |
 | `blueprint/template/scheduled-tasks/ops/update.md` | `scheduled-tasks/ops/update.md` |
 | `blueprint/template/scheduled-tasks/ops/conventions.md` | `scheduled-tasks/ops/conventions.md` |
 | `blueprint/template/scheduled-tasks/ops/token-reference.md` | `scheduled-tasks/ops/token-reference.md` |
-| `blueprint/template/scheduled-tasks/ops/audit.md` | `scheduled-tasks/ops/audit.md` |
 
 ---
 
