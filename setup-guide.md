@@ -89,7 +89,7 @@ In `CLAUDE.md`, make the following replacements:
 
 In `scheduled-tasks/changelog-monitor.md`:
 - Replace `[YOUR_SLACK_USER_ID]` with the user's Slack user ID. To find it: Slack → click your profile avatar → **More** → **Copy member ID** (yields a value of the form `U` + 10 alphanumeric chars, e.g. `U01ABCDE23F`). The monitor posts its daily summary as a self-DM to this user.
-- If the scheduled-tasks MCP is not yet configured to run `changelog-monitor.md` on a daily cadence, surface this in the Step 8 readiness announcement — the file is in place but nothing is scheduling it until the user registers it.
+- **Detect whether the MCP is already scheduling the task, then decide whether to flag Step 8.** Preferred mechanism: call the scheduled-tasks MCP's list tool (in Cowork this is typically `mcp__scheduled-tasks__list_scheduled_tasks` or an equivalent name — use whatever is available in the current session) and look for a task whose prompt or target references `changelog-monitor.md`. If a match exists, do not flag Step 8. If no match exists, set a flag for Step 8 to surface the loose-end note. If the MCP list tool is not available in the current Cowork session (e.g. the scheduled-tasks MCP isn't installed), fall back to asking the user directly: "Is the changelog-monitor scheduled task already registered with your scheduled-tasks MCP? (yes/no)" and flag based on the answer. Do not default to "always flag" silently — either detect or ask, but make the decision deterministic.
 
 > **Note:** The `@`-prefixed paths in `CLAUDE.md` (Ops File Reminder table, Approval Rule) are working-folder-relative and resolve correctly regardless of the folder's name — no find-and-replace is needed during setup.
 

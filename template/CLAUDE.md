@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~5,200 tokens
+1. Read `CLAUDE.md` (this file) — ~5,475 tokens
 2. Read `wiki/hot.md` — ~55 tokens
 3. Check `drafts/` — list filenames only, up to 20 (negligible tokens at that cap; if more than 20 files exist, list the 20 most recently modified and note the overflow count)
 4. Check if the user's opening message is `!! ready`:
@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~5,255 tokens** (~6,005 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~5,530 tokens** (~6,280 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
 
@@ -97,7 +97,7 @@ All other write actions — Blueprint Sync writes, and the log appends + `hot.md
 | Any schema change | `blueprint/template/CLAUDE.md` always |
 | Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
 | Schema version bump | `blueprint/CHANGELOG.md` (new section documenting the version) in addition to any rows above that the change triggers |
-| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (scope) + `ops/token-reference.md` (file-size row) + `setup-guide.md` (Step 2 copy / Step 3 personalize if placeholders / Step 7 verify) + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md` (new section — treat any new scheduled task as at minimum a patch version bump, so the Schema-version-bump row applies) |
+| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical on line 23 naming current tasks — the glob itself already covers new files, so this is a doc-hygiene touch, not a behavioral one) + `ops/token-reference.md` (file-size row) + `setup-guide.md` (Step 2 copy / Step 3 personalize if placeholders / Step 7 verify) + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md` (new section — treat any new scheduled task as at minimum a patch version bump, so the Schema-version-bump row applies) |
 
 **Versioning split.** The CLAUDE.md footer and `hot.md`'s `Schema:` field track the major.minor schema version (`X.Y`) only. Patch-level bumps (`X.Y.Z`) add a new `CHANGELOG.md` section but do **not** move the footer or `hot.md` field — those files are free to receive content edits as part of a patch, but the version number itself stays put. Minor/major bumps (`X.Y` → `X.(Y+1)` or `(X+1).0`) propagate through the "Any schema change" row and rewrite the footer.
 

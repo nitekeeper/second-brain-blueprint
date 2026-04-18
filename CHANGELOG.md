@@ -3,6 +3,149 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.6 — 2026-04-18
+
+### Follow-ups (audit-driven, sixth pass)
+
+- **`user-guide.md:14` cold-start prose updated from `~6,005` to `~6,280` (W1).**
+  v2.0.5's cold-start cascade (documented `~5,200` → `~5,475`, total cold-start
+  `~5,255` → `~5,530`, `!! ready` total `~6,005` → `~6,280`) propagated to
+  `README.md`, `template/CLAUDE.md`, and the cost table at `user-guide.md:209`,
+  but missed the prose sentence at `user-guide.md:14`. The miss produced a
+  direct self-contradiction inside the same file — opening narrative said
+  `~6,005`, cost table 195 lines later said `~6,280`. One-line string
+  replacement; no behavioral change. Exactly the kind of drift the Blueprint
+  Sync Rule exists to catch, hence flagged as WARNING rather than STYLE.
+- **`user-guide.md:94` envelope prose updated from `~25,000–35,000` to
+  `~30,000–45,000` (W2).** v2.0.5 bumped the `!! audit all` envelope from
+  `~25,000–35,000` to `~30,000–40,000` across `ops/audit.md:71`,
+  `user-guide.md:215`, and the CHANGELOG, but missed the command-reference
+  prose at `user-guide.md:94`. Same intra-file self-contradiction pattern as
+  W1. Fixed in the same pass as W4's envelope widen so line 94, line 215, and
+  `audit.md:71` all report the new `~30,000–45,000` range without another
+  propagation round.
+- **`ops/ingest.md:64` dangling cross-reference dropped (W3).** Step 0's slug
+  derivation said "same rules as Step 7 (lowercase-hyphenated from the H1 or
+  filename stem; for URL ingest reuse the U2 slug)" — but Step 7 consumes a
+  pre-computed `${slug}` and contains zero slug-derivation rules. The inline
+  parenthetical on line 64 itself is the canonical source. Rewrote to drop the
+  "same rules as Step 7" clause and added a positive pointer noting that
+  `changelog-monitor.md` Step 3 relies on the same rules (which is what makes
+  cross-path hash comparisons possible) and that Step 7 is a consumer, not a
+  source. Low-severity today — the parenthetical was correct so no agent was
+  ever actually stranded — but pre-empts the class of error (slug derivation
+  divergence between ingest paths) that v2.0.2's hash canonicalization
+  hardened against.
+- **`!! audit all` envelope widened from `~30,000–40,000` to `~30,000–45,000`
+  (W4).** `ops/audit.md:71` declared `token-reference.md`'s documented Tokens
+  column as the envelope's source of truth, but re-deriving gave ~42,435
+  (blueprint-doc rows 24,540 + template-side rows 17,895) — above the stated
+  40,000 upper bound. The directive to derive from the table and the literal
+  range disagreed. Chose Option A (widen the range) over Option B (re-point
+  the directive at measured actuals) because the 110% per-file headroom
+  convention already implies per-file Chars values overshoot measured actuals
+  by ~10%, so an envelope that contains the sum of Chars values is the
+  internally consistent choice. Widened to `~30,000–45,000` (≈110% of current
+  documented sum, rounded to nearest 1,000) in `audit.md:71`, cascaded to
+  `user-guide.md:215` and `user-guide.md:94` (W2). Amended the `audit.md:71`
+  note to call the 45,000 upper bound "the documented sum plus a small
+  cushion, matching the 110% per-file headroom convention" so the next editor
+  sees *why* the number is 45,000 rather than a hand-tuned figure.
+- **`token-reference.md` CHANGELOG row recalibrated to absorb this v2.0.6
+  entry.** Post-fix `wc -c` against every row: all other rows stayed within
+  headroom (`ingest.md` 14,247 / 15,500; `ops/audit.md` 6,207 / 6,600;
+  `user-guide.md` 15,076 / 16,600). `CHANGELOG.md` itself grew from 30,830 →
+  ~35,000 for this v2.0.6 entry, crossing its 33,900 Chars cap and firing
+  the recalibration trigger. Bumped the `blueprint/CHANGELOG.md` row to
+  `~38,500 chars / ~9,620 tokens` per the 110%-of-measured convention (rounded
+  to nearest 100 for chars, nearest 10 for tokens). The blueprint-doc sum in
+  `token-reference.md` moves from 24,540 to ~25,680 tokens; new `!! audit all`
+  envelope total is ~43,575, still inside the widened 30,000–45,000 range set
+  by W4.
+
+## v2.0.5 — 2026-04-18
+
+### Follow-ups (audit-driven, fifth pass)
+
+- **Retry-after-crash prose aligned with actual ingest behavior (W1).**
+  v2.0.4's CHANGELOG and `troubleshooting.md` Prevention paragraph for the
+  "Ingest interrupted mid-flight and retry silently deleted the inbox file"
+  entry both described the post-Step-6-crash case as "retry finds the
+  pre-moved raw file and writes the source page against it" / "the source
+  page write on retry will see the pre-moved raw file and behave correctly."
+  Tracing the op showed this is not what happens: `ops/ingest.md` has no
+  Step 0.5 branch that detects and adopts a pre-moved raw file. Filename
+  retry fails at Step 0's `wiki/inbox/<file>` read (the file is gone); URL
+  retry pre-computes a fresh `ts` in Step 5 and writes a new
+  `raw/<slug>-<new-ts>.md`, leaving the original pre-moved raw as an orphan.
+  Both the CHANGELOG entry and the troubleshooting Prevention paragraph were
+  rewritten to describe actual behavior — the source is preserved in `raw/`
+  (the real data-loss fix), but manual recovery is required on retry: either
+  re-clip to drive a fresh ingest (accepting an orphan raw file) or
+  `mv raw/<slug>-<ts>.md wiki/inbox/<slug>.md` before retrying. No code
+  change; the prose now matches the op. The alternative fix (add the
+  Step 0.5 adoption branch to match the old prose) was rejected as a larger
+  surface area for marginal retry continuity — the manual-recovery path is
+  simple, documented, and preserves data either way.
+- **`!! audit all` envelope re-summed and reframed as derivable (W2).**
+  v2.0.4's envelope bump (~25,000–35,000 tokens, based on a ~33,000-token
+  measurement) was itself pushed out of spec by the act of documenting it:
+  post-v2.0.4 CHANGELOG and troubleshooting growth brought the summed cost
+  to ~36,440. `ops/audit.md:71` and `user-guide.md:215` bumped to
+  ~30,000–40,000 to absorb near-term drift, and the `audit.md` note now
+  explicitly calls out `token-reference.md` as the source of truth rather
+  than treating the range as a hand-tuned figure. Future envelope drift
+  should be caught by summing the table rather than editing the literal.
+- **`setup-guide.md` Step 3 MCP detection made deterministic (W3).** Step 3
+  previously said "if the scheduled-tasks MCP is not yet configured to run
+  `changelog-monitor.md` on a daily cadence, surface this in Step 8" but
+  never specified how the setup-time agent was supposed to know. Three
+  operators running setup could produce three different readiness
+  announcements. Rewritten to prescribe: (i) call the scheduled-tasks MCP's
+  list tool (e.g. `mcp__scheduled-tasks__list_scheduled_tasks`) and look
+  for a task referencing `changelog-monitor.md`; (ii) if the list tool is
+  unavailable, ask the user directly. Explicit prohibition against silent
+  "always flag" default. Step 8's conditional wiring (added in v2.0.4 to
+  close audit #4 C1) now has a well-defined input.
+- **"New scheduled task" sync row tightened (W4).** `CLAUDE.md:100` listed
+  `ops/audit.md (scope)` as a required touch-point, but v2.0.1's scope
+  generalization (the glob `every file directly under scheduled-tasks/`)
+  already covers new files automatically. The row now says
+  `ops/audit.md (informational parenthetical on line 23 naming current tasks
+  — the glob itself already covers new files, so this is a doc-hygiene
+  touch, not a behavioral one)`. Eliminates the misdirection where an
+  operator adding a new scheduled task would open `audit.md` looking for a
+  scope block to edit.
+- **`ingest.md` Step 5 execution mechanism made explicit (S1).** Step 5
+  told the agent to "generate once and hold in working memory" a bash
+  timestamp, but Cowork Bash does not persist env vars across tool calls,
+  so "hold in working memory" required an unstated implementation choice.
+  Step 5 now documents the two acceptable patterns: (i) standalone Bash
+  call captures `date +%Y-%m-%d-%H%M%S` output into LLM working memory,
+  then Step 6 inlines the literal as `export ts="..."`; or (ii) Steps 5
+  and 6 fold into a single Bash invocation. The Step 6 `${ts:?…}` guard
+  catches unset-variable leakage but cannot catch a *different* `ts`
+  landing in Step 7 — that's load-bearing on the agent picking one of
+  the two documented patterns and sticking with it.
+- **`token-reference.md` headroom recalibrated across drifted rows (S2).**
+  Three template-side rows sat below the 10% headroom convention
+  (`template/CLAUDE.md` at 5.5%, `refresh-hot.md` at 3.4%, `ops/audit.md`
+  at 6.0%). Bumped pre-emptively. The W1 / S1 / v2.0.5-changelog edits in
+  this pass also grew `troubleshooting.md`, `setup-guide.md`,
+  `ops/ingest.md`, and `CHANGELOG.md` into their prior headroom, so those
+  rows were re-calibrated in the same pass rather than waiting for the
+  next incidental edit to trip the recalibration trigger. CLAUDE.md's
+  cold-start cascade (documented `~5,200` → `~5,475`, total cold-start
+  `~5,255` → `~5,530`, `!! ready` total `~6,005` → `~6,280`) propagated
+  to `README.md`, `user-guide.md`, and `template/CLAUDE.md` per the
+  "File-size or cost change" Blueprint Sync Rule row.
+
+### Not applied
+- **Q1 (per-file schema footers).** Carried from v2.0.3 and v2.0.4.
+  Still a judgment call — either add footers to every template file for
+  provenance parity, or drop `changelog-monitor.md`'s for symmetry.
+  Audit #5 could not resolve intent.
+
 ## v2.0.4 — 2026-04-18
 
 ### Follow-ups (audit-driven, fourth pass)
@@ -28,10 +171,16 @@
   recalibrate) renumber to 11–13. A mid-flight failure now either leaves the
   inbox file untouched (crash before Step 6 — clean retry from Step 0) or
   leaves the raw file in place with no source page yet (crash between Step 6
-  and 7 — retry finds the pre-moved raw file and writes the source page
-  against it). The inbox file is never silently deleted after a partial-write
-  state. See `troubleshooting.md` "Ingest interrupted mid-flight and retry
-  silently deleted the inbox file" for the symptom and retrospective fix.
+  and 7 — the source is preserved in `raw/` but manual recovery is required
+  on retry, see `troubleshooting.md` for the recovery paths). The inbox file
+  is never silently deleted after a partial-write state, which is the real
+  data-loss fix; the retry itself is not automatic (the op has no Step-0.5
+  branch that adopts a pre-moved raw file), so operators either re-clip the
+  article to drive a fresh ingest (leaving the pre-moved raw file as a
+  harmless orphan) or move it back to `wiki/inbox/` under its original name
+  before retrying. See `troubleshooting.md` "Ingest interrupted mid-flight
+  and retry silently deleted the inbox file" for the symptom and the
+  manual-recovery procedure.
 - **Pre-computed `ts` closes a sub-second drift window (CRITICAL).** Old
   Step 9's bash snippet generated its own `ts` at move time; old Step 5's
   source-page write referenced `<YYYY-MM-DD-HHMMSS>` without a mandate to
