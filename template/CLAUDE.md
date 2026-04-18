@@ -46,7 +46,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 | Any write action (approval) | `@Library/scheduled-tasks/ops/token-reference.md` |
 | After any wiki-state change (Ingest/Lint/Update/filed Query) | `@Library/scheduled-tasks/refresh-hot.md` |
 
-> **Note:** `@Library` in the paths above refers to your Cowork working folder name. If your folder is named something other than `Library`, replace `@Library` with your actual folder name throughout this file only. The ops files use working-folder-relative paths and do not require changes.
+> **Note:** The `@`-prefixed path segment above (shown as `@Library/...` in the unconfigured template) refers to your Cowork working folder. At setup time this prefix is rewritten to match the folder the user actually selected — so if you see `@MyWiki/...` here, that is expected. If you ever rename the working folder, search-and-replace the `@`-prefix throughout this file only; the ops files use working-folder-relative paths and do not require changes.
 
 > **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~880 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
 
@@ -87,6 +87,7 @@ All other write actions (including Blueprint Sync writes, log appends, hot.md re
 | Schema or startup change | `blueprint/README.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md` |
 | Operation step change | `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md`, `blueprint/template/scheduled-tasks/ops/[op].md` |
 | New known issue or fix | `blueprint/troubleshooting.md` |
+| Schema change that introduces a new footgun | `blueprint/troubleshooting.md` in addition to the Schema row above — document the old behavior, the fix, and the version it was fixed in |
 | Setup step change | `blueprint/setup-guide.md` |
 | File-size or cost change | `blueprint/template/scheduled-tasks/ops/token-reference.md` (and re-propagate cold-start totals to CLAUDE.md, README.md, user-guide.md) |
 | Conventions change | `blueprint/template/scheduled-tasks/ops/conventions.md` |
@@ -212,7 +213,7 @@ Triggered when user says: `!! ready`
 
 ## Response Footer
 
-**CRITICAL: Every single response — without exception — must end with all four lines below. Missing any line is an error.**
+**CRITICAL: Every single response — without exception — must end with all five lines below (four command hints + the 💡 Web Clipper tip). Missing any line is an error.**
 
 ```
 📥 !! ingest: [URL | Page Name | All]
