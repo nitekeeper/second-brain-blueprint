@@ -10,12 +10,13 @@ Audits files under `blueprint/` — the distribution template, its docs, and its
 
 ## If `!! audit all`
 
-Audit every file under `blueprint/`, including:
+Audit every tracked file under `blueprint/` — specifically the files listed below. `blueprint/.git/` is VCS state and is always excluded.
 
 - `blueprint/README.md`
 - `blueprint/setup-guide.md`
 - `blueprint/user-guide.md`
 - `blueprint/troubleshooting.md`
+- `blueprint/CHANGELOG.md`
 - `blueprint/LICENSE`
 - `blueprint/.gitignore`
 - `blueprint/template/CLAUDE.md`
@@ -39,7 +40,7 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
    - Show a normal approval request (summary + token estimate including the `token-reference.md` self-cost (see `@scheduled-tasks/ops/token-reference.md` header) + to-do list of affected files).
    - After approval, apply fixes.
    - If any fix touches the schema, startup behavior, operations, or conventions, follow the Blueprint Sync Rule in `CLAUDE.md` — update every downstream doc the table lists before closing the op.
-   - Append one entry to `wiki/log.md` (≤500 chars): `## [YYYY-MM-DD] audit | [fix summary]`
+   - Append one entry to `wiki/log.md` (≤500 chars): `## [YYYY-MM-DD] audit | [fix summary]` — this label supersedes the `sync | …` entry from CLAUDE.md's Blueprint Sync Rule for audit-driven edits. Do not write both; the single `audit` entry preserves audit provenance and covers the sync side-effect implicitly.
 6. If a fix was applied in step 5, refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`. The log-append is a wiki-state mutation, so `hot.md`'s `Last op` must reflect it. If no fix was applied (read-only audit), skip — the audit leaves no trace.
 7. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if an applied fix changed a tracked file's size enough to exceed its documented Chars value.
 

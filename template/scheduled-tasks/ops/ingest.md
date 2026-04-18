@@ -15,7 +15,7 @@ U4. Run main **Steps** as follows:
     - Step 3 (discuss takeaways) — use the in-memory content.
     - Step 4 (approval) — to-do list **must** include "Save fetched article to `wiki/inbox/<slug>.md`" as the first item; the rest (source page create, index/log update, inbox→raw move, etc.) is identical to a filename-based ingest.
     - On approval, write the inbox file first, then run Steps 5–12 unchanged.
-U5. Note to the user once (inline, not gated): "URL ingest is ~40–60% more expensive in tokens than a Web Clipper clip. Either path works — clipping is cheaper for future sources."
+U5. Note to the user once per `!! ingest <URL>` invocation (inline, not gated): "URL ingest is ~40–60% more expensive in tokens than a Web Clipper clip. Either path works — clipping is cheaper for future sources." If the user fires multiple URL ingests in the same session, emit the note on each one — "once" means once per invocation, not once per session.
 
 ## If `!! ingest all`
 
@@ -43,8 +43,9 @@ B7. Write one log entry per file during `[main-step 10]` (not one combined entry
 6. Read `wiki/index.md` to identify all affected concept/entity pages
 7. Update affected pages; create any new concept or entity pages warranted
 8. Update `wiki/index.md` with new and modified entries
-9. Move the source file from `wiki/inbox/` to `raw/` — **with collision handling**:
+9. Move the source file from `wiki/inbox/` to `raw/` — **with collision handling**. The snippet below uses relative paths (`wiki/inbox/…`, `raw/…`), so cwd MUST be the working-folder root before running — the same cwd discipline the `setup-guide.md` Step 1 reminder and `ops/lint.md` / `ops/conventions.md` require. If a fresh sandbox fired this block, the relative paths would resolve against the session root and the mv would land outside the wiki. Resolve `$WORKDIR` to the selected Cowork folder as an absolute path and `cd` into it before running — or anchor `$file` and the `raw/` destination to absolute paths instead.
     ```bash
+    cd "${WORKDIR:?WORKDIR must be set to the working-folder absolute path — see setup-guide.md Step 1}"
     : "${file:?file path is required — set \$file to the wiki/inbox/... source before running}"
     [ -e "$file" ] || { echo "source not found: $file"; exit 1; }
     base=$(basename "$file")

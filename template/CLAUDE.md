@@ -8,7 +8,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 1. Read `CLAUDE.md` (this file) — ~4,200 tokens
 2. Read `wiki/hot.md` — ~55 tokens
-3. Check `drafts/` — list any files present (negligible tokens)
+3. Check `drafts/` — list filenames only, up to 20 (negligible tokens at that cap; if more than 20 files exist, list the 20 most recently modified and note the overflow count)
 4. Check if the user's opening message is `!! ready`:
    - **If yes:** follow the **Session Memory Commands** section — skip the normal readiness announcement below
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
@@ -96,8 +96,11 @@ All other write actions — Blueprint Sync writes, and the log appends + `hot.md
 | Conventions change | `blueprint/template/scheduled-tasks/ops/conventions.md` |
 | Any schema change | `blueprint/template/CLAUDE.md` always |
 | Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
+| Schema version bump | `blueprint/CHANGELOG.md` (new section documenting the version) in addition to any rows above that the change triggers |
 
 After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blueprint synced — [what changed]` (≤500 chars). The `sync` op label is distinct from wiki-page `update` entries so `grep`/`tail` can separate them.
+
+**Exception — audit-driven edits:** When the blueprint change was surfaced by `!! audit` and approved via the audit flow, `ops/audit.md` step 5 mandates a single `## [YYYY-MM-DD] audit | [fix summary]` entry. That `audit` label supersedes the `sync` label above — do not write both. The `audit` label preserves audit provenance; `sync` remains the default for proactive blueprint propagation outside an audit.
 
 ---
 
