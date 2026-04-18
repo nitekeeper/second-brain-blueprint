@@ -5,7 +5,7 @@ Format: `~N tokens (R read / W write)`
 
 > **Estimates only:** Every number in this file is `chars ÷ 4`. Real token usage depends on the model's tokenizer, exact file contents, and runtime overhead (tool calls, system prompt) — treat these as rough planning figures, not precise accounting. Quote them as approximate when citing in approval requests.
 
-> **Self-cost note:** This file itself is ~850 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~850-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
+> **Self-cost note:** This file itself is ~1,050 tokens to read. Every approval request requires reading it unless the relevant numbers are already cached in working memory from earlier in the same operation. Include the ~1,050-token cost in quoted estimates for the first approval of an operation; subsequent approvals within the same op can cache.
 
 > **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
 
@@ -15,18 +15,18 @@ Format: `~N tokens (R read / W write)`
 |---|---|---|
 | `wiki/hot.md` | ~210 | ~55 |
 | `memory.md` | ~500 (when full) | ~125 |
-| `CLAUDE.md` | ~15,800 | ~3,950 |
+| `CLAUDE.md` | ~16,800 | ~4,200 |
 | `wiki/index.md` | ~800 (grows with pages) | ~200 |
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
-| `scheduled-tasks/refresh-hot.md` | ~4,100 | ~1,020 |
-| `ops/ingest.md` | ~4,300 | ~1,080 |
-| `ops/lint.md` | ~2,400 | ~600 |
-| `ops/query.md` | ~2,100 | ~520 |
+| `scheduled-tasks/refresh-hot.md` | ~4,100 | ~1,030 |
+| `ops/ingest.md` | ~4,900 | ~1,230 |
+| `ops/lint.md` | ~2,500 | ~630 |
+| `ops/query.md` | ~2,100 | ~530 |
 | `ops/update.md` | ~1,400 | ~350 |
-| `ops/conventions.md` | ~2,500 | ~620 |
-| `ops/audit.md` | ~4,900 | ~1,230 |
-| `ops/token-reference.md` | ~3,400 | ~850 |
+| `ops/conventions.md` | ~2,500 | ~630 |
+| `ops/audit.md` | ~5,100 | ~1,280 |
+| `ops/token-reference.md` | ~4,200 | ~1,050 |
 | Average concept page | ~2,000 | ~500 |
 | Average source page | ~1,500 | ~375 |
 | Raw source document | varies | ~1,000–8,000 |
@@ -42,7 +42,7 @@ Format: `~N tokens (R read / W write)`
 | Write `memory.md` (`!! wrap`) | ~150–250 |
 | Wipe `memory.md` (`!! ready`) | ~50 |
 
-> **`!! wrap` / `!! ready` true session cost.** The raw write costs above cover *only* the `memory.md` touch. Both commands also execute the full `hot.md` refresh flow (read `refresh-hot.md` ~1,020 + re-read `wiki/index.md` ~200 + re-read `wiki/log.md` tail ~625) and append one entry to `log.md` (~100). Realistic per-command cost when none of those files are already cached is ~2,000 tokens, not ~50–250. Quote ~2,000 when asked unless the relevant reads are warm from a prior op in the same session. `!! wrap` and `!! ready` are **not** approval-gated (they are documented exceptions in `CLAUDE.md`'s Approval Rule), so `token-reference.md` itself does not need to be re-read for either command.
+> **`!! wrap` / `!! ready` true session cost.** The raw write costs above cover *only* the `memory.md` touch. Both commands also execute the full `hot.md` refresh flow (read `refresh-hot.md` ~1,030 + re-read `wiki/index.md` ~200 + re-read `wiki/log.md` tail ~625) and append one entry to `log.md` (~100). Realistic per-command cost when none of those files are already cached is ~2,000 tokens, not ~50–250. Quote ~2,000 when asked unless the relevant reads are warm from a prior op in the same session. `!! wrap` and `!! ready` are **not** approval-gated (they are documented exceptions in `CLAUDE.md`'s Approval Rule), so `token-reference.md` itself does not need to be re-read for either command.
 
 ## Ingest Estimate Formula
 `raw source read + (500 × pages to create) + (200 × pages to update) + 500 overhead`

@@ -26,7 +26,7 @@ If the wiki does not contain a good answer:
 After any Step 2 or Step 3 answer, ask: "Worth filing this as an analysis page?"
 If yes:
 1. Read `@scheduled-tasks/ops/conventions.md` before writing the analysis page — this enforces slug, frontmatter, tag, and wiki-link conventions that analysis pages must follow
-2. Show approval request and wait for confirmation — include the cost of re-reading `token-reference.md` itself (~850 tokens) in the estimate
+2. Show approval request and wait for confirmation — include the cost of re-reading `token-reference.md` itself (see the self-cost figure in its header) in the estimate
 3. Write to `wiki/pages/analyses/`
 4. Update `wiki/index.md` and append to `wiki/log.md` — **log entry must be ≤500 chars total**
 5. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
