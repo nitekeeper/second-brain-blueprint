@@ -171,6 +171,57 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 ---
 
+## `!! wrap` or `!! ready` paused for approval on log append / hot.md refresh
+
+**Symptom:** Agent ran `!! wrap` (or `!! ready`) and then stopped mid-procedure to request a separate approval for appending to `log.md` or refreshing `hot.md`. Felt redundant, since the user had just invoked the command.
+
+**Cause:** Older schema versions (≤1.11) scoped the Approval Rule exception too narrowly — only `memory.md` write / wipe was covered. The companion `log.md` append and `hot.md` refresh fell under the general "explicit approval required" clause, so a strict agent would pause.
+
+**Fix:** Schema v1.12+ broadened both exceptions so that the user invoking `!! wrap` or `!! ready` implicitly approves the **entire** procedure: memory.md touch + `memory | …` log append + `hot.md` refresh. No secondary approval request.
+
+**Prevention:** Keep `CLAUDE.md` on schema v1.12 or newer.
+
+---
+
+## `!! ingest all` approval promised pages before the sources were read
+
+**Symptom:** During `!! ingest all`, the B4 combined approval listed "all pages to be created / updated across the batch" but the numbers felt speculative — and sometimes a file ended up touching pages that weren't on the approval list.
+
+**Cause:** In schema v1.11 and earlier, the batch preamble read `log.md` tail and `index.md` once, then immediately asked for approval (B4), and only read the actual source files per-file during B5. The approval was necessarily speculative because no source file had been opened yet.
+
+**Fix:** Schema v1.12+ introduces a new step B3.5 — a batch-level pre-read of every source file in `wiki/inbox/` — before B4. B4's token estimate now accounts for those reads, and B5 no longer re-reads sources.
+
+**Prevention:** Keep `CLAUDE.md` and `scheduled-tasks/ops/ingest.md` on schema v1.12 or newer — the blueprint sync will keep them in step if you follow the Blueprint Sync Rule in `CLAUDE.md`.
+
+---
+
+## Edited `blueprint/.gitignore` and nothing changed about my Obsidian vault
+
+**Symptom:** Followed older setup-guide advice to "remove the `.obsidian/` line from `.gitignore` and commit the settings files you want to track," but `wiki/.obsidian/` behavior didn't change and the settings still weren't bundled with the blueprint.
+
+**Cause:** The blueprint's `.gitignore` scopes only to files **inside** `blueprint/`. The Obsidian vault lives at `wiki/.obsidian/`, which is outside that scope — so the `.obsidian/` entry in `blueprint/.gitignore` was never governing the user's real vault settings. The v1.11 setup-guide note implied otherwise.
+
+**Fix:** v1.12 setup-guide.md rewrote the note to explain the scope and to describe (without implementing) the bundling machinery that would actually ship vault settings with the blueprint (a curated `blueprint/template/.obsidian/`, an un-ignored entry, and a Step 2 copy rule).
+
+**Prevention:** Don't edit `blueprint/.gitignore` expecting it to govern files outside `blueprint/`. Treat vault-setting bundling as a distribution-time concern, not a setup-time one.
+
+---
+
+## `!! audit [some-wiki-page]` returns "no match"
+
+**Symptom:** Ran `!! audit [page-name]` expecting an audit of a wiki page and got "no match" or a redirect to `!! lint`.
+
+**Cause:** `!! audit` scopes **exclusively** to files under `blueprint/` — the schema, the ops templates, and the distribution docs. It is designed to catch logic contradictions, approval leaks, and blueprint-sync drift in the system itself, not quality issues on wiki content.
+
+**Fix:** Use the right command for the right scope:
+
+- `!! lint [page-name]` or `!! lint all` — wiki-page quality (broken links, orphans, stale claims)
+- `!! audit [file-name]` or `!! audit all` — blueprint integrity (schema, ops files, docs)
+
+**Prevention:** Remember the split — **lint = wiki integrity, audit = blueprint integrity**.
+
+---
+
 ## Bulk Edits Reference
 
 Always use Python for any edit touching more than one file. Always anchor to an absolute root path (never rely on cwd) and always handle encoding errors explicitly:
