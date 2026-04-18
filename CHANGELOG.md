@@ -3,6 +3,30 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0 — 2026-04-18
+
+**Theme:** rerun-proofness. The entire ingest pipeline is now idempotent on duplicate input, with a content-hash dedupe primitive and timestamped immutable raw snapshots. This unblocks safe scheduled-task monitoring — a daily changelog monitor can now trigger re-ingests without fear of duplicating state. This is a breaking schema change; upgrades require touching every source page.
+
+### Breaking changes
+- **`raw/` files use timestamped naming.** Naming is now `raw/<slug>-<YYYY-MM-DD-HHMMSS>.md` instead of the old `<slug>.md` with collision-handling fallbacks. Second-precision timestamps are physically unique in single-user workflow, so the collision-handling bash snippet in `ops/ingest.md` Step 9 is gone — replaced with a simple `mv`. Existing files under the old naming stay as-is; only newly ingested files use the new scheme.
+- **Source pages require `source_hash:` frontmatter.** 8-char SHA-256 hex prefix of the raw content body (preamble-stripped). This is the new dedupe primitive. Source pages without this field trigger a full regeneration on the next ingest — that's the migration path, not a bug. If you have existing v1.x source pages, expect them to be regenerated the next time their source is ingested.
+- **Schema version bumped to 2.0.** Footer in `CLAUDE.md` (and blueprint template) now reads `Schema version: 2.0`.
+
+### New behavior
+- **`ops/ingest.md` Step 0: hash check.** First action of every ingest. Computes the 8-char SHA-256 prefix of the raw body, compares against the stored `source_hash:` on the existing source page. On match: deletes the inbox file, prints `No change since last ingest — skipped.`, exits cleanly. No log entry, no `hot.md` refresh, no recalibration. On mismatch: regenerates the source page from the new content (no in-place merge).
+- **`!! ingest all` batch hash check (B3.6).** The batch flow hash-checks each file up front and excludes no-ops from the approval. Running `!! ingest all` twice in a row is now a guaranteed no-op on the second run.
+- **Provenance footnotes in source pages.** Every curated bullet in the `## Key Takeaways` section ends with a `[^n]` footnote referencing the raw snapshot: `[^1]: raw/<filename> — fetched YYYY-MM-DD`. Makes "where did this fact come from and when" answerable from the page itself.
+- **Rerun-proof guarantee.** Same input → zero state change. Re-running any ingest (manually or from a scheduled task) is safe by design.
+
+### Force re-ingest escape hatch
+If you need to regenerate a source page *without* the underlying content having changed (e.g. the previous generation was poorly worded and you want a do-over), delete the `source_hash:` line from the source page's frontmatter. The next ingest will treat the missing hash as a mismatch and regenerate. No `--force` flag, no ops change — the escape hatch is the absence of the field.
+
+### New file
+- **`scheduled-tasks/changelog-monitor.md` restored.** The original trigger for this migration. A daily scheduled task that fetches four monitored documentation pages, computes content hashes, compares against wiki state, and reports findings via Slack DM. Read-only — never writes files. The user runs `!! ingest` manually after reviewing the Slack summary.
+
+### Migration note
+Existing source pages without `source_hash:` will trigger a full re-ingest on next run for that source. This is the intended migration path — the next ingest for each source writes the hash in place. No bulk migration script is needed; the transition happens gradually as sources are re-ingested in normal operation.
+
 ## v1.14 — 2026-04-18
 
 ### Safety / footgun fixes

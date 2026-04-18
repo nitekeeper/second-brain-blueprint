@@ -20,11 +20,11 @@ Format: `~N tokens (R read / W write)`
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
 | `scheduled-tasks/refresh-hot.md` | ~4,100 | ~1,030 |
-| `ops/ingest.md` | ~7,900 | ~1,980 |
+| `ops/ingest.md` | ~10,000 | ~2,500 |
 | `ops/lint.md` | ~2,500 | ~630 |
 | `ops/query.md` | ~2,100 | ~530 |
 | `ops/update.md` | ~1,400 | ~350 |
-| `ops/conventions.md` | ~2,500 | ~630 |
+| `ops/conventions.md` | ~4,600 | ~1,150 |
 | `ops/audit.md` | ~5,600 | ~1,400 |
 | `ops/token-reference.md` | ~4,500 | ~1,130 |
 | Average concept page | ~2,000 | ~500 |

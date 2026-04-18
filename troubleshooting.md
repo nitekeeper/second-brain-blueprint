@@ -222,6 +222,72 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 ---
 
+## Source page gets regenerated on every ingest
+
+**Symptom:** You re-run `!! ingest` on a source whose content hasn't changed, and the agent still regenerates the source page instead of printing `No change since last ingest — skipped.` Every run produces a new `raw/` snapshot and a new log entry.
+
+**Cause:** The source page is missing the `source_hash:` frontmatter field, or the stored hash is stale / doesn't match the current raw body. In schema v2.0+, Step 0 of the ingest op treats missing or mismatched `source_hash:` as a mismatch and fully regenerates the page.
+
+**Fix:** Check the source page's frontmatter. It should contain a line like `source_hash: a3f8b2d1`. If missing, the next ingest will write one. If present but the wrong value (e.g. manually edited), let the next ingest correct it. If you see the hash keep changing between ingests of identical content, the issue is upstream — the fetched content body is actually varying (e.g. the page has a timestamp in the body, a visitor counter, CSRF tokens leaking into Markdown, or a CDN varying whitespace). Investigate what's non-deterministic in the source before blaming the hash.
+
+**Prevention:** Upgrade to schema v2.0+. Don't hand-edit `source_hash:` — let the ingest op manage it.
+
+---
+
+## `raw/` directory keeps growing
+
+**Symptom:** `raw/` accumulates multiple `<slug>-<timestamp>.md` files per source — sometimes dozens if a source changes frequently.
+
+**Cause:** This is by design in schema v2.0+. Every content change (hash mismatch) writes a new timestamped snapshot to `raw/`. Old snapshots are never automatically deleted — they're the immutable provenance trail backing each historical generation of the source page.
+
+**Fix:** No fix needed if disk space isn't a concern. If you want to reclaim space, prune manually:
+
+```bash
+# Keep only the most recent snapshot per slug (inspect before running)
+cd "$WORKDIR/raw"
+ls -1 | sed -E 's/-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9]{6}\.md$//' | sort -u | while read slug; do
+  ls -1t ${slug}-*.md 2>/dev/null | tail -n +2
+done
+```
+
+The above lists files safe to delete; re-run wrapped in `xargs rm` once you've verified the output. Pruning old `raw/` files doesn't affect the source page's `source_hash:` dedupe behavior — it only breaks the provenance footnote trail back to that specific snapshot.
+
+**Prevention:** Periodically prune manually. The agent will never auto-prune `raw/` — that's a deliberate choice to preserve the archive.
+
+---
+
+## Changelog monitor ran but nothing was ingested
+
+**Symptom:** The `documentation-changelog-monitor` scheduled task ran and you got a Slack DM, but no wiki pages were created or updated, no entries appeared in `log.md`, and `wiki/inbox/` is empty.
+
+**Cause:** By design. In schema v2.0+, the changelog monitor is strictly read-only — it fetches the monitored pages, computes content hashes, compares against stored `source_hash:` values in the wiki, and posts findings to Slack. It never writes to `wiki/`, `raw/`, or `inbox/`. Ingest is always manual.
+
+**Fix:** Read the Slack DM. Sources flagged 🆕 (NEW_ENTRY) or 🆘 (UNINGESTED) are candidates for manual ingest. Run `!! ingest <URL>` or clip to `wiki/inbox/` and run `!! ingest <filename>` for each one you want to bring in.
+
+**Prevention:** None needed — this is the intentional separation of concerns. If you want automatic ingest on change, that's a larger design change (and you'd lose the approval checkpoint the current flow guarantees). The read-only monitor + manual ingest pattern is v2.0's deliberate contract.
+
+---
+
+## Want to force re-ingest an unchanged source
+
+**Symptom:** `!! ingest <source>` prints `No change since last ingest — skipped.` but you want the source page rewritten anyway — e.g. the prior generation's wording was poor, or you want fresh LLM output after a model upgrade.
+
+**Cause:** The Step 0 hash check matched, so the ingest short-circuited. This is working as designed.
+
+**Fix:** Delete the `source_hash:` line from the source page's frontmatter, then re-run ingest. The next run will treat the missing hash as a mismatch and fully regenerate the page (and write a fresh `source_hash:` based on the raw body).
+
+```bash
+# Example: force re-ingest of wiki/pages/sources/claude-code-overview.md
+sed -i.bak '/^source_hash:/d' wiki/pages/sources/claude-code-overview.md
+rm wiki/pages/sources/claude-code-overview.md.bak
+```
+
+(Despite the general rule against `sed -i`, removing a single frontmatter line from a single file is a safe narrow usage. For bulk deletions, use the Python pattern in the Bulk Edits Reference below.)
+
+**Prevention:** No `--force` flag exists by design — the escape hatch is the absence of `source_hash:` itself. This keeps the ops surface minimal and the force path auditable (a missing field is visible in the frontmatter).
+
+---
+
 ## Bulk Edits Reference
 
 Always use Python for any edit touching more than one file. Always anchor to an absolute root path (never rely on cwd) and always handle encoding errors explicitly:
