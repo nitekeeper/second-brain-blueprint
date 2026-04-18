@@ -1,6 +1,6 @@
 # Task: Refresh hot.md
 
-Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation that changes wiki state (Ingest, Lint, Update). This keeps session startup cost low — the next session reads only hot.md instead of index.md and log.md.
+Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation that changes wiki state (Ingest, Lint, Update, filed Query, Audit-with-fix, `!! wrap`, `!! ready`). This keeps session startup cost low — the next session reads only hot.md instead of index.md and log.md.
 
 ---
 

@@ -36,12 +36,12 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
 4. Report findings to the user. No approval request is needed to run the audit — it is read-only.
 5. If the user asks for any fix to be applied:
    - Read `@scheduled-tasks/ops/conventions.md` before editing any page.
-   - Show a normal approval request (summary + token estimate including the ~850-token `token-reference.md` self-cost + to-do list of affected files).
+   - Show a normal approval request (summary + token estimate including the `token-reference.md` self-cost (see `@scheduled-tasks/ops/token-reference.md` header) + to-do list of affected files).
    - After approval, apply fixes.
    - If any fix touches the schema, startup behavior, operations, or conventions, follow the Blueprint Sync Rule in `CLAUDE.md` — update every downstream doc the table lists before closing the op.
-   - Append one entry to `wiki/log.md` (≤500 chars): `## [YYYY-MM-DD] audit | [findings summary or fix summary]`
-6. No `hot.md` refresh unless a fix actually mutated wiki state (audits of blueprint files do not).
-7. No token-reference.md recalibration unless an applied fix changed a tracked file's size enough to exceed its documented Chars value.
+   - Append one entry to `wiki/log.md` (≤500 chars): `## [YYYY-MM-DD] audit | [fix summary]`
+6. If a fix was applied in step 5, refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`. The log-append is a wiki-state mutation, so `hot.md`'s `Last op` must reflect it. If no fix was applied (read-only audit), skip — the audit leaves no trace.
+7. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if an applied fix changed a tracked file's size enough to exceed its documented Chars value.
 
 ---
 

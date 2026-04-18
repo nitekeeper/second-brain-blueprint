@@ -14,7 +14,7 @@ Triggered when the user says "lint the wiki" or "lint [page-name]".
    - Missing cross-references — concept mentioned but not linked
    - Data gaps — important topic with no page and no raw source
 4. Report all findings to the user
-5. Show approval request (summary + token estimate + to-do list) for any fixes — include the cost of re-reading `token-reference.md` itself (~850 tokens) in the estimate
+5. Show approval request (summary + token estimate + to-do list) for any fixes — include the cost of re-reading `token-reference.md` itself (see the self-cost figure in its header) in the estimate
 6. If any approved fix creates or edits a page, read `@scheduled-tasks/ops/conventions.md` first — lint fixes are page writes and must obey the same conventions as ingest/update
 7. Apply approved fixes
 8. Append entry to `wiki/log.md` — **must be ≤500 chars total** and **must include a canonical `Gaps:` line** so `refresh-hot.md` can parse it deterministically:

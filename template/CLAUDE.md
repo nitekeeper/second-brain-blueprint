@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~3,950 tokens
+1. Read `CLAUDE.md` (this file) — ~4,200 tokens
 2. Read `wiki/hot.md` — ~55 tokens
 3. Check `drafts/` — list any files present (negligible tokens)
 4. Check if the user's opening message is `!! ready`:
@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~4,005 tokens** (~4,130 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~4,255 tokens** (~4,380 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
 
@@ -49,7 +49,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 > **Note:** The `@`-prefixed path segment in the table above refers to your Cowork working folder. At setup time the unconfigured template uses a placeholder working-folder name; the placeholder is rewritten to match the folder the user actually selected — so whatever name you see here is expected. If you ever rename the working folder, search-and-replace the `@`-prefix throughout this file only; the ops files use working-folder-relative paths and do not require changes.
 
-> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read (~850 tokens). Factor this into your quoted estimate and avoid re-reading `token-reference.md` multiple times in the same operation — cache the relevant numbers after the first read.
+> **Approval cost reminder:** Each approval request itself consumes the token-reference.md read. The current self-cost is documented in `token-reference.md`'s header — read it once per op, cache the value, and factor it into every quoted estimate in that op.
 
 ---
 
@@ -70,7 +70,7 @@ Read-only actions do not require approval.
 - `!! ready` — user invocation is implicit approval for the **entire ready flow**: reading and wiping `memory.md`, appending the `memory | Session summary consumed` entry to `log.md`, and refreshing `hot.md`, but only if the mid-session guard in Session Memory Commands passes. These side-effects are covered by the same invocation — do not pause for a separate approval on the log append or hot.md refresh.
 - `!! audit` — user invocation runs a read-only audit and needs no approval to *run*. Any fix the user asks you to apply **after** the audit is a normal write and goes through the full approval flow.
 
-All other write actions — Blueprint Sync writes, and the log appends + `hot.md` refreshes driven by Ingest / Lint / Query-filing / Update — require explicit approval.
+All other write actions — Blueprint Sync writes, and the log appends + `hot.md` refreshes driven by Ingest / Lint / Query-filing / Update / Audit-with-fix — require explicit approval.
 
 ---
 
@@ -95,9 +95,8 @@ All other write actions — Blueprint Sync writes, and the log appends + `hot.md
 | Conventions change | `blueprint/template/scheduled-tasks/ops/conventions.md` |
 | Any schema change | `blueprint/template/CLAUDE.md` always |
 | Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
-| Schema version bump | `blueprint/template/CLAUDE.md` footer, `blueprint/setup-guide.md` hot.md template |
 
-After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] update | Blueprint synced — [what changed]` (≤500 chars).
+After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blueprint synced — [what changed]` (≤500 chars). The `sync` op label is distinct from wiki-page `update` entries so `grep`/`tail` can separate them.
 
 ---
 
@@ -127,6 +126,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] update | Bl
 │               ├── lint.md
 │               ├── query.md
 │               ├── update.md
+│               ├── audit.md
 │               ├── conventions.md
 │               └── token-reference.md
 ├── scheduled-tasks/            ← Reusable task and ops instruction files
@@ -136,6 +136,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] update | Bl
 │       ├── lint.md
 │       ├── query.md
 │       ├── update.md
+│       ├── audit.md
 │       ├── conventions.md
 │       └── token-reference.md
 └── wiki/                       ← Obsidian vault root (open this folder in Obsidian)
@@ -253,7 +254,7 @@ Show brackets literally. No query command — handled automatically via waterfal
 updated: YYYY-MM-DD
 ---
 Pages: N | Schema: vX.Y | Updated: YYYY-MM-DD
-Last op: [operation] YYYY-MM-DD ([brief result])
+Last op: [operation] YYYY-MM-DD ([one-line result])
 Gaps: [comma-separated open data gaps]
 Hot: [5 most recently updated page titles]
 ```
