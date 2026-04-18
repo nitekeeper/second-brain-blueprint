@@ -6,12 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~4,200 tokens)
+1. `CLAUDE.md` — its operating instructions (~4,580 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~55 tokens)
 
-**Total cold-start cost: ~4,255 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~4,635 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~5,005 tokens total when the summary is full).
+If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~5,385 tokens total when the summary is full).
 
 ---
 
@@ -153,7 +153,7 @@ The agent will never edit or create files without showing you a plan first. Ever
 
 Read-only actions (answering questions, reading files) happen without approval.
 
-**Documented exceptions (no separate approval prompt):** `!! wrap` and `!! ready`. Your invocation is implicit approval — but both commands have built-in safeguards: `!! wrap` warns before overwriting an existing summary, and `!! ready` refuses to wipe memory mid-session without explicit `!! ready confirm`.
+**Documented exceptions (no separate approval prompt):** `!! wrap`, `!! ready`, and `!! audit`. Your invocation is implicit approval — `!! wrap` and `!! ready` have built-in safeguards (`!! wrap` warns before overwriting an existing summary, `!! ready` refuses to wipe memory mid-session without explicit `!! ready confirm`); `!! audit` is read-only by default, and any fix you request afterward goes through the normal approval flow.
 
 ---
 
@@ -172,8 +172,8 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~4,255 |
-| Cold start with `!! ready` (full memory) | ~5,005 |
+| Cold start | ~4,635 |
+| Cold start with `!! ready` (full memory) | ~5,385 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all | ~8,000–12,000 (scales with page count) |
@@ -182,7 +182,7 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | Audit all (full blueprint) | ~20,000–25,000 |
 | `!! wrap` or `!! ready` (realistic) | ~2,700 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~4,255 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~4,635 tokens to re-orient.
 
 ---
 
@@ -203,5 +203,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~4,255 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~4,635 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.
