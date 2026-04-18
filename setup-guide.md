@@ -32,6 +32,7 @@ Show approval request, then execute:
 
 ```bash
 mkdir -p raw
+mkdir -p drafts
 mkdir -p wiki/inbox
 mkdir -p wiki/pages/concepts
 mkdir -p wiki/pages/entities
@@ -42,6 +43,7 @@ mkdir -p scheduled-tasks/ops
 
 **What each folder is for:**
 - `raw/` — immutable source archive; Claude moves files here after ingesting
+- `drafts/` — Claude's scrapbook for in-progress planning and drafting; outside the Obsidian vault
 - `wiki/inbox/` — drop clipped articles here; Obsidian Web Clipper saves here
 - `wiki/pages/` — all wiki content organized by type
 - `scheduled-tasks/` — agent operation instruction files
@@ -195,6 +197,7 @@ Check the following and report status to the user:
 - [ ] All 6 ops files exist in `scheduled-tasks/ops/`
 - [ ] `scheduled-tasks/refresh-hot.md` exists
 - [ ] `raw/` folder exists
+- [ ] `drafts/` folder exists
 
 ---
 

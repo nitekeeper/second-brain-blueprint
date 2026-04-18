@@ -48,6 +48,19 @@ After a Step 2 or Step 3 answer, the agent will ask: *"Worth filing this as an a
 
 ---
 
+### Planning & Drafting
+
+When working through a complex idea or system change, the agent uses `drafts/` as a scrapbook — creating a working file to think through the problem across the conversation.
+
+**What happens:**
+- Agent creates a file in `drafts/` (e.g. `drafts/topic-name.md`) and iterates on it with you
+- At startup, the agent checks `drafts/` and surfaces any in-progress files in its readiness announcement — so nothing gets lost between sessions
+- When a draft is ready to become a source, the agent moves it to `wiki/inbox/` for ingestion
+
+`drafts/` lives outside the Obsidian vault, so none of its contents appear in your wiki graph.
+
+---
+
 ### Health Check — Lint
 
 Run periodically to keep the wiki clean.
@@ -129,6 +142,7 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 ## Tips
 
 - **Clip first, ingest later** — build up a batch of articles in `wiki/inbox/`, then ingest them in one session
+- **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
 - **New session anytime** — starting fresh costs only ~1,000 tokens; the wiki state is always preserved on disk

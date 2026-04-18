@@ -8,8 +8,9 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 1. Read `wiki/CLAUDE.md` (this file) — ~900 tokens
 2. Read `wiki/hot.md` — ~100 tokens
-3. Announce readiness with a one-line summary from `hot.md`
-4. Do NOT read `index.md` or `log.md` until an operation is triggered
+3. Check `drafts/` — list any files present (negligible tokens)
+4. Announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
+5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
 **Total cold-start cost: ~1,000 tokens**
 
@@ -82,6 +83,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] update | Bl
 ```
 Library/
 ├── raw/                        ← Immutable source documents. NEVER modify.
+├── drafts/                     ← In-progress planning files. Claude's scrapbook.
 ├── blueprint/                  ← Setup guide and templates for sharing this system
 │   ├── README.md
 │   ├── setup-guide.md
