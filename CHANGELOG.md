@@ -3,6 +3,51 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v1.14 — 2026-04-18
+
+### Safety / footgun fixes
+- **`!! ready` truncation-branch `clear` and `keep` now log and refresh `hot.md`.**
+  In v1.13 and earlier, recovery choices on a truncated `memory.md` mutated the
+  file but left no trace in `log.md` and didn't refresh `hot.md` — the "any
+  wiki-state change → refresh hot.md" invariant was silently violated in that
+  sub-branch, so `hot.md`'s `Last op:` could go stale and the recovery choice
+  was invisible in the audit trail. `clear` now appends
+  `## [YYYY-MM-DD] memory | Truncated summary cleared`; `keep` appends
+  `## [YYYY-MM-DD] memory | Truncated summary acknowledged`. Both then refresh
+  `hot.md`. `edit` remains a no-op (the file is untouched, so nothing to log
+  or refresh).
+- **Approval Rule exception broadened for `!! wrap` and `!! ready`.** The
+  exception previously named specific log-entry shapes (`Session summary saved`
+  / `Session summary consumed`). The new truncation-branch entries would have
+  fallen outside the exception and required separate approval — defeating the
+  purpose. Exception wording is now generic (`memory | …`) so all current and
+  future memory-flow log entries are covered symmetrically for both commands.
+
+### Estimate re-baselining
+- **`ops/ingest.md` recalibrated.** File grew during v1.14 edits, leaving <2%
+  headroom against documented Chars (well below the 10% convention). Chars
+  column bumped from ~7,300 → ~7,900; Tokens ~1,830 → ~1,980.
+
+### Scope & notation cleanup
+- **README `!! audit` exception drift fixed.** `README.md`'s "Approval before
+  every wiki write" bullet listed `!! wrap` and `!! ready` as "the only
+  exceptions" — but `CLAUDE.md` and `user-guide.md` include `!! audit` as a
+  third documented exception (read-only by default; any fix afterward goes
+  through the normal approval flow). README now matches.
+- **Tier 3 row renamed in `CLAUDE.md` Tiered Read Structure.** The old "Audit
+  only" label semantically collided with `!! audit` (which reads nothing from
+  `log.md`). Renamed to "History review" to remove the ambiguity.
+
+### Style / readability
+- **`ops/ingest.md` step 9: `$file` precondition made explicit.** Preamble now
+  states that both `$WORKDIR` and `$file` must be exported in the same Bash
+  invocation as the snippet. The `${file:?…}` guard still catches misuse at
+  runtime; this change surfaces the requirement in prose.
+- **`setup-guide.md` Step 7: verify checklist adds `wiki/pages/` subfolders.**
+  Previously only `wiki/inbox/` was explicitly verified; the four
+  `wiki/pages/{concepts,entities,sources,analyses}` subfolders created by
+  Step 1's `mkdir -p` are now individually confirmed.
+
 ## v1.13 — 2026-04-18
 
 ### Spec additions
@@ -17,10 +62,11 @@
 ### Estimate re-baselining
 - **`memory.md` cost estimates raised to match the "detailed summary" spec.** Read
   cost went from ~125 → ~750 tokens. Cold-start-with-memory figure cascaded
-  through `CLAUDE.md` and `user-guide.md` (~4,380 → ~5,005). Realistic
-  `!! wrap`/`!! ready` cost raised from ~2,000 → ~2,700. The true-session-cost
-  note now also calls out that `!! ready` reads the full `memory.md` before
-  wiping (previously invisible in the estimate).
+  through `CLAUDE.md` and `user-guide.md` (~4,760 → ~5,385). Realistic `!! wrap`
+  cost raised from ~2,000 → ~2,700; `!! ready` raised to ~2,800 (the command
+  reads the full `memory.md` before wiping). The true-session-cost note now
+  also calls out that `!! ready` reads the full `memory.md` before wiping
+  (previously invisible in the estimate).
 
 ### Safety / footgun fixes
 - **`!! wrap` pre-write safeguard extended to `TRUNCATED_ACKNOWLEDGED`.** Previously

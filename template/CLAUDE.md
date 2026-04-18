@@ -28,7 +28,7 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 | 1 — Conditional | `memory.md` | Only when user says `!! ready` |
 | 2 — Operations | `index.md` + `log.md` tail (5 entries) | Before any wiki operation |
 | 3 — On demand | Individual wiki pages | Only pages needed for current task |
-| 3 — Audit only | Full `log.md` | Only when user requests history |
+| 3 — History review | Full `log.md` | Only when user requests history |
 
 ---
 
@@ -66,8 +66,8 @@ Before any file create, edit, or delete — stop and present:
 Read-only actions do not require approval.
 
 **Documented exceptions (no separate approval request required):**
-- `!! wrap` — user invocation is implicit approval for the **entire wrap flow**: writing `memory.md`, appending the `memory | Session summary saved` entry to `log.md`, and refreshing `hot.md` (see Session Memory Commands for the pre-write safeguard). These side-effects are covered by the same invocation — do not pause for a separate approval on the log append or hot.md refresh.
-- `!! ready` — user invocation is implicit approval for the **entire ready flow**: reading and wiping `memory.md`, appending the `memory | Session summary consumed` entry to `log.md`, and refreshing `hot.md`, but only if the mid-session guard in Session Memory Commands passes. These side-effects are covered by the same invocation — do not pause for a separate approval on the log append or hot.md refresh.
+- `!! wrap` — user invocation is implicit approval for the **entire wrap flow**: writing `memory.md`, appending the relevant `memory | …` entry to `log.md`, and refreshing `hot.md` (see Session Memory Commands for the pre-write safeguard and exact entry shapes). These side-effects are covered by the same invocation — do not pause for a separate approval on the log append or hot.md refresh.
+- `!! ready` — user invocation is implicit approval for the **entire ready flow**: reading and (when applicable) wiping `memory.md`, appending the relevant `memory | …` entry to `log.md`, and refreshing `hot.md`, but only if the mid-session guard in Session Memory Commands passes. These side-effects are covered by the same invocation — do not pause for a separate approval on the log append or hot.md refresh. Exact entry shapes for each branch (normal consumption, truncation-`clear`, truncation-`keep`) are documented per-branch in Session Memory Commands.
 - `!! audit` — user invocation runs a read-only audit and needs no approval to *run*. Any fix the user asks you to apply **after** the audit is a normal write and goes through the full approval flow.
 
 All other write actions — Blueprint Sync writes, and the log appends + `hot.md` refreshes driven by Ingest / Lint / Query-filing / Update / Audit-with-fix — require explicit approval.
@@ -216,9 +216,9 @@ Triggered when user says: `!! ready`
 2. Read `memory.md`.
 3. **If `MEMORY_STATE: EMPTY` or `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED` is present** (or file is missing/blank): announce readiness normally (from `hot.md`). Do not wipe. `TRUNCATED_ACKNOWLEDGED` means a prior session already shown the truncated content and the user chose to keep it visible without re-prompting — leave it alone.
 4. **If `MEMORY_STATE: WRAPPED` is present but `MEMORY_WRAP_COMPLETE` is MISSING:** the file is truncated. Display what is present, warn the user it appears incomplete, and do NOT wipe. Offer three options and wait for an explicit choice:
-   - `clear` — wipe back to EMPTY (for when the partial content is useless).
-   - `keep` — rewrite the opening marker from `MEMORY_STATE: WRAPPED` to `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED`, leaving the body intact. This silences the truncation warning on future `!! ready` calls so the loop breaks, while preserving what was recovered.
-   - `edit` — hand control back to the user so they can fix the file manually; do not touch it.
+   - `clear` — wipe back to EMPTY (for when the partial content is useless). Then append to `log.md`: `## [YYYY-MM-DD] memory | Truncated summary cleared` (≤500 chars), and refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md` so the `Last op:` field reflects the recovery action.
+   - `keep` — rewrite the opening marker from `MEMORY_STATE: WRAPPED` to `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED`, leaving the body intact. This silences the truncation warning on future `!! ready` calls so the loop breaks, while preserving what was recovered. Then append to `log.md`: `## [YYYY-MM-DD] memory | Truncated summary acknowledged` (≤500 chars), and refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`.
+   - `edit` — hand control back to the user so they can fix the file manually; do not touch the file, do not append to `log.md`, do not refresh `hot.md`.
    Under no circumstances auto-wipe in this branch.
 5. **If both markers are present (valid wrapped summary):**
    - Display the full summary verbatim to the user (do not paraphrase, do not truncate).
@@ -282,6 +282,6 @@ Grep tip (portable, extended regex): `grep -E "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 1.13 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 1.14 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format. Also replace `[YourName]` in line 3 above.
