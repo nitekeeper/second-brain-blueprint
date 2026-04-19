@@ -20,7 +20,6 @@ Format: `~N tokens (R read / W write)`
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
 | `scheduled-tasks/refresh-hot.md` | ~4,400 | ~1,100 |
-| `scheduled-tasks/changelog-monitor.md` | ~8,500 | ~2,130 |
 | `ops/ingest.md` | ~17,000 | ~4,250 |
 | `ops/lint.md` | ~2,500 | ~630 |
 | `ops/query.md` | ~2,100 | ~530 |

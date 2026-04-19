@@ -25,7 +25,7 @@ If you saved a session summary with `!! wrap`, say `!! ready` at the start of yo
 3. Tell the agent: `!! ingest [filename]`
 
 **What happens:**
-- **Hash check first.** Before any work, the agent runs the source body through a deterministic canonicalizer (preamble-strip + whitespace / line-ending normalization) and computes an 8-char SHA-256 hash of the canonicalized content. It compares this against the stored `source_hash:` on the existing source page (if one exists). The same canonicalizer runs in the ingest op and in the daily changelog monitor, so the same underlying source produces the same hash whether you ingested it via Clipper or via URL, or whether the monitor fetched it directly. If the hashes match, the agent prints `No change since last ingest — skipped.`, deletes the inbox file, and stops. No log entry, no page edits, no cost. This is the rerun-proof guarantee.
+- **Hash check first.** Before any work, the agent runs the source body through a deterministic canonicalizer (preamble-strip + whitespace / line-ending normalization) and computes an 8-char SHA-256 hash of the canonicalized content. It compares this against the stored `source_hash:` on the existing source page (if one exists). The same canonicalizer runs for both Clipper ingest and URL ingest, so the same underlying source produces the same hash either way. If the hashes match, the agent prints `No change since last ingest — skipped.`, deletes the inbox file, and stops. No log entry, no page edits, no cost. This is the rerun-proof guarantee.
 - If the hash differs (or there's no existing source page), the agent proceeds:
   - Discusses 3–5 key takeaways with you
   - Shows you a to-do list of every page it will create or update
@@ -101,33 +101,6 @@ Runs a strict, Senior-Software-Architect-style audit of the blueprint files them
 - Blueprint-sync drift (the template and its downstream docs falling out of step)
 
 Audits are **read-only by default** — no approval needed to run one. If the audit surfaces fixes you want applied, the agent will go through the normal approval flow before writing anything. Each finding comes with quoted evidence and a severity label (CRITICAL / WARNING / STYLE); if nothing is wrong the audit says so instead of padding the list.
-
----
-
-### Staying Current — Changelog Monitor
-
-A daily scheduled task (`scheduled-tasks/changelog-monitor.md`) fetches your monitored documentation pages, content-hashes them against each source page's stored `source_hash:`, and posts a single Slack DM summarizing findings. Strictly read-only — never writes files, never triggers ingest automatically. The monitor is the detector; `!! ingest` stays the writer.
-
-**Slack DM format:**
-
-```
-📅 Changelog monitor — YYYY-MM-DD
-✅ Source A — no change
-🆕 Source B — CHANGED (stored: … → fetched: …)
-🆘 Source C — UNINGESTED (no wiki page yet)
-❌ Source D — fetch failed (retry next run)
-```
-
-**What to do with each status:**
-
-- ✅ — nothing. No change since your last ingest.
-- 🆕 — run `!! ingest <URL>` to pull the update. v2.0's hash-check guarantee makes re-ingest idempotent: if the source didn't actually change, the command exits with `No change since last ingest — skipped.`
-- 🆘 — run `!! ingest <URL>` to bootstrap a new source page.
-- ❌ — transient. Wait for the next daily run before investigating.
-
-**Editing the watch list:** add or remove rows in the `## Monitored Sources` table in `scheduled-tasks/changelog-monitor.md`. The task iterates the table on every run — no scheduler restart needed.
-
-**Scheduling the task:** register the 2-line prompt from the file's `## Invocation` section in your Cowork scheduled-tasks MCP. All logic lives in the file itself so the scheduler contract stays thin and version-controlled.
 
 ---
 

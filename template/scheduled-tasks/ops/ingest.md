@@ -37,7 +37,7 @@ B7. Write one log entry per file during `[main-step 11]` (not one combined entry
 
 ## Hash Canonicalization
 
-Both Step 0 of this op and Step 3 of `@scheduled-tasks/changelog-monitor.md` feed the source body through this canonical pipeline **before** computing the SHA-256. Applying the same normalizer in both places is what makes the hash comparable across Clipper ingest, URL ingest, and the read-only monitor fetch — three paths that would otherwise produce visibly different markdown for identical underlying content.
+Step 0 of this op feeds the source body through this canonical pipeline **before** computing the SHA-256. Applying the normalizer ensures that Clipper ingest and URL ingest produce the same hash for identical underlying content — two paths that would otherwise produce visibly different markdown.
 
 Steps (applied in order, producing the hash input):
 
@@ -60,8 +60,8 @@ This canonicalizer survives: Clipper-vs-WebFetch whitespace differences, CRLF/LF
 
 0. **Hash check (no-op guard).** First action of every ingest, before any other reads or writes:
     - Load the raw source body into working memory. For filename ingest: read `wiki/inbox/<file>`. For URL ingest: content is already in memory from U1 (this step does not re-read).
-    - Run the body through the **Hash Canonicalization** pipeline above (preamble-strip if present → line-ending normalization → whitespace collapse → trim). Compute SHA-256 over the canonicalized bytes and take the first 8 hex characters as the computed hash. The same pipeline is used by `changelog-monitor.md` Step 3 so cross-path hashes (Clipper ingest vs URL monitor fetch) are directly comparable.
-    - Derive the expected source-page slug (lowercase-hyphenated from the H1 or filename stem; for URL ingest reuse the U2 slug). These rules are canonical for both ingest paths and are what `changelog-monitor.md` Step 3 relies on — Step 7 consumes the already-derived `${slug}` and does not re-derive.
+    - Run the body through the **Hash Canonicalization** pipeline above (preamble-strip if present → line-ending normalization → whitespace collapse → trim). Compute SHA-256 over the canonicalized bytes and take the first 8 hex characters as the computed hash. The same pipeline is used for both Clipper ingest and URL ingest, so both paths produce comparable hashes for identical underlying content.
+    - Derive the expected source-page slug (lowercase-hyphenated from the H1 or filename stem; for URL ingest reuse the U2 slug). Step 7 consumes the already-derived `${slug}` and does not re-derive.
     - If `wiki/pages/sources/<slug>.md` exists, read its `source_hash:` frontmatter.
     - **If stored `source_hash:` matches the computed hash:** delete the inbox file (if present), print `No change since last ingest — skipped.` to the user, and exit cleanly. Do NOT continue to Step 1. Do NOT append to `log.md`. Do NOT refresh `hot.md`. Do NOT recalibrate. This is the rerun-proof guarantee — same input, zero state change.
     - **Otherwise** (hash differs, source page doesn't exist, or source page is missing `source_hash:`): continue to Step 1. Step 7 will (re)generate the source page from the new content; there is no in-place merge.
@@ -86,7 +86,7 @@ This canonicalizer survives: Clipper-vs-WebFetch whitespace differences, CRLF/LF
 7. Write (or regenerate) a source summary page in `wiki/pages/sources/`. The frontmatter MUST include:
     - `source_hash: <8-char-hex>` — the same hash computed in Step 0. Dedupe primitive; a missing or stale `source_hash:` will cause the next ingest to trigger a full regeneration.
     - `original_file: raw/<slug>-<ts>.md` — using the Step-5 `ts`. Every `[^n]:` provenance footnote in the Key Takeaways section must cite the same `raw/<slug>-<ts>.md` path.
-    - `source_url: <URL>` — the canonical URL this source was pulled from. For URL ingest, reuse the value U3 already prepended. For filename (Clipper) ingest, pull the URL from the Clipper's own preamble (Obsidian Web Clipper writes `source:` by default; accept that, `url:`, or any equivalent field that carries the origin URL) and propagate it verbatim into `source_url:`. If no URL is recoverable from the Clipper preamble, write `source_url: unknown` and note the gap in the approval request so the user can correct it post-ingest. This field is the stable join key that `@scheduled-tasks/changelog-monitor.md` Step 1 uses to reverse-look-up stored hashes; a source page missing `source_url:` (or with `unknown`) will be invisible to the monitor and will report 🆘 UNINGESTED there. Mandatory as of schema v2.0.10 — see `troubleshooting.md` "Changelog monitor reports 🆘 UNINGESTED for a source I know I ingested" for the pre-v2.0.10 failure mode this invariant eliminates.
+    - `source_url: <URL>` — the canonical URL this source was pulled from. For URL ingest, reuse the value U3 already prepended. For filename (Clipper) ingest, pull the URL from the Clipper's own preamble (Obsidian Web Clipper writes `source:` by default; accept that, `url:`, or any equivalent field that carries the origin URL) and propagate it verbatim into `source_url:`. If no URL is recoverable from the Clipper preamble, write `source_url: unknown` and note the gap in the approval request so the user can correct it post-ingest. This field records source provenance and is useful for manually tracking whether a source has been updated.
 
     On hash mismatch, fully regenerate the page from the new raw content — do not attempt to merge with the prior page body.
 8. Read `wiki/index.md` to identify all affected concept/entity pages
@@ -102,5 +102,5 @@ This canonicalizer survives: Clipper-vs-WebFetch whitespace differences, CRLF/LF
 
 - A single source typically touches 5–15 pages. Be thorough.
 - Read `@scheduled-tasks/ops/conventions.md` before creating or editing any pages.
-- Source pages must include: `original_file:`, `source_hash:`, and `source_url:` frontmatter; Key Takeaways section; Connections section; and `[^n]:` provenance footnotes on every curated bullet. The `source_url:` invariant is load-bearing for the changelog monitor — see Step 7 for the field's role and the fallback path when no URL is recoverable.
+- Source pages must include: `original_file:`, `source_hash:`, and `source_url:` frontmatter; Key Takeaways section; Connections section; and `[^n]:` provenance footnotes on every curated bullet. See Step 7 for the `source_url:` fallback path when no URL is recoverable from the Clipper preamble.
 - Rerun-proof guarantee: running the same ingest twice produces zero state change. See Step 0.

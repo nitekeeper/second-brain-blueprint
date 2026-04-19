@@ -76,7 +76,6 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 | `blueprint/template/scheduled-tasks/ops/update.md` | `scheduled-tasks/ops/update.md` |
 | `blueprint/template/scheduled-tasks/ops/conventions.md` | `scheduled-tasks/ops/conventions.md` |
 | `blueprint/template/scheduled-tasks/ops/token-reference.md` | `scheduled-tasks/ops/token-reference.md` |
-| `blueprint/template/scheduled-tasks/changelog-monitor.md` | `scheduled-tasks/changelog-monitor.md` |
 
 ---
 
@@ -86,10 +85,6 @@ In `CLAUDE.md`, make the following replacements:
 - Replace `[YourName]` with the name the user gave in the pre-flight check (appears in the top-of-file greeting)
 - Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
 - Remove the `> **Setup note:** …` block at the very end of `CLAUDE.md` (immediately under the `Schema version:` footer). It is scaffolding for this setup step only — once the replacements above are done, it has no further purpose and will otherwise sit as stale cruft in the live file.
-
-In `scheduled-tasks/changelog-monitor.md`:
-- Replace `[YOUR_SLACK_USER_ID]` with the user's Slack user ID. To find it: Slack → click your profile avatar → **More** → **Copy member ID** (yields a value of the form `U` + 10 alphanumeric chars, e.g. `U01ABCDE23F`). The monitor posts its daily summary as a self-DM to this user.
-- **Detect whether the MCP is already scheduling the task, then decide whether to flag Step 8.** Preferred mechanism: call the scheduled-tasks MCP's list tool (in Cowork this is typically `mcp__scheduled-tasks__list_scheduled_tasks` or an equivalent name — use whatever is available in the current session) and look for a task whose prompt or target references `changelog-monitor.md`. If a match exists, do not flag Step 8. If no match exists, set a flag for Step 8 to surface the loose-end note. If the MCP list tool is not available in the current Cowork session (e.g. the scheduled-tasks MCP isn't installed), fall back to asking the user directly: "Is the changelog-monitor scheduled task already registered with your scheduled-tasks MCP? (yes/no)" and flag based on the answer. Do not default to "always flag" silently — either detect or ask, but make the decision deterministic.
 
 > **Note:** The `@`-prefixed paths in `CLAUDE.md` (Ops File Reminder table, Approval Rule) are working-folder-relative and resolve correctly regardless of the folder's name — no find-and-replace is needed during setup.
 
@@ -235,7 +230,6 @@ Check the following and report status to the user:
 - [ ] `wiki/hot.md` exists with today's date
 - [ ] All 7 ops files exist in `scheduled-tasks/ops/`
 - [ ] `scheduled-tasks/refresh-hot.md` exists
-- [ ] `scheduled-tasks/changelog-monitor.md` exists and `[YOUR_SLACK_USER_ID]` has been replaced with the user's Slack user ID
 - [ ] `raw/` folder exists
 - [ ] `drafts/` folder exists
 
@@ -250,10 +244,6 @@ Tell the user:
 > **Next step:** Clip an article with Obsidian Web Clipper — it will save to `wiki/inbox/`. Then tell me: `!! ingest [filename]`
 >
 > For daily usage, see `blueprint/user-guide.md`."
-
-**If Step 3 flagged that `changelog-monitor.md` is not yet on a daily scheduled-tasks cadence,** append this line to the readiness announcement (quoted block, inline with the rest):
-
-> "One loose end: `scheduled-tasks/changelog-monitor.md` is in place but nothing is scheduling it yet. When you're ready to turn on daily changelog monitoring, register it with the scheduled-tasks MCP at whatever cadence you like (the file itself is written for a daily run). The wiki works fine without it — this is an optional quality-of-life addition."
 
 Then display the standard footer:
 ```

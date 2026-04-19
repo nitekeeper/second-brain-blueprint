@@ -97,7 +97,7 @@ All other write actions — Blueprint Sync writes, and the log appends + `hot.md
 | Any schema change | `blueprint/template/CLAUDE.md` always |
 | Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
 | Schema version bump | `blueprint/CHANGELOG.md` (new section documenting the version) in addition to any rows above that the change triggers |
-| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical on line 23 naming current tasks — the glob itself already covers new files, so this is a doc-hygiene touch, not a behavioral one) + `ops/token-reference.md` (file-size row) + `setup-guide.md` (Step 2 copy / Step 3 personalize if placeholders / Step 7 verify) + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md` (new section — treat any new scheduled task as at minimum a patch version bump, so the Schema-version-bump row applies) |
+| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical naming current tasks — the glob itself already covers new files, so this is a doc-hygiene touch, not a behavioral one) + `ops/token-reference.md` (file-size row) + `setup-guide.md` (Step 2 copy / Step 3 personalize if placeholders / Step 7 verify) + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md` (new section — treat any new scheduled task as at minimum a patch version bump, so the Schema-version-bump row applies) |
 
 **Versioning split.** The CLAUDE.md footer and `hot.md`'s `Schema:` field track the major.minor schema version (`X.Y`) only. Patch-level bumps (`X.Y.Z`) add a new `CHANGELOG.md` section but do **not** move the footer or `hot.md` field — those files are free to receive content edits as part of a patch, but the version number itself stays put. Minor/major bumps (`X.Y` → `X.(Y+1)` or `(X+1).0`) propagate through the "Any schema change" row and rewrite the footer.
 
@@ -136,7 +136,6 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │   └── template/
 │       ├── CLAUDE.md
 │       └── scheduled-tasks/
-│           ├── changelog-monitor.md
 │           ├── refresh-hot.md
 │           └── ops/
 │               ├── ingest.md
@@ -147,7 +146,6 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │               ├── conventions.md
 │               └── token-reference.md
 ├── scheduled-tasks/            ← Reusable task and ops instruction files
-│   ├── changelog-monitor.md
 │   ├── refresh-hot.md
 │   └── ops/
 │       ├── ingest.md
