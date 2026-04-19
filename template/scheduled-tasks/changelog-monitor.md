@@ -21,7 +21,7 @@ Add a source by appending a row here. Remove one by deleting its row. Keep the n
 
 ## Execution
 
-1. **Read the wiki's stored hashes.** Build a URL → source-page map **once** per run by enumerating `source pages via Bash: find mnt/*/wiki/pages/sources -name "*.md"` and reading each file's `source_url:` frontmatter. Then, for each monitored source:
+1. **Read the wiki's stored hashes.** Build a URL → source-page map **once** per run by enumerating source pages via Bash: `find mnt/*/wiki/pages/sources -name "*.md"` and reading each file's `source_url:` frontmatter. Then, for each monitored source:
    - Look up the monitored URL in the map. **Exact string match** — no URL normalization (the canonicalizer in `ops/ingest.md` §Hash Canonicalization applies to source *body*, not URL); if the monitored URL's punctuation disagrees with the stored `source_url:`, fix the stored value during the next ingest rather than softening the match here.
    - If exactly one source page matches, read its `source_hash:` frontmatter into memory.
    - If no source page matches, record the source as UNINGESTED and skip the hash lookup.
