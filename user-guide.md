@@ -6,12 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~5,500 tokens)
+1. `CLAUDE.md` — its operating instructions (~6,250 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~80 tokens)
 
-**Total cold-start cost: ~5,580 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~6,330 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~6,330 tokens total when the summary is full).
+If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~7,280 tokens total when the summary is full).
 
 ---
 
@@ -178,18 +178,18 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~5,530 |
-| Cold start with `!! ready` (full memory) | ~6,280 |
+| Cold start | ~6,330 |
+| Cold start with `!! ready` (full memory) | ~7,280 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all | ~8,000–12,000 (scales with page count) |
 | Simple query (wiki) | ~2,000–4,000 |
 | Audit a single blueprint file | ~1,000–5,000 |
 | Audit all (full blueprint) | ~30,000–54,000 |
-| `!! wrap` (realistic) | ~2,800 |
-| `!! ready` (realistic) | ~2,825 |
+| `!! wrap` (realistic) | ~3,000 |
+| `!! ready` (realistic) | ~3,300 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~5,530 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~6,330 tokens to re-orient.
 
 ---
 
@@ -210,5 +210,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~5,530 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~6,330 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.
