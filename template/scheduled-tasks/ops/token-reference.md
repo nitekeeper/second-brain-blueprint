@@ -32,6 +32,9 @@ Format: `~N tokens (R read / W write)`
 | `blueprint/user-guide.md` | ~17,100 | ~4,280 |
 | `blueprint/troubleshooting.md` | ~27,300 | ~6,830 |
 | `blueprint/LICENSE` | ~1,400 | ~350 |
+| `blueprint/skills/sqlite-query/SKILL.md` | ~4,700 | ~1,180 |
+| `blueprint/skills/sqlite-query/query-layer.md` | ~2,500 | ~630 |
+| `blueprint/skills/sqlite-query/ingest-hook.md` | ~3,300 | ~830 |
 | Average concept page | ~2,500 | ~630 |
 | Average source page | ~1,900 | ~480 |
 | Raw source document | varies | ~1,000–8,000 |

@@ -22,6 +22,7 @@ Audit every tracked file under `blueprint/` — specifically the files listed be
 - `blueprint/template/CLAUDE.md`
 - Every file directly under `blueprint/template/scheduled-tasks/` (currently `refresh-hot.md`; do not recurse into `ops/`)
 - Every file under `blueprint/template/scheduled-tasks/ops/`
+- Every file under `blueprint/skills/` (skill bundles — recurse into subdirectories)
 
 ## If `!! audit [Page Name]`
 
