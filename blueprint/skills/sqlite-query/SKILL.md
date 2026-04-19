@@ -82,6 +82,8 @@ Plus creates `wiki.db` at the working folder root.
 
 If `wiki.db` becomes corrupted or a query fails at runtime, `query-layer.md` catches the exception and falls back to the built-in grep layer transparently, logging a warning.
 
+**DB desync recovery.** If the ingest hook logs a hook error (e.g. `[sqlite-query] hook error for <slug>: …`), `wiki.db` may have drifted from the markdown files. To repair: say `!! install sqlite-query` — the install flow detects the existing DB, skips creation, and re-offers the backfill step. Choose yes to re-sync all pages. Alternatively, say `!! uninstall sqlite-query` to remove the skill and revert to the built-in grep layer.
+
 ---
 
 ## Uninstall
@@ -98,4 +100,4 @@ Steps:
 
 ## Offered During Setup
 
-`setup-guide.md` Step 4 offers this skill during initial setup. Choosing yes runs the install flow above (skipping the backfill step since no pages exist yet).
+`setup-guide.md` Step 4.5 offers this skill during initial setup. Choosing yes runs the install flow above (skipping the backfill step since no pages exist yet).

@@ -14,7 +14,7 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
 
 1. **Query `wiki.db`** for pages related to the topic slug — both directions:
    ```python
-   import sqlite3, pathlib, os
+   import sqlite3, pathlib, os, subprocess
 
    WORKDIR = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
    db = WORKDIR / "wiki.db"
@@ -34,8 +34,20 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
        conn.close()
 
        if rows:
-           # Return list of (slug, title, summary) tuples to the agent
-           candidate_paths = [f"wiki/pages/**/{row[0]}.md" for row in rows]
+           # Resolve each slug to a concrete file path via `find`.
+           # Do NOT use glob patterns (e.g. wiki/pages/**/<slug>.md) — they are
+           # not expanded by Python's open() or the Read tool, and unmatched bash
+           # globs return the literal pattern string rather than empty.
+           candidate_paths = []
+           pages_dir = str(WORKDIR / "wiki" / "pages")
+           for row in rows:
+               result = subprocess.run(
+                   ["find", pages_dir, "-name", f"{row[0]}.md"],
+                   capture_output=True, text=True
+               )
+               path = result.stdout.strip()
+               if path:
+                   candidate_paths.append(path)
        else:
            candidate_paths = []
 
