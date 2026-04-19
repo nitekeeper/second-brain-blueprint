@@ -44,6 +44,7 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
 | Answer a question (wiki/web) | `@scheduled-tasks/ops/query.md` |
 | Update a page | `@scheduled-tasks/ops/update.md` |
 | Create or edit any page | `@scheduled-tasks/ops/conventions.md` |
+| Install a skill (`!! install <skill>`) | `@blueprint/skills/<skill>/SKILL.md` |
 | Any write action (approval) | `@scheduled-tasks/ops/token-reference.md` |
 | After any wiki-state change (Ingest/Lint/Update/filed Query/Audit-with-fix/`!! wrap`/`!! ready`) | `@scheduled-tasks/refresh-hot.md` |
 
@@ -135,18 +136,25 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │   ├── CHANGELOG.md
 │   └── template/
 │       ├── CLAUDE.md
-│       └── scheduled-tasks/
-│           ├── refresh-hot.md
-│           └── ops/
-│               ├── ingest.md
-│               ├── lint.md
-│               ├── audit.md
-│               ├── query.md
-│               ├── update.md
-│               ├── conventions.md
-│               └── token-reference.md
+│       ├── scheduled-tasks/
+│       │   ├── refresh-hot.md
+│       │   └── ops/
+│       │       ├── ingest.md
+│       │       ├── lint.md
+│       │       ├── audit.md
+│       │       ├── query.md
+│       │       ├── update.md
+│       │       ├── conventions.md
+│       │       └── token-reference.md
+│       └── skills/                ← Installable skill bundles
+│           └── sqlite-query/
+│               ├── SKILL.md
+│               ├── query-layer.md
+│               └── ingest-hook.md
 ├── scheduled-tasks/            ← Reusable task and ops instruction files
 │   ├── refresh-hot.md
+│   ├── query-layer.md          ← Present only if a query-layer skill is installed
+│   ├── ingest-hook.md          ← Present only if an ingest-hook skill is installed
 │   └── ops/
 │       ├── ingest.md
 │       ├── lint.md

@@ -10,12 +10,12 @@ If highly confident in the answer, respond directly with citations where relevan
 **Step 2 — Check the wiki**
 If not highly confident, or if the question touches topics this wiki covers:
 1. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
-2. Derive a slug from the key topic in the question (lowercase-hyphenated). Run a grep pre-filter to find candidate pages without reading their content:
+2. **Check for an installed query layer.** If `scheduled-tasks/query-layer.md` exists, read it and follow its instructions to find candidate pages — it returns a list of page paths. Skip to step 4 with those results. If it returns empty or fails, fall through to step 3 (grep). If `scheduled-tasks/query-layer.md` does not exist, proceed to step 3.
+3. Derive a slug from the key topic in the question (lowercase-hyphenated). Run a grep pre-filter to find candidate pages without reading their content:
    ```bash
    grep -rl "topic-slug" wiki/pages --include="*.md"
    ```
-   If the grep returns matches, those are your candidate pages — skip to step 4. If no matches, fall back to reading `wiki/index.md` (step 3).
-3. Read `wiki/index.md` to find relevant pages (fallback only — use when grep returns no matches or the topic slug is ambiguous)
+   If grep returns matches, those are your candidate pages — skip to step 4. If no matches, fall back to reading `wiki/index.md`.
 4. Read the candidate pages identified in step 2 or 3
 5. Synthesize an answer with `[[wiki link]]` citations
 

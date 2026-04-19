@@ -100,6 +100,23 @@ print(f"edited {edited} files under {pages}")
 
 The agent should always print the edit count and the resolved root path before considering the bulk edit complete — a count of 0 is a red flag, not a success.
 
+## Query Layer Hook Contract
+
+A file at `scheduled-tasks/query-layer.md` overrides the built-in grep query step. Skills that provide a query layer must follow this contract:
+
+- **Input:** a topic slug (lowercase-hyphenated) derived from the user's question, available in working memory as `slug`
+- **Output:** a list of candidate page file paths for the agent to read, or `None` / empty list to trigger fallback to grep
+- **Fallback:** if the query layer fails or returns empty, the agent falls back to grep automatically — query layers must never hard-fail the op
+
+## Ingest Hook Contract
+
+A file at `scheduled-tasks/ingest-hook.md` runs after Step 11 of the ingest op. Skills that provide an ingest hook must follow this contract:
+
+- **Input:** per-page values from working memory — `slug`, `title`, `type`, `summary`, `tags`, `created`, `updated`, `related` (list of slugs)
+- **Runs:** once per page touched in the ingest (source page + every concept/entity page created or updated)
+- **Errors:** must be non-fatal — log a warning and let the ingest op continue
+- **Side effects:** hook is responsible for keeping any external index (e.g. `wiki.db`) in sync with the markdown files
+
 ## Immutable Files
 Never modify anything in `raw/` — these are the original source documents.
 
