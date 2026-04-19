@@ -22,7 +22,6 @@ Do not proceed until the user confirms the folder is selected.
 Before starting, confirm:
 1. You have access to the working folder (the Cowork working directory)
 2. The `blueprint/` folder exists inside it (you are reading this file from there)
-3. Ask the user: **"What is your name? I'll use it to personalize your wiki."** Wait for the answer before proceeding.
 
 ---
 
@@ -82,9 +81,8 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 ## Step 3 — Personalize Template Files
 
 In `CLAUDE.md`, make the following replacements:
-- Replace `[YourName]` with the name the user gave in the pre-flight check (appears in the top-of-file greeting)
 - Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
-- Remove the `> **Setup note:** …` block at the very end of `CLAUDE.md` (immediately under the `Schema version:` footer). It is scaffolding for this setup step only — once the replacements above are done, it has no further purpose and will otherwise sit as stale cruft in the live file.
+- Remove the `> **Setup note:** …` block at the very end of `CLAUDE.md` (immediately under the `Schema version:` footer). It is scaffolding for this setup step only — once the replacement above is done, it has no further purpose and will otherwise sit as stale cruft in the live file.
 
 > **Note:** The `@`-prefixed paths in `CLAUDE.md` (Ops File Reminder table, Approval Rule) are working-folder-relative and resolve correctly regardless of the folder's name — no find-and-replace is needed during setup.
 
@@ -221,7 +219,7 @@ Instruct the user to do this manually in the Chrome extension settings:
 
 Check the following and report status to the user:
 
-- [ ] `CLAUDE.md` exists at the working folder root and contains the user's name
+- [ ] `CLAUDE.md` exists at the working folder root
 - [ ] `memory.md` exists at the working folder root (empty)
 - [ ] `wiki/inbox/` folder exists
 - [ ] `wiki/pages/` subfolders exist: `concepts/`, `entities/`, `sources/`, `analyses/`
