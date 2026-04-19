@@ -4,6 +4,14 @@
 
 ---
 
+## Credits & Attribution
+
+| Role | Person / Project |
+|---|---|
+| **Original concept** | [Andrej Karpathy](https://github.com/karpathy) — coined the "LLM Wiki" pattern in his foundational [gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f); this entire system is an implementation of that idea |
+
+---
+
 ## What Is This?
 
 Most AI tools re-derive answers from scratch every time you ask a question. Nothing accumulates.
