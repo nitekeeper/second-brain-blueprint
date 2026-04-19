@@ -104,6 +104,19 @@ Audits are **read-only by default** — no approval needed to run one. If the au
 
 ---
 
+### Installing Skills — `!! install`
+
+Skills extend the core system without changing the blueprint itself. The only skill currently available is `sqlite-query`.
+
+- `!! install sqlite-query` — installs the SQLite query layer. Replaces the built-in grep lookup with a local `wiki.db` index. Recommended when your wiki grows beyond ~500 pages. If your wiki already has pages, the agent will offer to backfill `wiki.db` from them.
+- `!! uninstall sqlite-query` — removes the skill and reverts to the grep layer.
+
+**Fallback:** if SQLite is unavailable or a query fails at runtime, the system falls back to grep automatically.
+
+**Query layer precedence:** Basic (grep) → SQLite (if installed) → future skills. Only one query layer is active at a time.
+
+---
+
 ### Updating Pages — `!! update`
 
 You don't need a special command to trigger an update — just make a correction or add context mid-conversation. The agent detects it and runs the update op automatically.

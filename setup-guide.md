@@ -182,6 +182,17 @@ Replace all `YYYY-MM-DD` placeholders with today's date. Replace `vX.Y` in `hot.
 
 ---
 
+## Step 4.5 — Offer SQLite Query Skill
+
+Ask the user:
+
+> "Would you like to install the SQLite query layer? It replaces the built-in grep-based lookup with a local database (`wiki.db`) for faster relationship queries — recommended if you expect your wiki to grow beyond ~500 pages. You can always install it later with `!! install sqlite-query`."
+
+- **If yes:** run the `!! install sqlite-query` flow from `blueprint/skills/sqlite-query/SKILL.md` — skip the backfill step (no pages exist yet). On completion, continue to Step 5.
+- **If no:** continue to Step 5. The basic grep layer is active by default.
+
+---
+
 ## Step 5 — Configure Obsidian
 
 Instruct the user to do this manually in Obsidian (you cannot do this via file edits):

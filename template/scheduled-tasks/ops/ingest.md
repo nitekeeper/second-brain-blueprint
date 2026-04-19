@@ -96,6 +96,7 @@ This canonicalizer survives: Clipper-vs-WebFetch whitespace differences, CRLF/LF
 11. Append entry to `wiki/log.md` — **must be ≤500 chars total (header + body)**:
     `## [YYYY-MM-DD] ingest | [Title]`
     If the entry would exceed 500 chars, compress the title/body (or split into a follow-up entry).
+11.5. **Run ingest hook if installed.** If `scheduled-tasks/ingest-hook.md` exists, read it and execute it — passing the current page's `slug`, `title`, `type`, `summary`, `tags`, `created`, `updated`, and `related` from working memory. Run once per page touched in this ingest (source page + every concept/entity page created or updated in Steps 7–9). Hook errors are non-fatal — log the warning and continue.
 12. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
 13. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section)
 
