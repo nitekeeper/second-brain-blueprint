@@ -65,7 +65,7 @@ try:
     print(f"[sqlite-query] synced: {slug} ({len(related)} relations)")
 
 except Exception as e:
-    print(f"[sqlite-query] hook error for {slug}: {e} — wiki.db may be out of sync, run !! lint to repair")
+    print(f"[sqlite-query] hook error for {slug}: {e} — wiki.db may be out of sync. To repair: say '!! install sqlite-query' and choose yes to the backfill offer, or '!! uninstall sqlite-query' to revert to grep.")
 ```
 
 ---
@@ -73,5 +73,5 @@ except Exception as e:
 ## Notes
 
 - Runs once per page touched in the ingest op — source page + every concept/entity page updated
-- Errors are non-fatal: the ingest op continues, but wiki.db may drift from the markdown files. `!! lint` detects and repairs drift.
+- Errors are non-fatal: the ingest op continues, but wiki.db may drift from the markdown files. To repair: say `!! install sqlite-query` and choose yes to the backfill offer, or `!! uninstall sqlite-query` to revert to grep.
 - Bidirectional relation insert uses `INSERT OR IGNORE` so duplicate pairs are silently skipped

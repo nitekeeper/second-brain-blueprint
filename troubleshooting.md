@@ -288,6 +288,18 @@ rm wiki/pages/sources/claude-code-overview.md.bak
 
 ---
 
+## URL ingest keeps regenerating the same source even when the article hasn't changed
+
+**Symptom:** `!! ingest <URL>` produces a new `raw/` snapshot and regenerates the source page on every run, even when the article content appears unchanged.
+
+**Cause:** URL ingest uses WebFetch, which may route the article body through an LLM for HTML-to-markdown conversion. LLM prose rewriting produces slightly different markdown on every call — the hash canonicalizer handles whitespace and CRLF differences but not semantic rewrites. Each rewrite yields a different SHA-256 hash, mismatches the stored `source_hash:`, and triggers full regeneration.
+
+**Fix:** Switch to Obsidian Web Clipper for this source. The Clipper saves verbatim markdown once — same bytes on every run — so the canonicalized hash is stable across ingests. If you must use URL ingest, accept the periodic regeneration as correct behavior: each LLM rewrite is treated as a content change.
+
+**Prevention:** Prefer Web Clipper for sources you'll ingest more than once. URL ingest is best for one-shot ingests or sources not subject to LLM-based HTML rendering.
+
+---
+
 ## Bulk Edits Reference
 
 Always use Python for any edit touching more than one file. Always anchor to an absolute root path (never rely on cwd) and always handle encoding errors explicitly:

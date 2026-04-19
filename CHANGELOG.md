@@ -3,6 +3,421 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.21 — 2026-04-19
+
+### Remove CHANGELOG from `!! audit all` scope; fix v2.0.18 arithmetic residual (audit #25 — S1)
+
+- **`blueprint/CHANGELOG.md` removed from `!! audit all` scope.** A changelog is an
+  append-only log — auditing it for logic errors is not meaningful, and fixing narrative
+  figures inside it is the exact pattern that created the cascade-miss class in the first
+  place. Removed the `blueprint/CHANGELOG.md` line from `ops/audit.md`'s scope list.
+  Removed the companion warning note (added in v2.0.19) that told the agent CHANGELOG
+  was read-but-not-tracked — it is now neither read nor tracked. Cascade: `user-guide.md`
+  audit cost figures updated from `~30,000–43,000+` to `~30,000–43,000` (both
+  occurrences — the `+` existed solely because CHANGELOG was an unaccounted read).
+
+- **v2.0.18 arithmetic residual corrected (S1).** Audit #25 S1 flagged that v2.0.20
+  corrected the v2.0.18 narrative sentence (`"~75,346 chars (pre-entry ~73,333)"`) but
+  left the adjacent arithmetic base unchanged (`75,344 × 1.25`). Corrected in-place to
+  `75,346 × 1.25 = 94,182.5`. Arithmetic conclusion unchanged (~94,200). No cascade.
+
+---
+
+## v2.0.20 — 2026-04-19
+
+### v2.0.18 narrative corrected; no table or cascade impact (audit #24 — S1)
+
+- **CHANGELOG.md v2.0.18 narrative corrected.** Audit #24 S1 (carried from audit #23)
+  flagged that the v2.0.18 narrative cited `"pre-entry ~73,334"` (actual: 73,333) and
+  `"grew CHANGELOG.md to ~75,344 chars"` (actual: 75,346). Corrected in-place to
+  `"pre-entry ~73,333"` and `"~75,346 chars"`. Fourth occurrence of the cascade-miss
+  class (v2.0.15 first — 593 chars, source-of-truth impact; v2.0.17 second — 1,151 chars,
+  cosmetic; v2.0.18 third — 2 chars, rounding artifact; v2.0.20 correction closes it).
+
+- **No file-size or token-table changes.** `blueprint/CHANGELOG.md` was removed from
+  `token-reference.md` in v2.0.19, so the corrected narrative figures have no calibration
+  role anywhere in the system. No recalibration, no envelope change, no cold-start
+  cascade required.
+
+---
+
+## v2.0.19 — 2026-04-19
+
+### Remove `blueprint/CHANGELOG.md` from token-reference; add audit token warning
+
+- **`blueprint/CHANGELOG.md` removed from `token-reference.md` tracked-files table.**
+  CHANGELOG.md grows with every fix cycle and is only read during `!! audit all`,
+  which is approval-exempt — tracking its size adds recalibration churn without
+  protecting anything. Removed the row (~94,200 / ~23,550). New table sum: 40,820
+  tokens. Envelope tightened from `~30,000–67,000` to `~30,000–43,000` (sum 40,820
+  + ~2,180 cushion). Cascade: `ops/token-reference.md` (row removed, Step 5 envelope
+  and floor note updated), `ops/audit.md` (envelope updated), `user-guide.md` (cost
+  table and `!! audit` description updated).
+
+- **Warning note added to `ops/audit.md`.** CHANGELOG.md is still read during every
+  `!! audit all` pass but is no longer in the cost table. A note now instructs the
+  agent to warn users that `!! audit all` may use significantly more tokens than the
+  envelope suggests after many audit-and-fix cycles.
+
+### Post-fix token-reference envelope
+
+Blueprint-doc rows: README (1,500) + setup-guide (3,300) + user-guide (4,450) +
+troubleshooting (7,080) + LICENSE (350) = **16,680**
+
+Template-side rows: CLAUDE (6,450) + refresh-hot (1,280) + ingest (4,950) + lint (780) +
+query (830) + update (600) + conventions (2,100) + audit (2,050) + token-reference (2,120)
+= **21,160**
+
+Skill rows: SKILL.md (1,300) + query-layer (800) + ingest-hook (880) = **2,980**
+
+**Total ≈ 40,820 tokens** inside `~30,000–43,000`. Cushion ≈ 2,180 tokens (5.1% of
+43,000 — above the 2% floor of ~860 tokens).
+
+---
+
+## v2.0.18 — 2026-04-19
+
+### v2.0.17 narrative corrected; CHANGELOG.md recalibrated; envelope widened to ~30,000–67,000 (audit #22 — S1, S2)
+
+- **v2.0.17 CHANGELOG narrative corrected (S1).** Audit #22 S1 flagged that the v2.0.17
+  narrative cited the pre-entry CHANGELOG.md size (`~72,182 chars`, `22.6%` headroom)
+  instead of the post-entry size. Corrected in-place to `~73,300` / `~20.7%` (+1 char).
+  Same cascade-miss class as v2.0.15 → v2.0.17 retroactive fix; no token-table or
+  envelope impact from the correction itself.
+
+- **`blueprint/CHANGELOG.md` recalibrated; envelope widened (S2).** Audit #22 S2
+  identified that CHANGELOG.md's measured size (73,333 chars) had grown ~4,800 chars
+  above the last calibration point (~70,800), placing the next recalibration's token
+  delta (+795 tokens) on a path that would breach the 2% envelope cushion floor.
+  Adding v2.0.18 entry grew CHANGELOG.md to ~75,346 chars (pre-entry ~73,333).
+  Recalibrated at 125%: 75,346 × 1.25 = 94,182.5 → **~94,200 / ~23,550**
+  (was ~88,500 / ~22,130). New table sum ~64,370 tokens; cushion ~65,000 − 64,370 =
+  630 tokens (0.97% — below the 2% floor of ~1,300). Envelope widened from
+  `~30,000–65,000` to `~30,000–67,000` (sum + ~2,630 cushion = 3.93% of 67,000 —
+  above the 2% floor). Cascade applied to: `ops/audit.md` Notes, `user-guide.md`
+  cost table, `user-guide.md` !! audit description.
+
+### Post-fix token-reference envelope
+
+Blueprint-doc rows: README (1,500) + setup-guide (3,300) + user-guide (4,450) +
+troubleshooting (7,080) + CHANGELOG (**23,550**) + LICENSE (350) = **40,230**
+
+Template-side rows: CLAUDE (6,450) + refresh-hot (1,280) + ingest (4,950) + lint (780) +
+query (830) + update (600) + conventions (2,100) + audit (2,050) + token-reference (2,120)
+= **21,160**
+
+Skill rows: SKILL.md (1,300) + query-layer (800) + ingest-hook (880) = **2,980**
+
+**Total ≈ 64,370 tokens** inside `~30,000–67,000`. Cushion ≈ 2,630 tokens (3.93% of
+67,000 — above the 2% floor).
+
+---
+
+## v2.0.17 — 2026-04-19
+
+### Retroactive correction: v2.0.15 CHANGELOG narrative values updated (audit #21 — S1)
+
+- **CHANGELOG v2.0.15 narrative corrected to show accurate post-recalibration values.**
+  Audits #19 and #20 flagged that the v2.0.15 CHANGELOG narrative cited stale intermediate
+  values — `"70,207 chars"`, `"~87,900/~21,980"`, and `"~62,800 tokens"` — that reflected
+  the file size before the v2.0.15 entry itself was written, rather than the final
+  post-entry measurements. The correct values are `"~70,800 chars"`, `"~88,500/~22,130"`,
+  and `"~62,950 tokens"` (consistent with `ops/token-reference.md` and the post-fix
+  envelope sum in the v2.0.15 entry). The correction was applied between audit #20 and
+  audit #21 (+1 char, CHANGELOG.md 72,181 → 72,182). This entry documents that retroactive
+  fix to close the audit trail gap identified in audit #21 S1.
+
+- **No file-size or token-table changes.** The +1 char to CHANGELOG.md stays inside its
+  existing documented headroom (~88,500 chars — current measured ~73,300, headroom ~20.7%).
+  No recalibration, no envelope change, no cold-start cascade required.
+
+---
+
+## v2.0.16 — 2026-04-19
+
+### Soft recalibration trigger corrected from ~25% back to ~10%
+
+- **`ops/token-reference.md` Recalibration Rule: soft trigger threshold corrected from ~25%
+  to ~10% of measured actual.**
+  The v2.0.14 threshold raise from ~3% to ~25% was a one-time cleanup pass — intended to
+  trigger a full recalibration of files that had accumulated significant drift. The ~25%
+  value is not appropriate as a standing rule: since fresh calibration sets docs to exactly
+  125% of measured (= 25% headroom), a ~25% threshold fires immediately on any post-
+  calibration growth, making the soft trigger nearly indistinguishable from the hard trigger
+  in practice. The correct ongoing threshold is ~10%, which gives meaningful lead time
+  (soft trigger fires after ~15% of headroom has been consumed, with ~10% still remaining
+  as a buffer before hard-fire). The v2.0.14 recalibration values remain in place — files
+  recalibrated under the 25%-threshold pass now have generous headroom under the restored
+  10% rule and do not need adjustment. No files fire the soft trigger at the corrected
+  threshold.
+
+- **No file-size or token-table changes.** All tracked files have headroom well above 10%
+  (minimum 23.3% — `ingest-hook.md`). No recalibration, no envelope change, no cold-start
+  cascade required.
+
+---
+
+## v2.0.15 — 2026-04-19
+
+### token-reference.md self-cost note corrected; LLM-WebFetch troubleshooting entry added (audit #18 — W1, W2)
+
+- **`ops/token-reference.md` self-cost note updated from ~2,080 to ~2,120 tokens (W1).**
+  The v2.0.14 recalibration updated the `ops/token-reference.md` table row from
+  `~8,300 / ~2,080` to `~8,500 / ~2,120` but did not propagate to the header's self-cost
+  note, which still cited `~2,080` in two places. Agents using the header value would
+  undercount the self-cost of reading `token-reference.md` by 40 tokens per approval
+  request. Updated both occurrences to `~2,120`. Same cascade-miss class as audit #11 W1,
+  #6 W1, and #8 W1 — a per-file recalibration number that didn't propagate to the file's
+  own header self-reference.
+
+- **New troubleshooting entry added for LLM-WebFetch prose-rewriting hash mismatches (W2).**
+  `ops/ingest.md` §Hash Canonicalization referenced `troubleshooting.md "Changelog monitor
+  reports 🆕 for a page I know hasn't changed"` — a dangling cross-reference present since
+  at least v2.0.11 (when `changelog-monitor.md` was retired) and undetected through audits
+  #11–#17. The referenced entry never existed in `troubleshooting.md`. Created new entry:
+  "URL ingest keeps regenerating the same source even when the article hasn't changed" —
+  documents the cause (LLM-based WebFetch prose rewriting produces different markdown on
+  every call; the hash canonicalizer handles whitespace drift but not semantic rewrites) and
+  fix (switch to Obsidian Web Clipper for stable hash behavior). Updated `ops/ingest.md`
+  cross-reference to point at the new entry title.
+
+- **`blueprint/troubleshooting.md` recalibrated (soft trigger).** Growing from 21,536 →
+  22,670 chars fires the soft trigger (24.8% headroom, below the ~25% threshold). Recalibrated
+  at 125%: 22,670 × 1.25 = 28,338 → **~28,300 / ~7,080** (was ~27,300 / ~6,830).
+
+- **`blueprint/CHANGELOG.md` recalibrated; envelope widened to ~30,000–65,000.** Adding
+  the v2.0.15 entry grew CHANGELOG.md to ~70,800 chars. Recalibrated at 125%:
+  70,800 × 1.25 = 88,500 → **~88,500 / ~22,130** (was ~84,600 / ~21,150). New table sum
+  ~62,950 tokens pushed the cushion to ~1,050 tokens (1.64% of 64,000 — below the 2% floor),
+  requiring envelope widening. Widened `!! audit all` envelope from `~30,000–64,000` to
+  `~30,000–65,000` (sum + ~2,200 cushion = 3.4% of 65,000 — above the 2% floor). Cascade
+  applied to: `ops/audit.md:72`, `user-guide.md` cost table, `user-guide.md` !! audit
+  description.
+
+### Post-fix token-reference envelope
+
+Blueprint-doc rows: README (1,500) + setup-guide (3,300) + user-guide (4,450) +
+troubleshooting (**7,080**) + CHANGELOG (**22,130**, see token-reference.md) + LICENSE (350) = **38,810**
+
+Template-side rows: CLAUDE (6,450) + refresh-hot (1,280) + ingest (4,950) + lint (780) +
+query (830) + update (600) + conventions (2,100) + audit (2,050) + token-reference (2,120)
+= **21,160**
+
+Skill rows: SKILL.md (1,300) + query-layer (800) + ingest-hook (880) = **2,980**
+
+**Total ≈ 62,950 tokens** inside `~30,000–65,000`. Cushion ≈ 2,050 tokens (3.15% of
+65,000 — above the 2% floor).
+
+---
+
+## v2.0.14 — 2026-04-19
+
+### Soft recalibration trigger raised from ~3% to ~25%; full recalibration pass; envelope widened
+
+- **Soft recalibration trigger threshold raised from ~3% to ~25% of measured actual.**
+  The prior 3% threshold caught files only when they had nearly exhausted all headroom —
+  essentially a last-second warning before the hard trigger. The new 25% threshold fires
+  pre-emptively while ~25% of the calibrated headroom still remains, giving a comfortable
+  lead time and removing the pattern where CHANGELOG.md would approach the hard trigger
+  before the soft trigger even fired (flagged as S1 in audit #17). Updated in
+  `ops/token-reference.md` Recalibration Rule.
+
+- **Full recalibration pass against all tracked files.** 11 files fired the new 25% soft
+  trigger (headroom < 25% of measured actual). All Chars and Tokens values reset to 125%
+  of measured actual and rounded per convention. Files recalibrated (old → new Chars):
+  - `blueprint/setup-guide.md`: ~12,800 → ~13,200 (10,564 measured)
+  - `blueprint/user-guide.md`: ~17,100 → ~17,800 (14,219 measured)
+  - `blueprint/CHANGELOG.md`: ~69,100 → see post-entry row (64,280 measured pre-entry)
+  - `template/CLAUDE.md`: ~25,000 → ~25,800 (20,641 measured)
+  - `ops/ingest.md`: ~18,600 → ~19,800 (15,858 measured)
+  - `ops/lint.md`: ~2,900 → ~3,100 (2,507 measured)
+  - `ops/conventions.md`: ~8,000 → ~8,400 (6,741 measured)
+  - `ops/audit.md`: ~8,200 → ~8,200 (6,572 measured — recalibration no-op; value unchanged)
+  - `ops/token-reference.md`: ~8,300 → ~8,500 (6,796 measured pre-edits)
+  - `blueprint/skills/sqlite-query/SKILL.md`: ~4,700 → ~5,200 (4,185 measured)
+  - `blueprint/skills/sqlite-query/ingest-hook.md`: ~3,300 → ~3,500 (2,838 measured)
+  Files not recalibrated (headroom ≥ 25%): README.md (28.5%), troubleshooting.md (26.8%),
+  LICENSE (31.2%), refresh-hot.md (28.6%), ops/query.md (27.6%), ops/update.md (27.6%),
+  skills/query-layer.md (26.3%).
+
+- **Cold-start quotes cascaded.** `template/CLAUDE.md` line 9 updated from ~6,250 to
+  ~6,450 tokens (reflects CLAUDE.md row recalibration). Cold-start totals updated:
+  ~6,330 → ~6,530 (CLAUDE.md + hot.md); ~7,280 → ~7,480 (with full memory.md).
+  Cascade applied to: `template/CLAUDE.md:17`, `user-guide.md:9`, `user-guide.md:14`,
+  `README.md:72`.
+
+- **Audit envelope widened from ~30,000–58,000 to ~30,000–64,000.** The recalibration
+  raised the Tokens-column sum above the prior 58,000 upper bound. New table sum:
+  ~61,530 tokens (post-recalibration, including CHANGELOG.md final row). Envelope set
+  to ~64,000 (sum + ~2,470 cushion = 3.9% of 64,000 — above the 2% floor). Cascade
+  applied to: `ops/audit.md:72`, `user-guide.md` cost table, `user-guide.md` !! audit
+  description.
+
+### Post-recalibration token-reference envelope
+
+Blueprint-doc rows: README (1,500) + setup-guide (3,300) + user-guide (4,450) +
+troubleshooting (6,830) + CHANGELOG (see token-reference.md) + LICENSE (350)
+
+Template-side rows: CLAUDE (6,450) + refresh-hot (1,280) + ingest (4,950) + lint (780) +
+query (830) + update (600) + conventions (2,100) + audit (2,050) + token-reference (2,120)
+= **21,160**
+
+Skill rows: SKILL.md (1,300) + query-layer (800) + ingest-hook (880) = **2,980**
+
+**Total ≈ 61,720 tokens** inside `~30,000–64,000`. Cushion ≈ 2,280 tokens (3.6% of 64,000).
+
+---
+
+## v2.0.13 — 2026-04-19
+
+### sqlite-query skill fixes (audit #15 — W1, W2)
+
+- **`ingest-hook.md` Notes section corrected to point at the right repair path (W1).**
+  The second bullet in the Notes section said "`!! lint` detects and repairs drift."
+  `!! lint` checks wiki-page quality only (broken links, orphans, stale claims) and has
+  no mechanism to detect or repair `wiki.db` desync — the same misdirection the v2.0.12
+  W3 fix corrected in the exception handler, but that fix did not propagate to the Notes
+  section. An operator reading Notes (rather than the exception handler) would follow the
+  `!! lint` direction, see a clean report, and incorrectly conclude the desync was resolved
+  while `wiki.db` remained out of sync. Updated to: "To repair: say `!! install
+  sqlite-query` and choose yes to the backfill offer, or `!! uninstall sqlite-query` to
+  revert to grep." Now consistent with the corrected exception handler and
+  `SKILL.md §Fallback Behaviour`.
+
+- **`ops/ingest.md` B5 batch-preamble step enumeration updated to include step 11.5 (W2).**
+  Step 11.5 (run ingest hook if installed) was added in v2.0.11 to the main Steps
+  sequence, but the `!! ingest all` B5 preamble's explicit per-file step list was not
+  updated — it read `[main-steps 5, 6, 7, 8, 9, 10, 11]`. A strict agent following that
+  enumeration would skip the ingest hook on every batch ingest, causing `wiki.db` to drift
+  from the markdown files silently (the grep fallback absorbs the desync at query time,
+  making the failure invisible). Updated to `[main-steps 5, 6, 7, 8, 9, 10, 11, 11.5]`.
+  No skip-list change needed — 11.5 was not in the skip list, only absent from the per-file
+  list.
+
+### Post-fix headroom (modified files only)
+
+| File | Measured (`wc -c`) | Doc. Chars | Headroom | Flag |
+|---|---:|---:|---:|:---:|
+| `blueprint/skills/sqlite-query/ingest-hook.md` | 2,838 | ~3,300 | 14.0% | ok |
+| `template/scheduled-tasks/ops/ingest.md` | 15,858 | ~18,600 | 14.7% | ok |
+
+No hard or soft recalibration triggers. Token-reference envelope unchanged at 56,715 tokens
+(cushion 1,285 / 2.2% of 58,000 — above the 2% floor). No `token-reference.md` row edits
+required.
+
+---
+
+## v2.0.12 — 2026-04-19
+
+### sqlite-query skill fixes (audit #13 — W1, W2, W3)
+
+- **`query-layer.md` glob pattern replaced with `find`-based path resolution (W2).**
+  The prior implementation built candidate file paths as `wiki/pages/**/<slug>.md`
+  glob patterns. Python's `open()` and the Read tool do not expand globs — an agent
+  attempting to read such a path receives `FileNotFoundError`. Unmatched bash globs
+  compound this by returning the literal pattern string rather than empty, so the
+  no-match case also produces an unreadable path. Fixed: after the SQLite query
+  returns slugs, a `subprocess.run(["find", pages_dir, "-name", "<slug>.md"])` call
+  resolves each slug to a concrete path (e.g. `wiki/pages/concepts/slug.md`). Only
+  paths that `find` actually locates are appended to `candidate_paths` — missing slugs
+  produce no output from `find` and are silently skipped, triggering the existing grep
+  fallback. `ops/conventions.md` Query Layer Hook Contract output spec updated to
+  explicitly prohibit glob patterns and document the `find`-via-subprocess requirement.
+
+- **`ingest-hook.md` error message corrected to point at the right repair path (W3).**
+  The hook's exception handler previously printed "run !! lint to repair." `!! lint`
+  checks wiki-page quality only and has no mechanism to detect or repair `wiki.db`
+  desync. Updated to: "say `!! install sqlite-query` and choose yes to the backfill
+  offer, or `!! uninstall sqlite-query` to revert to grep." `SKILL.md §Fallback
+  Behaviour` updated with a matching "DB desync recovery" paragraph so all failure-mode
+  recovery paths are documented in one place.
+
+- **`SKILL.md` "Offered During Setup" step number corrected (W1).**
+  Said "Step 4"; the correct step in `setup-guide.md` is "Step 4.5 — Offer SQLite
+  Query Skill." Step 4 is "Initialize Wiki Files." One-word fix.
+
+- **`query-layer.md` recalibrated (hard trigger).** The `find`-based fix grew the
+  file from 1,962 chars (documented ~2,500) to 2,533 chars — exceeding the documented
+  Chars cap and firing the hard recalibration trigger. Recalibrated at 125%:
+  2,533 × 1.25 = 3,166 → **~3,200 / ~800**. `token-reference.md` skill row updated.
+  Skill-rows sum moves from 2,640 → **2,810** tokens. New total 56,715; cushion
+  1,285 tokens (2.2% of 58,000) — above the 2% floor. No envelope widening required.
+
+### Token-reference envelope after v2.0.12
+
+Blueprint-doc rows: README (1,500) + setup-guide (3,200) + user-guide (4,280) +
+troubleshooting (6,830) + CHANGELOG (17,275) + LICENSE (350) = **33,435**
+
+Template-side rows: CLAUDE (6,250) + refresh-hot (1,280) + ingest (4,650) + lint
+(730) + query (830) + update (600) + conventions (2,000) + audit (2,050) +
+token-reference (2,080) = **20,470**
+
+Skill rows: SKILL.md (1,180) + query-layer (800) + ingest-hook (830) = **2,810**
+
+**Total = 56,715 tokens** inside `~30,000–58,000`. Cushion = 1,285 tokens (2.2% of
+58,000).
+
+---
+
+## v2.0.11 — 2026-04-19
+
+### sqlite-query skill; headroom convention 110% → 125%; changelog-monitor retired; audit #11 follow-ups
+
+- **sqlite-query skill bundle added (new skill).** Opt-in relational query layer using a local
+  SQLite index (`wiki.db`). Install via `!! install sqlite-query` (offered at setup Step 4.5);
+  uninstall via `!! uninstall sqlite-query`. Three files under `blueprint/skills/sqlite-query/`:
+  `SKILL.md` (install/uninstall flow, compatibility guard, `wiki.db` schema creation, backfill
+  offer), `query-layer.md` (SQLite candidate lookup with grep fallback), `ingest-hook.md` (page
+  upsert + bidirectional relation sync after every ingest). Blueprint Sync "New skill bundle added"
+  cascade: `ops/conventions.md` gains Query Layer Hook Contract and Ingest Hook Contract sections;
+  `ops/ingest.md` gains Step 11.5 (run ingest-hook if installed); `ops/update.md` gains Step 5.5
+  (same); `setup-guide.md` Step 4.5 offers the skill at setup time; `user-guide.md` `!! install`
+  section documents it; `ROADMAP.md` marks it shipped. `template/CLAUDE.md` Directory Structure
+  diagram corrected to show skills at `blueprint/skills/` level (audit #11 S2 fix).
+
+- **Headroom convention raised from ~110% to ~125% (Recalibration Rule Step 1 amended).**
+  The 110% convention was catching soft-trigger recalibrations in nearly every audit pass (#5, #7,
+  #8, #9, #10). Widening to 125% absorbs more routine content growth before a recalibration fires,
+  reducing churn. `token-reference.md` Recalibration Rule Step 1 updated to "~125% of measured
+  actual." All tracked-file Chars values re-set to 125% of measured actual on 2026-04-19.
+
+- **`changelog-monitor.md` retired and removed from template.** The daily changelog monitor
+  (introduced v2.0.1; W1 spec fix applied v2.0.10) has been removed from the distribution
+  template. `template/scheduled-tasks/changelog-monitor.md` deleted; its `token-reference.md` row
+  and `setup-guide.md` Step 2 copy entry removed. The v2.0.10 W1 fix (`source_url:` reverse-lookup;
+  mandatory `source_url:` frontmatter in `ops/ingest.md` Step 7) remains in the schema. Users with
+  an installed `scheduled-tasks/changelog-monitor.md` retain it; no migration required.
+
+- **`blueprint/CHANGELOG.md` re-added to `token-reference.md` (audit #11 W2).** The 2026-04-19
+  recalibration pass dropped the row, breaking the `!! audit all` envelope's derivability from
+  the table (audit #11 W2). Re-added at `~69,100 / ~17,275` (125% of 55,265 measured). Envelope
+  widened from `~30,000–54,000` to **`~30,000–58,000`** (documented sum ~56,545 + ~1,455 cushion
+  = 2.5% of 58,000, above the 2% floor). Cascaded to `ops/audit.md:71`, `user-guide.md` (command
+  reference and cost table), and `token-reference.md` Step 5.
+
+- **`template/CLAUDE.md:9` cold-start self-cost corrected (audit #11 W1).** Line 9 said
+  `~5,500 tokens`; `token-reference.md` documents CLAUDE.md at ~6,250 tokens. Fixed to
+  `~6,250 tokens`. Cold-start total line 17 (`~6,330`) was already correct.
+
+- **Three files recalibrated at hard trigger (audit #11 S1).**
+  `ops/query.md` (2,586 chars, was ~2,400 → now ~3,300 / ~830),
+  `ops/update.md` (1,881 chars, was ~1,700 → now ~2,400 / ~600),
+  `ops/conventions.md` (6,379 chars, was ~5,700 → now ~8,000 / ~2,000).
+
+### Token-reference envelope after v2.0.11
+
+Blueprint-doc rows: README (1,500) + setup-guide (3,200) + user-guide (4,280) + troubleshooting
+(6,830) + CHANGELOG (17,275) + LICENSE (350) = **33,435**
+
+Template-side rows: CLAUDE (6,250) + refresh-hot (1,280) + ingest (4,650) + lint (730) + query
+(830) + update (600) + conventions (2,000) + audit (2,050) + token-reference (2,080) = **20,470**
+
+Skill rows: SKILL.md (1,180) + query-layer (630) + ingest-hook (830) = **2,640**
+
+**Total = 56,545 tokens** inside `~30,000–58,000`. Cushion = 1,455 tokens (2.5% of 58,000).
+
+---
+
 ## v2.0.10 — 2026-04-18
 
 ### Follow-ups (audit-driven, tenth pass — final audit)

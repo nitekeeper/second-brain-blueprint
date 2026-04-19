@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~5,500 tokens
+1. Read `CLAUDE.md` (this file) — ~6,450 tokens
 2. Read `wiki/hot.md` — ~80 tokens
 3. Check `drafts/` — list filenames only, up to 20 (negligible tokens at that cap; if more than 20 files exist, list the 20 most recently modified and note the overflow count)
 4. Check if the user's opening message is `!! ready`:
@@ -14,7 +14,7 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~6,330 tokens** (~7,280 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~6,530 tokens** (~7,480 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
 
@@ -135,23 +135,23 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │   ├── user-guide.md
 │   ├── troubleshooting.md
 │   ├── CHANGELOG.md
-│   └── template/
-│       ├── CLAUDE.md
-│       ├── scheduled-tasks/
-│       │   ├── refresh-hot.md
-│       │   └── ops/
-│       │       ├── ingest.md
-│       │       ├── lint.md
-│       │       ├── audit.md
-│       │       ├── query.md
-│       │       ├── update.md
-│       │       ├── conventions.md
-│       │       └── token-reference.md
-│       └── skills/                ← Installable skill bundles
-│           └── sqlite-query/
-│               ├── SKILL.md
-│               ├── query-layer.md
-│               └── ingest-hook.md
+│   ├── template/
+│   │   ├── CLAUDE.md
+│   │   └── scheduled-tasks/
+│   │       ├── refresh-hot.md
+│   │       └── ops/
+│   │           ├── ingest.md
+│   │           ├── lint.md
+│   │           ├── audit.md
+│   │           ├── query.md
+│   │           ├── update.md
+│   │           ├── conventions.md
+│   │           └── token-reference.md
+│   └── skills/                    ← Installable skill bundles
+│       └── sqlite-query/
+│           ├── SKILL.md
+│           ├── query-layer.md
+│           └── ingest-hook.md
 ├── scheduled-tasks/            ← Reusable task and ops instruction files
 │   ├── refresh-hot.md
 │   ├── query-layer.md          ← Present only if a query-layer skill is installed

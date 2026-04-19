@@ -16,7 +16,6 @@ Audit every tracked file under `blueprint/` — specifically the files listed be
 - `blueprint/setup-guide.md`
 - `blueprint/user-guide.md`
 - `blueprint/troubleshooting.md`
-- `blueprint/CHANGELOG.md`
 - `blueprint/LICENSE`
 - `blueprint/.gitignore`
 - `blueprint/template/CLAUDE.md`
@@ -69,5 +68,5 @@ Use the prompt below **verbatim** as the operating instructions when reading the
 
 - Audits of instructional markdown are still meaningful: rules can contradict each other, state machines can have unreachable branches, approval paths can leak, documented token estimates can drift from reality. Treat these as the analog of "logic errors" for this codebase.
 - Keep the severity bar high. If the blueprint is sound, say so.
-- For `!! audit all`, expect ~30,000–54,000 tokens of reads (envelope widened 2026-04-18 in v2.0.6, further widened in v2.0.7, v2.0.9, and v2.0.10 to contain the documented Tokens-column sum from `token-reference.md` — the source of truth. Re-derive by summing the blueprint-doc and template-side rows rather than hand-tuning this figure; the ~54,000 upper bound is the documented sum plus a small additive cushion (~1,500–3,000 tokens) to absorb tool-call and prompt-side overhead. The 110% per-file headroom convention from `token-reference.md` is already baked into each row's Chars value and is NOT re-applied at the envelope level — adding more than a small cushion double-counts the headroom. Future envelope drift should be caught by re-summing the table, not by editing this literal). Warn the user up front if the session is already close to context limits.
+- For `!! audit all`, expect ~30,000–43,000 tokens of reads for the tracked files (re-derive by summing the blueprint-doc and template-side rows in `token-reference.md`). Warn the user up front if the session is already close to context limits.
 - For `!! audit [Page Name]`, expect ~1,000–5,000 tokens depending on file size.
