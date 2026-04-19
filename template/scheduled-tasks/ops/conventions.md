@@ -27,7 +27,19 @@ tags: [tag1, tag2]
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 sources: [source-slug-1, source-slug-2]
+related: [page-slug-1, page-slug-2]
 ---
+```
+
+The `related:` field lists slugs of directly connected pages — concepts, entities, analyses, or sources that share a meaningful relationship with this page. Use lowercase-hyphenated slugs (same as filenames, without `.md`). This field is the relationship layer: the agent queries it with grep instead of reading page content, keeping cross-page lookups fast and token-cheap as the wiki grows.
+
+**Grep query pattern** — find all pages that reference a given slug:
+```bash
+grep -rl "slug-name" wiki/pages --include="*.md"
+```
+This scans frontmatter and body in one pass. For frontmatter-only precision (faster on large wikis):
+```bash
+grep -rl "^related:.*slug-name" wiki/pages --include="*.md"
 ```
 
 Source pages also include:

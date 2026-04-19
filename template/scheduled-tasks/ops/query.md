@@ -10,9 +10,14 @@ If highly confident in the answer, respond directly with citations where relevan
 **Step 2 — Check the wiki**
 If not highly confident, or if the question touches topics this wiki covers:
 1. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
-2. Read `wiki/index.md` to find relevant pages
-3. Read those specific pages
-4. Synthesize an answer with `[[wiki link]]` citations
+2. Derive a slug from the key topic in the question (lowercase-hyphenated). Run a grep pre-filter to find candidate pages without reading their content:
+   ```bash
+   grep -rl "topic-slug" wiki/pages --include="*.md"
+   ```
+   If the grep returns matches, those are your candidate pages — skip to step 4. If no matches, fall back to reading `wiki/index.md` (step 3).
+3. Read `wiki/index.md` to find relevant pages (fallback only — use when grep returns no matches or the topic slug is ambiguous)
+4. Read the candidate pages identified in step 2 or 3
+5. Synthesize an answer with `[[wiki link]]` citations
 
 **Step 3 — Search the internet**
 If the wiki does not contain a good answer:

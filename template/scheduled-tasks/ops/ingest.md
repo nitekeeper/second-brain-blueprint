@@ -84,13 +84,14 @@ This canonicalizer survives: Clipper-vs-WebFetch whitespace differences, CRLF/LF
     ```
     `WORKDIR`, `file`, `slug`, and `ts` must all be exported in the **same** Bash invocation as the snippet — env vars do not persist across Cowork Bash calls. The `${…:?}` guards refuse to run if any variable is unset rather than silently operating on the wrong path.
 7. Write (or regenerate) a source summary page in `wiki/pages/sources/`. The frontmatter MUST include:
+    - `related: [slug-1, slug-2]` — slugs of every concept and entity page created or updated as part of this ingest. This is the relationship layer: populated here so query and lint ops can find connections via grep without reading page content. Update this list whenever related pages change.
     - `source_hash: <8-char-hex>` — the same hash computed in Step 0. Dedupe primitive; a missing or stale `source_hash:` will cause the next ingest to trigger a full regeneration.
     - `original_file: raw/<slug>-<ts>.md` — using the Step-5 `ts`. Every `[^n]:` provenance footnote in the Key Takeaways section must cite the same `raw/<slug>-<ts>.md` path.
     - `source_url: <URL>` — the canonical URL this source was pulled from. For URL ingest, reuse the value U3 already prepended. For filename (Clipper) ingest, pull the URL from the Clipper's own preamble (Obsidian Web Clipper writes `source:` by default; accept that, `url:`, or any equivalent field that carries the origin URL) and propagate it verbatim into `source_url:`. If no URL is recoverable from the Clipper preamble, write `source_url: unknown` and note the gap in the approval request so the user can correct it post-ingest. This field records source provenance and is useful for manually tracking whether a source has been updated.
 
     On hash mismatch, fully regenerate the page from the new raw content — do not attempt to merge with the prior page body.
 8. Read `wiki/index.md` to identify all affected concept/entity pages
-9. Update affected pages; create any new concept or entity pages warranted
+9. Update affected pages; create any new concept or entity pages warranted. For every concept and entity page created or updated: populate or extend its `related:` frontmatter field with slugs of other pages touched in this ingest. Relationships should be bidirectional — if page A lists page B in `related:`, page B should list page A. This is enforced by lint, so a missed direction here will surface on the next `!! lint` pass.
 10. Update `wiki/index.md` with new and modified entries
 11. Append entry to `wiki/log.md` — **must be ≤500 chars total (header + body)**:
     `## [YYYY-MM-DD] ingest | [Title]`
