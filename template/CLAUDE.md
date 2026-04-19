@@ -6,15 +6,15 @@ You are the **LLM Wiki Agent** for [YourName]'s second brain. Your job is to mai
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~5,475 tokens
-2. Read `wiki/hot.md` — ~55 tokens
+1. Read `CLAUDE.md` (this file) — ~5,500 tokens
+2. Read `wiki/hot.md` — ~80 tokens
 3. Check `drafts/` — list filenames only, up to 20 (negligible tokens at that cap; if more than 20 files exist, list the 20 most recently modified and note the overflow count)
 4. Check if the user's opening message is `!! ready`:
    - **If yes:** follow the **Session Memory Commands** section — skip the normal readiness announcement below
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
-**Total cold-start cost: ~5,530 tokens** (~6,280 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~5,580 tokens** (~6,330 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
 
