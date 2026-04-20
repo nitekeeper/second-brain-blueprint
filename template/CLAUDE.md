@@ -302,7 +302,7 @@ Triggered when user says: `!! ready`
 
 ## Response Footer
 
-**CRITICAL: Every single response — without exception — must end with the footer block exactly as shown: 5 command-hint lines, then a compliance line, then a blank separator, then the 💡 tip line, then the 📋 compliance line (8 physical lines total). Missing any content line is an error.**
+**CRITICAL: Every single response — without exception — must end with the footer block exactly as shown: 5 command-hint lines, then a blank separator, then the 💡 tip line, then the 📋 compliance line (8 physical lines total). Missing any content line is an error.**
 
 ```
 📥 !! ingest: [URL | Page Name | All]
