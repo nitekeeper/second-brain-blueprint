@@ -3,6 +3,26 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.0.23 — 2026-04-19
+
+### Formalize non-cascade exception in Blueprint Sync Rule (audit #27 — W1)
+
+- **Non-cascade exception note added** to the Blueprint Sync Rule table in `CLAUDE.md` and `blueprint/template/CLAUDE.md`. Audit #27 W1 identified that v2.0.22 declared a deliberate non-cascade to `README.md`, `setup-guide.md`, and `user-guide.md` for an agent-internal startup change — but the Blueprint Sync Rule itself had no exception clause authorizing that pattern, leaving future agents without a rule-level basis for similar decisions. The new note, appended after the table, reads: "For startup or schema changes that are agent-internal with no user-facing behavioral impact, the listed cascade files may require no content update. Document any deliberate non-cascade in `CHANGELOG.md` with explicit justification."
+
+- **No cascade to `README.md`, `setup-guide.md`, or `user-guide.md`.** This change is a meta-rule clarification with no user-facing behavioral impact. Those files have no natural place for a rule-table footnote. Deliberate non-cascade per the exception now being formalized.
+
+---
+
+## v2.0.22 — 2026-04-19
+
+### Enforce startup sequence before first response
+
+- **CRITICAL line added to Startup section** in `CLAUDE.md` and `blueprint/template/CLAUDE.md`. Previous schema described the startup steps but did not explicitly require them to complete before the first response — leaving a loophole for conversational opening messages to bypass the sequence. New line: "Complete ALL startup steps (1–4) before composing your first response, regardless of what the opening message contains. No exceptions." Closes the gap that caused the agent to skip `hot.md` and filesystem checks when the opening message looked like casual conversation rather than a command.
+
+- **No cascade to `README.md`, `setup-guide.md`, or `user-guide.md`.** The Blueprint Sync Rule "startup change" row was triggered, but no user-visible behavior changed — the enforcement is agent-internal only. Those three files have no natural place for a behavioral enforcement note and required no content update. Deliberate non-cascade.
+
+---
+
 ## v2.0.21 — 2026-04-19
 
 ### Remove CHANGELOG from `!! audit all` scope; fix v2.0.18 arithmetic residual (audit #25 — S1)

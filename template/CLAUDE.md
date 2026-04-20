@@ -14,6 +14,8 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
    - **If no:** announce readiness with a one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
 5. Do NOT read `index.md` or `log.md` until an operation is triggered
 
+**CRITICAL: Complete ALL startup steps (1–4) before composing your first response, regardless of what the opening message contains. No exceptions.**
+
 **Total cold-start cost: ~6,530 tokens** (~7,480 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
@@ -100,6 +102,8 @@ All other write actions — Blueprint Sync writes, and the log appends + `hot.md
 | Schema version bump | `blueprint/CHANGELOG.md` (new section documenting the version) in addition to any rows above that the change triggers |
 | New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical naming current tasks — the glob itself already covers new files, so this is a doc-hygiene touch, not a behavioral one) + `ops/token-reference.md` (file-size row) + `setup-guide.md` (Step 2 copy / Step 3 personalize if placeholders / Step 7 verify) + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md` (new section — treat any new scheduled task as at minimum a patch version bump, so the Schema-version-bump row applies) |
 | New skill bundle added | `blueprint/skills/<skill>/` (create directory + SKILL.md + any hook files) + `ops/token-reference.md` (add file-cost rows for all new files) + `blueprint/user-guide.md` (`!! install` section — mention the new skill) + `blueprint/setup-guide.md` (add or update the skill offer step) + `blueprint/ROADMAP.md` (mark as shipped) + `ops/conventions.md` if the skill introduces a new hook contract |
+
+> **Non-cascade exception:** For startup or schema changes that are agent-internal with no user-facing behavioral impact, the listed cascade files may require no content update. Document any deliberate non-cascade in `CHANGELOG.md` with explicit justification. (Pattern established by v2.0.22; formalized by v2.0.23.)
 
 **Versioning split.** The CLAUDE.md footer and `hot.md`'s `Schema:` field track the major.minor schema version (`X.Y`) only. Patch-level bumps (`X.Y.Z`) add a new `CHANGELOG.md` section but do **not** move the footer or `hot.md` field — those files are free to receive content edits as part of a patch, but the version number itself stays put. Minor/major bumps (`X.Y` → `X.(Y+1)` or `(X+1).0`) propagate through the "Any schema change" row and rewrite the footer.
 
