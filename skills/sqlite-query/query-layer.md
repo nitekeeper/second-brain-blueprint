@@ -1,8 +1,8 @@
 # Query Layer: SQLite
 
-Installed by the `sqlite-query` skill. Overrides the built-in grep query step in `ops/query.md`.
+Installed by the `sqlite-query` skill. Overrides the built-in grep query step in the Query Routing Rule embedded in `CLAUDE.md`.
 
-This file is read by the agent when `scheduled-tasks/query-layer.md` exists. It replaces Steps 2–3 of the core query op.
+This file is read by the agent when `scheduled-tasks/query-layer.md` exists. It replaces sub-steps 2–3 of the wiki-check branch (Step 2) in the Query Routing Rule waterfall.
 
 ---
 

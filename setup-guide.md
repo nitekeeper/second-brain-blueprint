@@ -71,7 +71,6 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 | `blueprint/template/scheduled-tasks/ops/ingest.md` | `scheduled-tasks/ops/ingest.md` |
 | `blueprint/template/scheduled-tasks/ops/lint.md` | `scheduled-tasks/ops/lint.md` |
 | `blueprint/template/scheduled-tasks/ops/audit.md` | `scheduled-tasks/ops/audit.md` |
-| `blueprint/template/scheduled-tasks/ops/query.md` | `scheduled-tasks/ops/query.md` |
 | `blueprint/template/scheduled-tasks/ops/update.md` | `scheduled-tasks/ops/update.md` |
 | `blueprint/template/scheduled-tasks/ops/conventions.md` | `scheduled-tasks/ops/conventions.md` |
 | `blueprint/template/scheduled-tasks/ops/token-reference.md` | `scheduled-tasks/ops/token-reference.md` |
@@ -238,7 +237,7 @@ Check the following and report status to the user:
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry
 - [ ] `wiki/hot.md` exists with today's date
-- [ ] All 7 ops files exist in `scheduled-tasks/ops/`
+- [ ] All 6 ops files exist in `scheduled-tasks/ops/`
 - [ ] `scheduled-tasks/refresh-hot.md` exists
 - [ ] `raw/` folder exists
 - [ ] `drafts/` folder exists
