@@ -66,7 +66,6 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 
 | From | To |
 |---|---|
-| `blueprint/template/CLAUDE.md` | `CLAUDE.md` |
 | `blueprint/template/scheduled-tasks/refresh-hot.md` | `scheduled-tasks/refresh-hot.md` |
 | `blueprint/template/scheduled-tasks/ops/ingest.md` | `scheduled-tasks/ops/ingest.md` |
 | `blueprint/template/scheduled-tasks/ops/lint.md` | `scheduled-tasks/ops/lint.md` |
@@ -77,11 +76,17 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 
 ---
 
-## Step 3 — Personalize Template Files
+## Step 3 — Write CLAUDE.md Directly (Read → Substitute → Write)
 
-In `CLAUDE.md`, make the following replacements:
-- Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
-- Remove the `> **Setup note:** …` block at the very end of `CLAUDE.md` (immediately under the `Schema version:` footer). It is scaffolding for this setup step only — once the replacement above is done, it has no further purpose and will otherwise sit as stale cruft in the live file.
+Do **not** copy `blueprint/template/CLAUDE.md` via Bash `cp`. Instead:
+
+1. Read `blueprint/template/CLAUDE.md` into working memory.
+2. In memory, make the following substitutions:
+   - Replace `[created-date]` and `[updated-date]` in the schema footer with today's date (YYYY-MM-DD)
+   - Remove the `> **Setup note:** …` block at the very end (immediately under the `Schema version:` footer) — it is setup scaffolding only and must not appear in the live file
+3. Write the final result directly to `CLAUDE.md` using the Write tool — one shot, no intermediate `cp`.
+
+> **Why Write instead of cp+Edit:** The Edit tool requires a prior Read call on the exact file path it is editing. Files created via Bash `cp` do not satisfy this requirement — the Edit tool has no record of them, and the first edit attempt will fail with "File has not been read yet." Writing the final content directly with the Write tool sidesteps this entirely.
 
 > **Note:** The `@`-prefixed paths in `CLAUDE.md` (Ops File Reminder table, Approval Rule) are working-folder-relative and resolve correctly regardless of the folder's name — no find-and-replace is needed during setup.
 

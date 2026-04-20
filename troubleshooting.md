@@ -348,3 +348,17 @@ print(f"edited {edited} files under {pages}")
 ```
 
 Run via the agent's shell sandbox or in your own terminal. Always export `WIKI_ROOT` to the absolute working-folder path before running, and always sanity-check the printed edit count. A count of 0 usually means the regex matched nothing — investigate before claiming success.
+
+---
+
+## Edit tool rejects files copied into place via Bash `cp`
+
+**Symptom:** During setup (or any flow that copies a template file via Bash and then edits it), the agent's first Edit call fails with: `File has not been read yet. Read it first before writing to it.`
+
+**Cause:** The Edit tool maintains an internal state tracker of files it has seen via the Read tool. Files that arrive via Bash `cp` — or any other shell command — are invisible to this tracker. The Edit tool will reject any edit attempt on such a file until an explicit Read call has been made against the exact file path.
+
+**Old behavior (≤v2.1.4):** `setup-guide.md` Step 2 used `cp blueprint/template/CLAUDE.md CLAUDE.md`, and Step 3 immediately tried to Edit the copy. The first Edit call always failed; a Read was needed in between. The failure was self-correcting (the agent would read then retry) but surfaced as a noisy repeated failure across setups.
+
+**Fix (v2.1.5+):** `setup-guide.md` Step 3 now instructs the agent to Read `blueprint/template/CLAUDE.md`, perform all substitutions in working memory, and Write the final content directly to `CLAUDE.md` — no `cp`, no Edit. The Write tool has no prior-Read requirement, eliminating the failure mode entirely.
+
+**General rule:** Never Bash-copy a file and immediately Edit it without an intervening Read. When writing a file that needs in-memory substitution, always prefer Read → substitute → Write over cp + Edit.
