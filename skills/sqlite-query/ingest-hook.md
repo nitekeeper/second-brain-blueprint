@@ -27,7 +27,7 @@ Also runs for every concept/entity page created or updated in Steps 7–9 of the
 import sqlite3, pathlib, os, json
 
 WORKDIR = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
-db = WORKDIR / "wiki.db"
+db = WORKDIR.parent / "wiki.db"  # stored outside the library FUSE mount for SQLite write compatibility
 
 # Values injected from ingest op working memory:
 # slug, title, type_, summary, tags, created, updated, related

@@ -168,6 +168,7 @@ Pages: 0 | Schema: vX.Y | Updated: YYYY-MM-DD
 Last op: init YYYY-MM-DD (wiki created, ready for first ingest)
 Gaps: none yet — add sources to discover gaps
 Hot: none yet
+Active skills: none
 ```
 
 **`memory.md`** (at working folder root)
