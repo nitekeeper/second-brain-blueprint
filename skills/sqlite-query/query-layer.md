@@ -17,7 +17,7 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
    import sqlite3, pathlib, os, subprocess
 
    WORKDIR = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
-   db = WORKDIR / "wiki.db"
+   db = WORKDIR.parent / "wiki.db"  # stored outside the library FUSE mount for SQLite write compatibility
 
    try:
        conn = sqlite3.connect(db)

@@ -39,7 +39,7 @@ Plus creates `wiki.db` at the working folder root.
    import sqlite3, pathlib, os
 
    WORKDIR = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
-   conn = sqlite3.connect(WORKDIR / "wiki.db")
+   conn = sqlite3.connect(WORKDIR.parent / "wiki.db")  # stored outside the library FUSE mount
    conn.executescript("""
        CREATE TABLE IF NOT EXISTS pages (
            slug     TEXT PRIMARY KEY,
@@ -71,10 +71,22 @@ Plus creates `wiki.db` at the working folder root.
 
 5. **Backfill check.** If `wiki/pages/` contains any pages:
    - Ask: "Your wiki has existing pages. Backfill wiki.db from them now? (yes/no)"
-   - If yes: read every page in `wiki/pages/` and for each, extract `slug`, `title`, `type`, `summary`, `tags`, `created`, `updated` from frontmatter, and `related:` slugs for relations. Insert into `wiki.db` using the ingest-hook pattern. Report count on completion.
+   - If yes: first read `wiki/index.md` and build a slug→summary map by parsing each `- [[Title]] — <summary> | updated: …` entry (the summary is the text between `— ` and ` | updated:`). Then read every page in `wiki/pages/` and for each, extract `slug`, `title`, `type`, `tags`, `created`, `updated` from frontmatter and `related:` slugs for relations — look up `summary` from the index.md map (not from frontmatter, which does not carry summaries). Insert into `wiki.db` using the ingest-hook pattern. Report count on completion.
    - If no: skip. The DB will populate naturally as pages are ingested or updated going forward.
 
 6. **Confirm:** "sqlite-query skill installed. Query and ingest ops will now use wiki.db."
+
+---
+
+## Known Limitation — FUSE / Network-Mounted Filesystems
+
+SQLite requires filesystem-level locking that FUSE and network mounts (e.g. Cowork-mounted folders, SMB, NFS) do not fully support. Symptoms: `wiki.db` is created (file exists) but all write attempts throw `sqlite3.OperationalError: disk I/O error`. Reads may succeed with `?nolock=1` but writes cannot be recovered this way.
+
+**At small wiki sizes (<500 pages):** uninstall the skill and use the built-in grep layer — it is fast enough and has no filesystem dependencies.
+
+**At larger wiki sizes (500–1000+ pages):** use the **path-patch approach** — store `wiki.db` at a stable path on the user's native filesystem *outside* the mounted folder (e.g. `~/.llm-wiki/wiki.db`). Update the `WORKDIR` resolution in `query-layer.md`, `ingest-hook.md`, and the install step in this file to point to that path. The DB persists natively across sessions with no per-session backfill needed.
+
+To uninstall cleanly: say `!! uninstall sqlite-query`.
 
 ---
 

@@ -22,6 +22,54 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
 
 ---
 
+## Query Routing Rule
+
+**CRITICAL: This rule is mandatory for every user question — no exception for perceived simplicity, brevity, or confidence level. Follow the waterfall below before composing any answer. No file read required — the waterfall is here.**
+
+### Waterfall
+
+**Step 1 — Answer from training knowledge**
+If highly confident in the answer AND the question clearly does not touch wiki content, respond directly with citations where relevant. Stop here.
+
+**Hard carve-out — always skip Step 1 and go directly to Step 2 for:**
+- Wiki-topology questions: "which pages cover X", "is X in the wiki", "what pages exist for Y"
+- Any question that could be answered by wiki content ("what is X", "how does X work", "tell me about X")
+- Any question where `Active skills` in `hot.md` lists an installed query layer (e.g. `sqlite-query`) — the skill exists to be used
+
+**Step 2 — Check the wiki**
+If not highly confident, or if the question touches topics this wiki covers:
+1. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
+2. **Check for an installed query layer.** If `scheduled-tasks/query-layer.md` exists, read it and follow its instructions to find candidate pages. Skip to step 4 with those results. If it returns empty or fails, fall through to step 3. If it does not exist, proceed to step 3.
+3. Derive a slug from the key topic (lowercase-hyphenated). Run a grep pre-filter:
+   ```bash
+   grep -rl "topic-slug" wiki/pages --include="*.md"
+   ```
+   If grep returns matches, those are your candidate pages — skip to step 4. If no matches, fall back to reading `wiki/index.md`.
+4. Read the candidate pages
+5. Synthesize an answer with `[[wiki link]]` citations
+
+**Step 3 — Search the internet**
+If the wiki does not contain a good answer:
+1. Search the web for the best available source
+2. Summarize the key findings clearly
+3. Ask the user: "I found a good source on this — want me to ingest it into the wiki?"
+4. If yes, save the source to `wiki/inbox/` and run the full INGEST operation
+
+### Filing Answers
+
+After any Step 2 or Step 3 answer, ask: "Worth filing this as an analysis page?"
+If yes:
+1. Read `@scheduled-tasks/ops/conventions.md` before writing
+2. Show approval request and wait for confirmation
+3. Write to `wiki/pages/analyses/`
+4. Update `wiki/index.md` and append to `wiki/log.md` (≤500 chars)
+5. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
+6. Recalibrate token estimates if any file's measured actual now exceeds its documented Chars value
+
+Log format: `## [YYYY-MM-DD] query | [Question summary]` (≤500 chars)
+
+---
+
 ## Tiered Read Structure
 
 | Tier | Files | When |
@@ -43,7 +91,6 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
 | Ingest a source | `@scheduled-tasks/ops/ingest.md` |
 | Lint the wiki | `@scheduled-tasks/ops/lint.md` |
 | Audit the blueprint | `@scheduled-tasks/ops/audit.md` |
-| Answer a question (wiki/web) | `@scheduled-tasks/ops/query.md` |
 | Update a page | `@scheduled-tasks/ops/update.md` |
 | Create or edit any page | `@scheduled-tasks/ops/conventions.md` |
 | Install a skill (`!! install <skill>`) | `@blueprint/skills/<skill>/SKILL.md` |
@@ -53,6 +100,8 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
 > **Note:** `@`-prefixed paths above are working-folder-relative — they resolve against whichever Cowork folder you selected at setup, regardless of its name. No setup-time rewriting is required, and renaming the folder later does not break these references.
 
 > **Approval cost reminder:** Each approval request itself consumes the token-reference.md read. The current self-cost is documented in `token-reference.md`'s header — read it once per op, cache the value, and factor it into every quoted estimate in that op.
+
+> **Tool reliability — file existence checks:** Never use the Glob tool to test whether a specific file exists. Glob can silently return empty for files that are present. Always use Bash `[ -f path ] && echo exists` or `ls path` for existence checks (e.g. checking for `scheduled-tasks/query-layer.md`, `scheduled-tasks/ingest-hook.md`, or any hook file).
 
 ---
 
@@ -147,8 +196,7 @@ After updating blueprint files, append to `log.md`: `## [YYYY-MM-DD] sync | Blue
 │   │           ├── ingest.md
 │   │           ├── lint.md
 │   │           ├── audit.md
-│   │           ├── query.md
-│   │           ├── update.md
+│   │   │           ├── update.md
 │   │           ├── conventions.md
 │   │           └── token-reference.md
 │   └── skills/                    ← Installable skill bundles
@@ -289,6 +337,7 @@ Pages: N | Schema: vX.Y | Updated: YYYY-MM-DD
 Last op: [operation] YYYY-MM-DD ([one-line result])
 Gaps: [comma-separated open data gaps]
 Hot: [comma-separated titles of 5 most recently updated pages]
+Active skills: [comma-separated installed skill names, or "none"]
 ```
 
 ## log.md Format
@@ -300,6 +349,6 @@ Grep tip (portable, extended regex): `grep -E "^## \[" log.md | tail -5`
 
 ---
 
-*Schema version: 2.0 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 2.1 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format.

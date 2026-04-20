@@ -4,6 +4,25 @@ Real issues encountered during the original setup, with fixes.
 
 ---
 
+## Glob tool silently returns empty for files that exist
+
+**Symptom:** The agent reports a file is missing (e.g. `scheduled-tasks/query-layer.md` "not found") even though the file is present. A follow-up `ls` or Bash check reveals it immediately.
+
+**Cause:** The Glob tool can silently return empty results for specific file paths that exist on disk. This is distinct from a legitimate "no match" — the tool returns no error, just an empty result, making the failure invisible. The issue was first observed during skill-presence detection (checking for `query-layer.md` and `ingest-hook.md` in `scheduled-tasks/`), causing the agent to conclude no skill was installed and skip the SQLite query waterfall.
+
+**Fix:** Use Bash for all file existence checks:
+```bash
+# Test existence
+[ -f scheduled-tasks/query-layer.md ] && echo "exists" || echo "missing"
+
+# Or just list the directory
+ls scheduled-tasks/
+```
+
+**Prevention (v2.1.1+):** A standing rule was added to `CLAUDE.md`'s Ops File Reminder section: "Never use the Glob tool to test whether a specific file exists. Always use Bash `[ -f path ]` or `ls path`." The `refresh-hot.md` Step 3 and `query-layer.md`'s page-resolution step already used Bash/`find` — this rule generalizes that pattern to all existence checks.
+
+---
+
 ## Obsidian shows tag errors on wiki pages
 
 **Symptom:** Obsidian flags YAML frontmatter tags as invalid. Pages show a warning icon.

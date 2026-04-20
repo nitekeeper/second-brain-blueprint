@@ -3,6 +3,68 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.1.4 — 2026-04-19
+
+### Inline query waterfall into CLAUDE.md; delete query.md
+
+- **Root cause:** v2.1.3 added a CRITICAL rule in `CLAUDE.md` to read `query.md` before answering. The rule was followed correctly once (after repeated correction), but failed reliably across sessions. The structural problem: answering questions is a trained reflex. A rule requiring an interrupting tool call before the reflex fires is not reliable enough. Every other op has an explicit user command (`!! ingest`, `!! lint`) that acts as a natural trigger for reading its ops file. Query has no command — it fires on every message with no trigger.
+
+- **Fix:** Inlined the full query waterfall directly into `CLAUDE.md`'s `## Query Routing Rule` section. Added "No file read required — the waterfall is here." to make the intent explicit. Deleted `scheduled-tasks/ops/query.md` and `blueprint/template/scheduled-tasks/ops/query.md`. Removed the `Answer a question (wiki/web)` row from the Ops File Reminder table in both `CLAUDE.md` and `blueprint/template/CLAUDE.md`. Removed `query.md` from Directory Structure in both files. Removed `ops/query.md` row from both `token-reference.md` copies.
+
+- **Tested:** Inlined waterfall confirmed working in fresh session — sqlite-query skill fired correctly on first question without correction.
+
+- **Cascade:** `blueprint/template/CLAUDE.md`, both `token-reference.md` copies, `CHANGELOG.md`. No cascade to `user-guide.md`, `setup-guide.md`, or `README.md` — agent-internal behavioral change with no user-facing impact. Deliberate non-cascade per exception clause in Blueprint Sync Rule.
+
+---
+
+## v2.1.3 — 2026-04-19
+
+### Add CRITICAL Query Routing Rule directly to CLAUDE.md
+
+- **Root cause:** The mandate to read `ops/query.md` before answering any question lived only inside `query.md` itself — a file the agent was supposed to read first, but kept skipping on simple-seeming questions. The agent had no in-CLAUDE.md trigger to enforce the routing step, so it defaulted to answering directly from training knowledge or `index.md`.
+
+- **Fix:** Added a standalone `## Query Routing Rule` section to `CLAUDE.md` immediately after the Startup block. The section contains a single CRITICAL rule: read `query.md` and follow its waterfall before answering any question, without exception. This surfaces the mandate at cold-start in the always-read file, eliminating the dependency on the agent proactively opening `query.md` first.
+
+- **Cascade:** `blueprint/template/CLAUDE.md` (same section added). No cascade to `user-guide.md`, `setup-guide.md`, or `README.md` — agent-internal behavioral rule with no user-facing impact. Deliberate non-cascade per exception clause in Blueprint Sync Rule.
+
+---
+
+## v2.1.2 — 2026-04-19
+
+### Tighten query op — remove Step 1 escape hatch for wiki questions
+
+- **`ops/query.md` Step 1 hardened.** Added a CRITICAL mandatory-trigger note at the top of the op ("no exception for perceived simplicity, brevity, or confidence level") and a hard carve-out block below Step 1 that forces wiki-topology questions, any question touchable by wiki content, and any session where an installed query layer is active, directly to Step 2 — bypassing the training-knowledge shortcut entirely.
+
+- **Root cause documented.** The Step 1 "if highly confident" shortcut was being abused to skip the query waterfall on short or simple-seeming questions, preventing the sqlite-query skill from ever firing even when it was installed and relevant.
+
+- **Cascade:** `blueprint/template/scheduled-tasks/ops/query.md` (same edits). No cascade to `CLAUDE.md`, `user-guide.md`, or `setup-guide.md` — the behavioral change is fully contained in the op file. Deliberate non-cascade per exception clause in Blueprint Sync Rule.
+
+---
+
+## v2.1.1 — 2026-04-19
+
+### Ban Glob for file existence checks; document silent-failure footgun
+
+- **Tool reliability note added to `CLAUDE.md` Ops File Reminder section.** The Glob tool can silently return empty for files that genuinely exist — first observed when checking for `scheduled-tasks/query-layer.md` and `ingest-hook.md`. The agent concluded no skill was installed and skipped the SQLite query waterfall. The standing rule: always use Bash `[ -f path ]` or `ls path` for existence checks, never Glob.
+
+- **`blueprint/troubleshooting.md` entry added.** Documents symptom, cause, fix, and prevention with a v2.1.1 reference.
+
+- **No cascade to `README.md`, `setup-guide.md`, or `user-guide.md`.** This is an agent-internal behavioral rule with no user-facing impact. Deliberate non-cascade per the exception clause in the Blueprint Sync Rule.
+
+---
+
+## v2.1 — 2026-04-19
+
+### Add `Active skills:` field to `hot.md` (persistent skill visibility)
+
+- **`Active skills:` field added to `hot.md` format.** `hot.md` is read on every cold start, making it the only reliable place to surface installed skills. Without this field, the agent entered each session with no in-context signal that the SQLite query layer was installed — causing it to skip the SQLite waterfall and fall back to training knowledge. The new field emits the comma-separated list of installed skill names (e.g. `sqlite-query`), or `none` when no skills are installed.
+
+- **`refresh-hot.md` updated (Step 3 added).** Derives `Active skills` by checking for the presence of `scheduled-tasks/query-layer.md` → `sqlite-query`; otherwise `none`. Field Reference row added. Output Format updated.
+
+- **Cascade:** `CLAUDE.md` (hot.md Format block + footer v2.0→v2.1), `scheduled-tasks/refresh-hot.md` (Step 3 + Field Reference + Output Format), `blueprint/template/CLAUDE.md` (same), `blueprint/template/scheduled-tasks/refresh-hot.md` (same), `blueprint/setup-guide.md` (initial hot.md snippet adds `Active skills: none`).
+
+---
+
 ## v2.0.23 — 2026-04-19
 
 ### Formalize non-cascade exception in Blueprint Sync Rule (audit #27 — W1)

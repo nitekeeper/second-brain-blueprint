@@ -22,7 +22,6 @@ Format: `~N tokens (R read / W write)`
 | `scheduled-tasks/refresh-hot.md` | ~5,100 | ~1,280 |
 | `ops/ingest.md` | ~19,800 | ~4,950 |
 | `ops/lint.md` | ~3,100 | ~780 |
-| `ops/query.md` | ~3,300 | ~830 |
 | `ops/update.md` | ~2,400 | ~600 |
 | `ops/conventions.md` | ~8,400 | ~2,100 |
 | `ops/audit.md` | ~8,200 | ~2,050 |
