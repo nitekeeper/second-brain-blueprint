@@ -3,6 +3,18 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.1.5 — 2026-04-19
+
+### Fix setup-guide Step 3: Write CLAUDE.md directly instead of cp+Edit
+
+- **Root cause:** `setup-guide.md` Step 2 copied `blueprint/template/CLAUDE.md` to `CLAUDE.md` via Bash `cp`. Step 3 then tried to Edit the copy. The Edit tool requires a prior Read call on the exact file path — files created via Bash are invisible to its state tracker — so the first Edit attempt always failed with "File has not been read yet." The failure was self-correcting (agent would Read then retry) but surfaced as a repeated noisy failure on every fresh setup.
+
+- **Fix:** Step 2 no longer copies `CLAUDE.md` via `cp`. Step 3 now instructs the agent to Read `blueprint/template/CLAUDE.md`, perform all substitutions (date replacement, setup-note removal) in working memory, and Write the result directly to `CLAUDE.md`. The Write tool has no prior-Read requirement, eliminating the failure mode entirely.
+
+- **Cascade:** `blueprint/setup-guide.md` (Steps 2 & 3 rewritten), `blueprint/troubleshooting.md` (new entry documenting symptom, cause, old behavior, fix, and general rule), `blueprint/CHANGELOG.md` (this entry).
+
+---
+
 ## v2.1.4 — 2026-04-19
 
 ### Inline query waterfall into CLAUDE.md; delete query.md
