@@ -268,4 +268,5 @@ Then display the standard footer:
 🔄 !! ready: [load session summary at start of new session]
 
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
+📋 Waterfall: [step taken] | Ops: [file read or N/A]
 ```

@@ -17,10 +17,12 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
    import sqlite3, pathlib, os, subprocess
 
    WORKDIR = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
-   db = WORKDIR.parent / "wiki.db"  # stored outside the library FUSE mount for SQLite write compatibility
+   db = WORKDIR / "wiki" / "wiki.db"  # inside wiki/ folder; nolock+MEMORY avoids FUSE locking
 
    try:
-       conn = sqlite3.connect(db)
+       conn = sqlite3.connect(f"file:{db}?nolock=1", uri=True)
+       conn.execute("PRAGMA journal_mode=MEMORY")
+       conn.execute("PRAGMA synchronous=OFF")
        rows = conn.execute("""
            SELECT DISTINCT p.slug, p.title, p.summary
            FROM pages p

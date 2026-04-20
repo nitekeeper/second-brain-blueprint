@@ -3,6 +3,46 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.1.8 — 2026-04-20
+
+### Token recalibration, envelope widening, and directional reference fix (audit #31)
+
+- **Recalibration (W1):** `troubleshooting.md` soft trigger fired — headroom dropped to 955 chars against a 2,735-char soft floor after two new troubleshooting sections (+3,392 chars total). Full recalibration pass applied to all seven files that grew since the 2026-04-19 calibration: `setup-guide.md` (~13,200 → ~13,800 / ~3,300 → ~3,450 tokens), `user-guide.md` (~17,800 → ~18,300 / ~4,450 → ~4,580), `troubleshooting.md` (~28,300 → ~34,200 / ~7,080 → ~8,550), `template/CLAUDE.md` (~30,100 → ~30,800 / ~7,530 → ~7,700), `SKILL.md` (~6,900 → ~7,000 / ~1,720 → ~1,750), `query-layer.md` (~3,200 → ~3,600 / ~800 → ~900), `ingest-hook.md` (~3,500 → ~3,800 / ~880 → ~950). Calibration date advanced to 2026-04-20.
+
+- **Envelope widening (W2):** Post-recalibration full-table token sum rises to ~45,520, exceeding the prior 45,000 ceiling and violating the 2% cushion floor. Envelope widened from `~30,000–45,000` to `~30,000–47,000` (cushion: 1,480 tokens, 3.1% > 2% floor). Cascaded to `ops/audit.md:71`, `user-guide.md` (§ Blueprint Audit command reference + cost table), and `ops/token-reference.md` Step 5 parenthetical and floor note.
+
+- **Cold-start cascade:** `CLAUDE.md` self-cost recalibrated to ~7,700 tokens; cold-start total updated to ~7,780 (was ~7,610); `!! ready` total updated to ~8,730 (was ~8,560). Propagated to `template/CLAUDE.md` (startup block), `blueprint/user-guide.md` (all three references and cost table), `blueprint/README.md` (lean-startup bullet).
+
+- **Directional reference fix (S1):** `template/CLAUDE.md` `!! ready` step 5 said "same guard as Blueprint-authoring Mode **below**" — the section is above, not below. Changed "below" to "above."
+
+- **No user-facing behavioral change.** All token figures are estimates; the updates keep the quoted ranges accurate. No cascade to `setup-guide.md` — it does not quote cold-start figures or the audit envelope.
+
+---
+
+## v2.1.7 — 2026-04-20
+
+### Fix SQLite FUSE locking failure on Cowork-mounted library folders
+
+- **Root cause:** SQLite's default rollback journal mode uses `fcntl` file locks. FUSE mounts (including Cowork-mounted library folders) do not support `fcntl`. Any SQLite connection using the default journal mode would fail with `sqlite3.OperationalError: disk I/O error` immediately after creating the DB file. A stale `.db-journal` left behind by the failed write would corrupt all subsequent connection attempts to the same path, even after reinstall. A prior workaround stored `wiki.db` at `WORKDIR.parent` (session-ephemeral, wiped at session end), causing the DB to disappear on every restart.
+
+- **Fix:** All three skill files (`SKILL.md`, `query-layer.md`, `ingest-hook.md`) now use `sqlite3.connect(f"file:{db}?nolock=1", uri=True)` with `PRAGMA journal_mode=MEMORY` and `PRAGMA synchronous=OFF`. This bypasses `fcntl` locking entirely. The DB is stored at `wiki/wiki.db` — inside the persistent library folder — so it survives across sessions without any per-session backfill.
+
+- **Cascade:** `blueprint/skills/sqlite-query/SKILL.md` (Step 3 Python, FUSE section, DB Desync Recovery note), `blueprint/skills/sqlite-query/query-layer.md` (Step 1 Python), `blueprint/skills/sqlite-query/ingest-hook.md` (Steps block Python), `blueprint/troubleshooting.md` (new "SQLite disk I/O error on FUSE-mounted library" entry), `blueprint/CHANGELOG.md` (this entry, retroactively added — entry was missing from the prior session's log).
+
+---
+
+## v2.1.6 — 2026-04-20
+
+### Add mandatory compliance line to Response Footer
+
+- **Problem:** The Query Routing Rule and Ops File Reminder are unconditional, but the agent can rationalize skipping them silently — stronger wording alone doesn't fix this because the agent already had clear text and ignored it.
+
+- **Fix:** Added a mandatory `📋 Waterfall: [step taken] | Ops: [file read or N/A]` compliance line to the Response Footer (after the 5 command-hint lines, before the blank separator). The agent must fill it in accurately on every response. This makes rule adherence externally visible — the user can immediately spot a skipped waterfall step or missing ops file read and call it out.
+
+- **Cascade:** `CLAUDE.md`, `blueprint/template/CLAUDE.md`, `blueprint/user-guide.md` (Footer Commands section updated; compliance line explained to user), `blueprint/setup-guide.md` (standard footer block updated), `blueprint/CHANGELOG.md` (this entry). Footer line count updated from 7 to 8 physical lines throughout.
+
+---
+
 ## v2.1.5 — 2026-04-19
 
 ### Fix setup-guide Step 3: Write CLAUDE.md directly instead of cp+Edit
@@ -1347,3 +1387,19 @@ Version history prior to v1.13 is implicit in `troubleshooting.md` — each
 Prevention bullet references the version in which the corresponding fix landed
 (v1.10 mid-session guard, v1.11 `keep` option, v1.12 broadened approval scope
 and ingest batch pre-read, etc.).
+
+---
+
+## v2.1.7 — 2026-04-20
+
+### Fix sqlite-query skill: use nolock+MEMORY to support FUSE-mounted library folders
+
+- **Problem:** `wiki.db` was stored outside the library folder (`WORKDIR.parent`) because SQLite's default locking mechanism throws `disk I/O error` on FUSE mounts. But `WORKDIR.parent` is session-level ephemeral storage — the DB was wiped at the end of every session, forcing a full backfill each time. Multiple sessions were spent diagnosing this, with several incorrect "fixes" applied and then lost.
+
+- **Root cause:** SQLite's default rollback journal uses `fcntl` file locks, which FUSE mounts do not support. The error manifests as `sqlite3.OperationalError: disk I/O error` on the first write. A secondary failure mode: `sqlite3.connect()` creates the DB file and a `.db-journal` file before hitting the lock error; a stale journal left behind corrupts all subsequent connection attempts to the same path.
+
+- **Fix:** Use `sqlite3.connect(f"file:{db}?nolock=1", uri=True)` with `PRAGMA journal_mode=MEMORY` and `PRAGMA synchronous=OFF`. This bypasses `fcntl` locking entirely and keeps the journal in memory. The DB is now stored at `wiki/wiki.db` — inside the library's persistent `wiki/` folder — so it survives across sessions with no per-session backfill cost.
+
+- **Verified:** `?nolock=1` + `MEMORY` journal successfully creates, writes, reads, and persists `wiki.db` inside the FUSE-mounted library folder on Cowork.
+
+- **Cascade:** `blueprint/skills/sqlite-query/SKILL.md` (install step 3, Known Limitation section, uninstall path reference, What This Skill Installs note), `blueprint/skills/sqlite-query/query-layer.md` (path + connection), `blueprint/skills/sqlite-query/ingest-hook.md` (path + connection), `blueprint/troubleshooting.md` (new entry), `blueprint/CHANGELOG.md` (this entry).

@@ -27,13 +27,15 @@ Also runs for every concept/entity page created or updated in Steps 7–9 of the
 import sqlite3, pathlib, os, json
 
 WORKDIR = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
-db = WORKDIR.parent / "wiki.db"  # stored outside the library FUSE mount for SQLite write compatibility
+db = WORKDIR / "wiki" / "wiki.db"  # inside wiki/ folder; nolock+MEMORY avoids FUSE locking
 
 # Values injected from ingest op working memory:
 # slug, title, type_, summary, tags, created, updated, related
 
 try:
-    conn = sqlite3.connect(db)
+    conn = sqlite3.connect(f"file:{db}?nolock=1", uri=True)
+    conn.execute("PRAGMA journal_mode=MEMORY")
+    conn.execute("PRAGMA synchronous=OFF")
 
     # Upsert the page
     conn.execute("""

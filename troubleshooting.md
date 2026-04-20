@@ -362,3 +362,22 @@ Run via the agent's shell sandbox or in your own terminal. Always export `WIKI_R
 **Fix (v2.1.5+):** `setup-guide.md` Step 3 now instructs the agent to Read `blueprint/template/CLAUDE.md`, perform all substitutions in working memory, and Write the final content directly to `CLAUDE.md` — no `cp`, no Edit. The Write tool has no prior-Read requirement, eliminating the failure mode entirely.
 
 **General rule:** Never Bash-copy a file and immediately Edit it without an intervening Read. When writing a file that needs in-memory substitution, always prefer Read → substitute → Write over cp + Edit.
+
+---
+
+## SQLite disk I/O error on FUSE-mounted library (Cowork)
+
+**Symptom:** `!! install sqlite-query` appears to succeed but any query or ingest hook immediately logs `sqlite3.OperationalError: disk I/O error`. The DB file is created (0 bytes or small) but has no tables or data. Subsequent installs don't help. A `wiki.db-journal` file may appear in the library folder.
+
+**Cause:** SQLite's default rollback journal mode uses `fcntl` file locks. FUSE mounts (including Cowork-mounted library folders) do not support these locks. SQLite creates the file and journal successfully, then fails at the locking step. The stale `.db-journal` file left behind corrupts all future connection attempts to the same DB path, even with `?nolock=1`.
+
+**Secondary cause (session-ephemeral path):** Previous versions stored `wiki.db` at `WORKDIR.parent` — outside the library folder — to avoid the FUSE restriction. But `WORKDIR.parent` is session-level storage, wiped at session end. The DB appeared to work within a session but was gone at the next startup.
+
+**Fix (v2.1.7+):** The skill now uses `sqlite3.connect(f"file:{db}?nolock=1", uri=True)` with `PRAGMA journal_mode=MEMORY` and `PRAGMA synchronous=OFF`. This bypasses `fcntl` locking entirely. The DB is stored at `wiki/wiki.db` inside the persistent library folder.
+
+**Recovery if you hit stale journal state:**
+1. Manually delete `wiki.db` and `wiki.db-journal` from your library folder (the agent cannot delete files there)
+2. Run `!! install sqlite-query` — the install creates a fresh `wiki/wiki.db` on a clean path
+3. Choose yes to backfill when prompted
+
+**General rule:** Any file the agent creates via Bash/Python inside the library folder uses FUSE and may fail for locking-dependent operations (SQLite, `flock`, `fcntl`). Use the Write/Edit tools for persistent file creation. For SQLite specifically, always use `?nolock=1` + `journal_mode=MEMORY` + `synchronous=OFF`.

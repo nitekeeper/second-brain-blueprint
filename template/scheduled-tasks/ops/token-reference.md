@@ -9,13 +9,13 @@ Format: `~N tokens (R read / W write)`
 
 > **Source of truth:** The Chars column below is the source of truth for file-read cost estimates. Any quoted cost in CLAUDE.md, README.md, user-guide.md, or setup-guide.md must be re-derivable from this table — re-propagate when this table changes.
 
-## File Read Costs (last calibrated: 2026-04-19 — recalibrate after each ingest)
+## File Read Costs (last calibrated: 2026-04-20 — recalibrate after each ingest)
 
 | File | Chars | Tokens (~chars÷4) |
 |---|---|---|
 | `wiki/hot.md` | ~300 | ~80 |
 | `memory.md` | ~3,800 (when full) | ~950 |
-| `CLAUDE.md` | ~30,100 | ~7,530 |
+| `CLAUDE.md` | ~30,800 | ~7,700 |
 | `wiki/index.md` | ~1,000 (grows with pages) | ~250 |
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
@@ -27,13 +27,13 @@ Format: `~N tokens (R read / W write)`
 | `ops/audit.md` | ~8,200 | ~2,050 |
 | `ops/token-reference.md` | ~8,500 | ~2,120 |
 | `blueprint/README.md` | ~6,000 | ~1,500 |
-| `blueprint/setup-guide.md` | ~13,200 | ~3,300 |
-| `blueprint/user-guide.md` | ~17,800 | ~4,450 |
-| `blueprint/troubleshooting.md` | ~28,300 | ~7,080 |
+| `blueprint/setup-guide.md` | ~13,800 | ~3,450 |
+| `blueprint/user-guide.md` | ~18,300 | ~4,580 |
+| `blueprint/troubleshooting.md` | ~34,200 | ~8,550 |
 | `blueprint/LICENSE` | ~1,400 | ~350 |
-| `blueprint/skills/sqlite-query/SKILL.md` | ~6,900 | ~1,720 |
-| `blueprint/skills/sqlite-query/query-layer.md` | ~3,200 | ~800 |
-| `blueprint/skills/sqlite-query/ingest-hook.md` | ~3,500 | ~880 |
+| `blueprint/skills/sqlite-query/SKILL.md` | ~7,000 | ~1,750 |
+| `blueprint/skills/sqlite-query/query-layer.md` | ~3,600 | ~900 |
+| `blueprint/skills/sqlite-query/ingest-hook.md` | ~3,800 | ~950 |
 | Average concept page | ~2,500 | ~630 |
 | Average source page | ~1,900 | ~480 |
 | Raw source document | varies | ~1,000–8,000 |
@@ -76,5 +76,5 @@ That fixed floor is ~3,455 tokens **before** the raw source and per-page writes 
 2. For each file, set Chars to 125% of measured actual, rounded to nearest 100
 3. Recalculate Tokens column (chars ÷ 4, rounded to nearest 10)
 4. Propagate changes to any cascading cold-start estimates (CLAUDE.md, user-guide.md, README.md)
-5. Re-sum the blueprint-doc and template-side Tokens-column rows and verify the result still fits inside the `!! audit all` envelope quoted at `ops/audit.md:71` (currently `~30,000–45,000`). If the updated sum exceeds the upper bound, widen the envelope (documented sum + ~1,500–3,000 cushion, rounded to nearest 1,000) and cascade to every `!! audit all` mention — `ops/audit.md:71`, `user-guide.md` (both the command reference and the cost table), and the CHANGELOG entry for this patch. Additionally, widen the envelope when the cushion (upper bound minus documented sum) drops below ~2% of the upper bound (~900 tokens on a 45,000-token envelope), even if the sum is still inside the bound — this prevents the cushion from being exhausted by ordinary churn before the next calibration. If both the sum stays inside the bound AND the cushion stays above ~2%, no envelope edit is needed.
+5. Re-sum the blueprint-doc and template-side Tokens-column rows and verify the result still fits inside the `!! audit all` envelope quoted at `ops/audit.md:71` (currently `~30,000–47,000`). If the updated sum exceeds the upper bound, widen the envelope (documented sum + ~1,500–3,000 cushion, rounded to nearest 1,000) and cascade to every `!! audit all` mention — `ops/audit.md:71`, `user-guide.md` (both the command reference and the cost table), and the CHANGELOG entry for this patch. Additionally, widen the envelope when the cushion (upper bound minus documented sum) drops below ~2% of the upper bound (~940 tokens on a 47,000-token envelope), even if the sum is still inside the bound — this prevents the cushion from being exhausted by ordinary churn before the next calibration. If both the sum stays inside the bound AND the cushion stays above ~2%, no envelope edit is needed.
 6. Update the calibration date in the header
