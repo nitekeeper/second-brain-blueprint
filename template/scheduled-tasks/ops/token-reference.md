@@ -15,7 +15,7 @@ Format: `~N tokens (R read / W write)`
 |---|---|---|
 | `wiki/hot.md` | ~300 | ~80 |
 | `memory.md` | ~3,800 (when full) | ~950 |
-| `CLAUDE.md` | ~25,800 | ~6,450 |
+| `CLAUDE.md` | ~30,100 | ~7,530 |
 | `wiki/index.md` | ~1,000 (grows with pages) | ~250 |
 | `wiki/log.md` tail (5 entries) | ~2,500 max (500 × 5 cap) | ~625 |
 | `wiki/log.md` full | audit only — unbounded | — |
@@ -31,7 +31,7 @@ Format: `~N tokens (R read / W write)`
 | `blueprint/user-guide.md` | ~17,800 | ~4,450 |
 | `blueprint/troubleshooting.md` | ~28,300 | ~7,080 |
 | `blueprint/LICENSE` | ~1,400 | ~350 |
-| `blueprint/skills/sqlite-query/SKILL.md` | ~5,200 | ~1,300 |
+| `blueprint/skills/sqlite-query/SKILL.md` | ~6,900 | ~1,720 |
 | `blueprint/skills/sqlite-query/query-layer.md` | ~3,200 | ~800 |
 | `blueprint/skills/sqlite-query/ingest-hook.md` | ~3,500 | ~880 |
 | Average concept page | ~2,500 | ~630 |
@@ -76,5 +76,5 @@ That fixed floor is ~3,455 tokens **before** the raw source and per-page writes 
 2. For each file, set Chars to 125% of measured actual, rounded to nearest 100
 3. Recalculate Tokens column (chars ÷ 4, rounded to nearest 10)
 4. Propagate changes to any cascading cold-start estimates (CLAUDE.md, user-guide.md, README.md)
-5. Re-sum the blueprint-doc and template-side Tokens-column rows and verify the result still fits inside the `!! audit all` envelope quoted at `ops/audit.md:71` (currently `~30,000–43,000`). If the updated sum exceeds the upper bound, widen the envelope (documented sum + ~1,500–3,000 cushion, rounded to nearest 1,000) and cascade to every `!! audit all` mention — `ops/audit.md:71`, `user-guide.md` (both the command reference and the cost table), and the CHANGELOG entry for this patch. Additionally, widen the envelope when the cushion (upper bound minus documented sum) drops below ~2% of the upper bound (~860 tokens on a 43,000-token envelope), even if the sum is still inside the bound — this prevents the cushion from being exhausted by ordinary churn before the next calibration. If both the sum stays inside the bound AND the cushion stays above ~2%, no envelope edit is needed.
+5. Re-sum the blueprint-doc and template-side Tokens-column rows and verify the result still fits inside the `!! audit all` envelope quoted at `ops/audit.md:71` (currently `~30,000–45,000`). If the updated sum exceeds the upper bound, widen the envelope (documented sum + ~1,500–3,000 cushion, rounded to nearest 1,000) and cascade to every `!! audit all` mention — `ops/audit.md:71`, `user-guide.md` (both the command reference and the cost table), and the CHANGELOG entry for this patch. Additionally, widen the envelope when the cushion (upper bound minus documented sum) drops below ~2% of the upper bound (~900 tokens on a 45,000-token envelope), even if the sum is still inside the bound — this prevents the cushion from being exhausted by ordinary churn before the next calibration. If both the sum stays inside the bound AND the cushion stays above ~2%, no envelope edit is needed.
 6. Update the calibration date in the header
