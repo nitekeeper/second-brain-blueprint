@@ -6,7 +6,7 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
 
 ## Startup (Every Session)
 
-1. Read `CLAUDE.md` (this file) — ~7,530 tokens
+1. Read `CLAUDE.md` (this file) — ~7,700 tokens
 2. Read `wiki/hot.md` — ~80 tokens
 3. Check `drafts/` — list filenames only, up to 20 (negligible tokens at that cap; if more than 20 files exist, list the 20 most recently modified and note the overflow count)
 4. Check if the user's opening message is `!! ready`:
@@ -16,7 +16,7 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
 
 **CRITICAL: Complete ALL startup steps (1–4) before composing your first response, regardless of what the opening message contains. No exceptions.**
 
-**Total cold-start cost: ~7,610 tokens** (~8,560 tokens when memory.md holds a full summary loaded via `!! ready`)
+**Total cold-start cost: ~7,780 tokens** (~8,730 tokens when memory.md holds a full summary loaded via `!! ready`)
 
 > **Estimates only:** All token figures in this file and in `scheduled-tasks/ops/token-reference.md` are `chars ÷ 4` estimates. Actual usage varies by tokenizer, file contents, and runtime overhead (tool calls, system prompt). Quote them as approximate in approval requests, never as precise numbers.
 
@@ -296,13 +296,13 @@ Triggered when user says: `!! ready`
      *(empty — use `!! wrap` at the end of a session to save a summary here)*
      ```
    - Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md` so the `Last op:` field reflects the memory read.
-   - Confirm: "Memory cleared. Ready to work." Then surface any in-progress drafts from `drafts/` (same as normal startup Step 4) so resuming via `!! ready` never drops drafts that a non-`!! ready` startup would have announced. **Blueprint-authoring mode:** if `wiki/` is absent at the working folder root, `drafts/` is almost certainly absent too — skip the drafts surface transparently (same guard as Blueprint-authoring Mode below; a single `[ -d drafts ]` check avoids prompting or erroring on a nonexistent directory).
+   - Confirm: "Memory cleared. Ready to work." Then surface any in-progress drafts from `drafts/` (same as normal startup Step 4) so resuming via `!! ready` never drops drafts that a non-`!! ready` startup would have announced. **Blueprint-authoring mode:** if `wiki/` is absent at the working folder root, `drafts/` is almost certainly absent too — skip the drafts surface transparently (same guard as Blueprint-authoring Mode above; a single `[ -d drafts ]` check avoids prompting or erroring on a nonexistent directory).
 
 ---
 
 ## Response Footer
 
-**CRITICAL: Every single response — without exception — must end with the footer block exactly as shown: 5 command-hint lines, then a blank separator, then the 💡 tip line (7 physical lines total). Missing any content line is an error.**
+**CRITICAL: Every single response — without exception — must end with the footer block exactly as shown: 5 command-hint lines, then a compliance line, then a blank separator, then the 💡 tip line, then the 📋 compliance line (8 physical lines total). Missing any content line is an error.**
 
 ```
 📥 !! ingest: [URL | Page Name | All]
@@ -312,11 +312,14 @@ Triggered when user says: `!! ready`
 🔄 !! ready: [load session summary at start of new session]
 
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
+📋 Waterfall: [step taken] | Ops: [file read or N/A]
 ```
 
-**CRITICAL: All 5 command-hint lines and the 💡 tip line are required in every response. Missing any content line is an error.**
+**CRITICAL: All 5 command-hint lines, the compliance line, and the 💡 tip line are required in every response. Missing any content line is an error.**
 
-Show brackets literally. No query command — handled automatically via waterfall.
+The `📋 Waterfall:` compliance line must be filled in accurately on every response — not copied literally with brackets. Fill in the waterfall step taken (e.g. `Step 2 via sqlite-query`, `Step 1 (training knowledge)`) and the ops file read (e.g. `ingest.md`, or `N/A` if none). This makes rule adherence externally visible in every response so violations are immediately catchable.
+
+Show brackets literally for command-hint lines. No query command — handled automatically via waterfall.
 
 ---
 

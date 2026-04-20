@@ -11,7 +11,7 @@ Replaces the built-in grep-based query layer with a SQLite index (`wiki.db`) for
 | `query-layer.md` | `scheduled-tasks/query-layer.md` |
 | `ingest-hook.md` | `scheduled-tasks/ingest-hook.md` |
 
-Plus creates `wiki.db` at the working folder root.
+Plus creates `wiki/wiki.db` inside the wiki folder.
 
 ---
 
@@ -39,7 +39,10 @@ Plus creates `wiki.db` at the working folder root.
    import sqlite3, pathlib, os
 
    WORKDIR = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
-   conn = sqlite3.connect(WORKDIR.parent / "wiki.db")  # stored outside the library FUSE mount
+   db = WORKDIR / "wiki" / "wiki.db"
+   conn = sqlite3.connect(f"file:{db}?nolock=1", uri=True)
+   conn.execute("PRAGMA journal_mode=MEMORY")
+   conn.execute("PRAGMA synchronous=OFF")
    conn.executescript("""
        CREATE TABLE IF NOT EXISTS pages (
            slug     TEXT PRIMARY KEY,
@@ -78,13 +81,13 @@ Plus creates `wiki.db` at the working folder root.
 
 ---
 
-## Known Limitation — FUSE / Network-Mounted Filesystems
+## FUSE / Network-Mounted Filesystems
 
-SQLite requires filesystem-level locking that FUSE and network mounts (e.g. Cowork-mounted folders, SMB, NFS) do not fully support. Symptoms: `wiki.db` is created (file exists) but all write attempts throw `sqlite3.OperationalError: disk I/O error`. Reads may succeed with `?nolock=1` but writes cannot be recovered this way.
+SQLite's default locking mechanism is incompatible with FUSE mounts (e.g. Cowork-mounted library folders). Symptoms: `sqlite3.OperationalError: disk I/O error` on any write attempt.
 
-**At small wiki sizes (<500 pages):** uninstall the skill and use the built-in grep layer — it is fast enough and has no filesystem dependencies.
+**Solution (already applied in this skill):** Use the `?nolock=1` URI parameter with `PRAGMA journal_mode=MEMORY` and `PRAGMA synchronous=OFF`. This bypasses filesystem locking entirely and keeps the journal in memory rather than on disk. The DB lives at `wiki/wiki.db` — the same persistent folder as all wiki pages — so it survives across sessions without any per-session backfill.
 
-**At larger wiki sizes (500–1000+ pages):** use the **path-patch approach** — store `wiki.db` at a stable path on the user's native filesystem *outside* the mounted folder (e.g. `~/.llm-wiki/wiki.db`). Update the `WORKDIR` resolution in `query-layer.md`, `ingest-hook.md`, and the install step in this file to point to that path. The DB persists natively across sessions with no per-session backfill needed.
+**Stale journal warning:** If a previous failed install left a `wiki.db-journal` file in the library, it will corrupt any subsequent SQLite connection to `wiki.db` at the same path. Fix: delete both `wiki.db` and `wiki.db-journal` manually from your library folder, then run `!! install sqlite-query` again with a clean path.
 
 To uninstall cleanly: say `!! uninstall sqlite-query`.
 
@@ -105,7 +108,7 @@ Tell the agent: `!! uninstall sqlite-query`
 Steps:
 1. Delete `scheduled-tasks/query-layer.md`
 2. Delete `scheduled-tasks/ingest-hook.md`
-3. Ask: "Delete wiki.db too? (yes/no)" — default no, since it may be useful to keep as a cache
+3. Ask: "Delete wiki/wiki.db too? (yes/no)" — default no, since it may be useful to keep as a cache
 4. Confirm: "sqlite-query skill removed. Query and ingest ops have reverted to the built-in grep layer."
 
 ---

@@ -6,12 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~7,530 tokens)
+1. `CLAUDE.md` — its operating instructions (~7,700 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~80 tokens)
 
-**Total cold-start cost: ~7,610 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~7,780 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~8,560 tokens total when the summary is full).
+If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~8,730 tokens total when the summary is full).
 
 ---
 
@@ -91,7 +91,7 @@ The agent always reports findings first and asks approval before fixing anything
 
 Runs a strict, Senior-Software-Architect-style audit of the blueprint files themselves (the schema, the ops files, the guides). Unlike `!! lint` (which targets your wiki pages), audit targets only `blueprint/` — the distribution template and its docs.
 
-- `!! audit all` — audit every file under `blueprint/` (~30,000–45,000 tokens)
+- `!! audit all` — audit every file under `blueprint/` (~30,000–47,000 tokens)
 - `!! audit [page-name]` — audit one matched file (~1,000–5,000 tokens)
 
 **What audit checks:**
@@ -145,7 +145,7 @@ If you start a session without saying `!! ready`, the summary stays in `memory.m
 
 ## Footer Commands
 
-Every agent response ends with the footer block: five command hints, a blank separator, and the 💡 Web Clipper tip (7 physical lines total):
+Every agent response ends with the footer block: five command hints, a blank separator, the 💡 Web Clipper tip, and a compliance line (8 physical lines total):
 
 ```
 📥 !! ingest: [URL | Page Name | All]
@@ -155,9 +155,12 @@ Every agent response ends with the footer block: five command hints, a blank sep
 🔄 !! ready: [load session summary at start of new session]
 
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
+📋 Waterfall: [step taken] | Ops: [file read or N/A]
 ```
 
-These are hints showing what the commands accept. Just type them naturally — e.g. `!! ingest my-article.md`, `!! lint all`, `!! audit all`, `!! wrap`, or `!! ready`.
+The first five lines are command hints — just type them naturally, e.g. `!! ingest my-article.md`, `!! lint all`, `!! audit all`, `!! wrap`, or `!! ready`.
+
+The `📋 Waterfall:` line is a compliance indicator filled in by the agent on every response — it shows which query waterfall step was taken and which ops file was read. If you see `Step 1` on a wiki question, or a missing ops file read before an operation, the agent skipped a mandatory step and you can call it out immediately.
 
 ---
 
@@ -191,18 +194,18 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~7,610 |
-| Cold start with `!! ready` (full memory) | ~8,560 |
+| Cold start | ~7,780 |
+| Cold start with `!! ready` (full memory) | ~8,730 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all | ~8,000–12,000 (scales with page count) |
 | Simple query (wiki) | ~2,000–4,000 |
 | Audit a single blueprint file | ~1,000–5,000 |
-| Audit all (full blueprint) | ~30,000–45,000 |
+| Audit all (full blueprint) | ~30,000–47,000 |
 | `!! wrap` (realistic) | ~3,000 |
 | `!! ready` (realistic) | ~3,300 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~7,610 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~7,780 tokens to re-orient.
 
 ---
 
@@ -223,5 +226,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~7,610 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~7,780 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.
