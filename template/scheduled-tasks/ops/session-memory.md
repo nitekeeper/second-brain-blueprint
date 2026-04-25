@@ -23,9 +23,9 @@ Read this file when the user says `!! wrap` or `!! ready`.
    - Exit 1 (WRAPPED): warn user — "A previous session summary is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — wait for explicit confirmation
    - Exit 2 (TRUNCATED_ACKNOWLEDGED): warn user — "A preserved (truncated) summary is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — wait for explicit confirmation
 
-2. Ask: "Anything specific you'd like included in the summary?"
+2. Ask: "Anything specific you'd like included in the snapshot?"
 
-3. **Snapshot pass:** Scan the conversation and compose a Claude-internal context snapshot. This is for Claude's use only — not for human reading.
+3. **Snapshot pass:** Review the full conversation history from this session and compose a Claude-internal context snapshot. This is for Claude's use only — not for human reading.
 
    **Include:**
    - What task is in flight
@@ -47,22 +47,22 @@ Read this file when the user says `!! wrap` or `!! ready`.
    TASK: <one sentence — what is being built or fixed>
    STATE: <one sentence — exactly where in the task we stopped>
    NEXT: <one sentence — the single first action to take next session>
-   LOCKED: <comma-separated decisions already made, not to revisit>
-   FILES: <comma-separated file paths currently in play>
+   LOCKED: <comma-separated decisions already made, not to revisit; omit line entirely if none>
+   FILES: <comma-separated file paths currently in play; omit line entirely if none>
    WATCH: <one sentence — real blocker or gotcha only; omit line entirely if none>
    [/SNAPSHOT]
    ```
 
    Do not add prose, markdown headers, or explanation outside the `[SNAPSHOT]` block.
 
-   Then pipe it to: `python scripts/wrap.py write`
-   - **Exit 0:** Snapshot written. Confirm: "Snapshot saved (~N tokens). **Close this conversation and start a new one**, then say `!! ready` as your first message. Starting a new conversation is the only way to get a clean context — `!! wrap` saves state to a file but does not free the current session's context."
+   Then run `python scripts/wrap.py write` with the snapshot block as stdin.
+   - **Exit 0:** Snapshot written. Parse the token count from stdout (format: `[OK] Snapshot written to memory.md (X chars, ~Y tokens)`). Confirm: "Snapshot saved (~Y tokens). **Close this conversation and start a new one**, then say `!! ready` as your first message. Starting a new conversation is the only way to get a clean context — `!! wrap` saves state to a file but does not free the current session's context."
 
-4. Append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Session summary saved` (≤500 chars)
+4. Append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Session snapshot saved` (≤500 chars)
 
 5. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
 
-6. Confirm: "Session summary saved. Say `!! ready` next session to load it."
+6. Confirm: "Session snapshot saved. Say `!! ready` next session to load it."
 
 ---
 
@@ -79,11 +79,11 @@ Read this file when the user says `!! wrap` or `!! ready`.
    - `keep`  — run `python scripts/ready.py keep`,  then append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Truncated summary acknowledged` (≤500 chars), refresh `hot.md`
    - `edit`  — hand control back to user; touch nothing, write nothing
 
-5. **Exit 1 (WRAPPED + COMPLETE):** Display the full summary verbatim (do not paraphrase, do not truncate).
-   - Append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Session summary consumed` (≤500 chars)
+5. **Exit 1 (WRAPPED + COMPLETE):** Parse the `[SNAPSHOT]` block silently to restore working context. Do NOT display the raw snapshot to the user.
+   - Append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Session snapshot consumed` (≤500 chars)
    - Run `python scripts/ready.py clear` to wipe memory.md
    - Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
-   - Confirm: "Memory cleared. Ready to work."
+   - Announce readiness using the TASK and NEXT fields: "Resuming: [TASK value]. Next: [NEXT value]. Ready to continue."
    - Surface any in-progress drafts from `drafts/` (same as normal startup step 3). If `drafts/` is absent, skip transparently.
 
 **Blueprint-authoring mode:** If `wiki/` absent at working folder root, skip all `wiki/log.md` appends and `hot.md` refreshes above — see CLAUDE.md Blueprint-authoring mode note.
