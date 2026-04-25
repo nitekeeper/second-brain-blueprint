@@ -12,6 +12,8 @@ Read this file when the user asks about the wiki folder layout, file locations, 
 <WorkingFolder>/
 ├── CLAUDE.md                   ← This file. Auto-read every session. Lean core schema.
 ├── memory.md                   ← Session memory. Written by `!! wrap`, read+wiped by `!! ready`.
+├── audits/                     ← Blueprint audit reports. Named AUD-YYYY-MM-DD-NNN.md. Developer use only.
+├── documents/                  ← Audit report template and design specifications. Developer use only.
 ├── backups/                    ← Migration backups. Gitignored. e.g. CLAUDE.md-v2.1-YYYY-MM-DD.bak
 ├── raw/                        ← Timestamped source snapshots — naming: <slug>-<YYYY-MM-DD-HHMMSS>.md
 ├── drafts/                     ← In-progress planning files. Claude's scrapbook.
@@ -21,8 +23,7 @@ Read this file when the user asks about the wiki folder layout, file locations, 
 │   ├── ready.py
 │   ├── log_tail.py
 │   ├── file_check.py
-│   ├── estimate_tokens.py
-│   └── migrate.py              ← present only if manually added
+│   └── estimate_tokens.py
 ├── blueprint/                  ← Setup guide and templates for sharing this system
 │   ├── LICENSE
 │   ├── .gitignore

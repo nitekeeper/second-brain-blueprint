@@ -48,14 +48,15 @@ Announce at most once per session (do not repeat on every response).
      scheduled-tasks/ops/token-reference.md
 
    Files UPDATED:
-     scheduled-tasks/ops/audit.md  (recalibration sections removed)
-     scheduled-tasks/ops/ingest.md (bash → Python, post-op advisory added)
-     scheduled-tasks/ops/lint.md   (bash → Python, post-op advisory added)
+     scheduled-tasks/ops/audit.md       (recalibration sections removed)
+     scheduled-tasks/ops/ingest.md      (bash → Python, post-op advisory added)
+     scheduled-tasks/ops/lint.md        (bash → Python, post-op advisory added)
+     scheduled-tasks/ops/conventions.md (updated for v2.2)
 
    Files UNTOUCHED:
      wiki/  (all pages, index, log, hot preserved)
      memory.md, raw/, drafts/
-     scheduled-tasks/ops/conventions.md, ingest.md* (beyond advisory update)
+     ingest.md (beyond advisory update)
      sqlite-query skill (if installed)
 
    Shall I proceed?

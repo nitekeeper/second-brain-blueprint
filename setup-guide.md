@@ -203,7 +203,7 @@ Python: python
 <!-- MEMORY_STATE: EMPTY -->
 # Session Memory
 
-*(empty — use `!! wrap` at the end of a session to save a summary here)*
+*(empty — use `!! wrap` at the end of a session to save a snapshot here)*
 ```
 
 Replace all `YYYY-MM-DD` placeholders with today's date. Replace `vX.Y` in `hot.md` with the schema version read from `CLAUDE.md`.
@@ -269,8 +269,8 @@ Check the following and report status to the user:
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry
 - [ ] `wiki/hot.md` exists with today's date
-- [ ] All 11 ops files exist in `scheduled-tasks/ops/`
-      (ingest, lint, audit, update, conventions, session-memory, blueprint-sync, reference, session-hygiene, migrate, refresh-hot)
+- [ ] All 10 ops files exist in `scheduled-tasks/ops/`
+      (ingest, lint, audit, update, conventions, session-memory, blueprint-sync, reference, session-hygiene, migrate)
 - [ ] All 6 scripts exist in `scripts/`
       (check_deps.py, wrap.py, ready.py, log_tail.py, file_check.py, estimate_tokens.py)
 - [ ] `scheduled-tasks/refresh-hot.md` exists
@@ -293,9 +293,8 @@ Then display the standard footer:
 ```
 📥 !! ingest: [URL | Page Name | All]
 🧹 !! lint: [Page Name | All]
-🔍 !! audit: [Page Name | All]
-💾 !! wrap: [save session summary to memory]
-🔄 !! ready: [load session summary at start of new session]
+💾 !! wrap: [save session snapshot to memory]
+🔄 !! ready: [load session snapshot at start of new session]
 
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
 📋 Waterfall: [step taken] | Ops: [file read or N/A]

@@ -69,15 +69,15 @@ Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 
 ## Key Features
 
-- **Lean startup** — agent cold-starts in ~7,780 tokens; reads only what it needs
-- **Approval before every wiki write** — `!! wrap`, `!! ready`, and `!! audit` are the only exceptions (`!! wrap` and `!! ready` are each gated by built-in safeguards; `!! audit` is read-only by default, and any fix you request afterward goes through the normal approval flow); every other write pauses with a plan + token estimate before touching a file
+- **Lean startup** — agent cold-starts in ~1,080 tokens; reads only what it needs
+- **Approval before every wiki write** — `!! wrap` and `!! ready` are the only exceptions (each gated by built-in safeguards); every other write pauses with a plan + token estimate before touching a file
 - **Query waterfall** — answers from training first, then wiki, then web search
-- **Self-auditing blueprint** — `!! audit` runs a strict architect-style review of the blueprint files themselves, so the schema and ops stay internally consistent as they evolve
+- **Self-auditing blueprint** — a strict architect-style audit op keeps the schema and ops internally consistent as they evolve (developer / blueprint-maintainer tool)
 - **Web Clipper optimized** — clipping articles before ingesting saves 40–60% in tokens vs URL fetch
 - **Pros/cons on every suggestion** — agent always shows trade-offs before recommending changes
-- **Session memory** — `!! wrap` saves a detailed summary at session end; `!! ready` loads and clears it next session
+- **Session memory** — `!! wrap` saves a compact session snapshot at end of session; `!! ready` restores working context at the start of the next session
 
-> **Note on token figures:** The token numbers above and throughout the blueprint (including `token-reference.md`) are **estimates** based on `chars ÷ 4`. Actual token usage depends on the model's tokenizer, exact file contents, and runtime overhead, so real numbers will differ. Treat these as rough planning figures, not precise accounting.
+> **Note on token figures:** The token numbers above and throughout the blueprint are **estimates** based on `chars ÷ 4` (computed via `scripts/estimate_tokens.py`). Actual token usage depends on the model's tokenizer, exact file contents, and runtime overhead, so real numbers will differ. Treat these as rough planning figures, not precise accounting.
 
 ---
 
