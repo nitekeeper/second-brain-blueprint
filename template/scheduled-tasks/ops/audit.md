@@ -41,7 +41,7 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
 4. **Generate and save the audit report.**
 
    a. Assign report ID: `AUD-YYYY-MM-DD-NNN` — NNN starts at `001`; if a report with today's date already exists in `audits/`, increment NNN.
-   b. Read `@blueprint/documents/audit-report-template.md` (blueprint-authoring mode: `@documents/audit-report-template.md`).
+   b. Read `@blueprint/docs/audit-report-template.md` (blueprint-authoring mode: `@docs/audit-report-template.md`).
    c. Fill in every section of the template:
       - **Report Header**: report ID, today's date, scope, schema version (read from `CLAUDE.md` footer), previous report ID or `None`.
       - **Executive Summary**: 2–3 sentences; overall risk level (CRITICAL if any open CRITICALs → `CRITICAL`; open WARNINGs only → `HIGH`; open STYLEs only → `MEDIUM`; zero open findings → `CLEAN`); finding counts by severity broken into new vs. carried-over.
