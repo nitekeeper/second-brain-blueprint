@@ -6,12 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~7,700 tokens)
+1. `CLAUDE.md` — its operating instructions (~1,000 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~80 tokens)
 
-**Total cold-start cost: ~7,780 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~1,080 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~8,730 tokens total when the summary is full).
+If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~1,830 tokens total when the summary is full).
 
 ---
 
@@ -110,10 +110,22 @@ Skills extend the core system without changing the blueprint itself. The only sk
 
 - `!! install sqlite-query` — installs the SQLite query layer. Replaces the built-in grep lookup with a local `wiki.db` index. Recommended when your wiki grows beyond ~500 pages. If your wiki already has pages, the agent will offer to backfill `wiki.db` from them.
 - `!! uninstall sqlite-query` — removes the skill and reverts to the grep layer.
+- `!! install claude-code-enhanced` — (Claude Code CLI only) registers `/wrap`, `/ready`, and `/migrate` as native slash commands. Works alongside the `!! command` syntax — both remain available.
+- `!! uninstall claude-code-enhanced` — removes the slash commands.
 
 **Fallback:** if SQLite is unavailable or a query fails at runtime, the system falls back to grep automatically.
 
 **Query layer precedence:** Basic (grep) → SQLite (if installed) → future skills. Only one query layer is active at a time.
+
+---
+
+### Cross-Platform Scripts
+
+The agent uses a set of Python scripts under `scripts/` for file operations that previously required bash. These scripts work identically on Windows, macOS, and Linux.
+
+You do not need to call them directly — the agent uses them automatically. If a script fails, the agent will show the error and suggest a fix.
+
+Python 3.8+ is required. If Python is not installed, the agent will show OS-specific installation instructions the first time a script is needed.
 
 ---
 
@@ -140,6 +152,17 @@ At the start of your next session, say `!! ready` as your first message. The age
 If you start a session without saying `!! ready`, the summary stays in `memory.md` untouched until you explicitly ask for it. It won't be read automatically.
 
 > **Note:** This is not a history log — it's a single-use memory bridge. Once consumed with `!! ready`, the summary is gone. If you need a permanent record of a decision, ingest it or file it as an analysis page.
+
+### Session Hygiene
+
+After `!! ingest`, `!! lint`, or `!! audit` completes, the agent will show a session advisory recommending you start a new session before doing more work. This is because each turn in a long session re-reads the entire conversation history, increasing cost non-linearly.
+
+**Recommended workflow:**
+- One ingest (or batch ingest) per session
+- One lint pass per session
+- `!! audit all` always in its own session
+
+To dismiss the advisory and continue anyway, say `!! proceed`. The agent will resume normally.
 
 ---
 
@@ -169,7 +192,7 @@ The `📋 Waterfall:` line is a compliance indicator filled in by the agent on e
 The agent will never edit or create files without showing you a plan first. Every write action comes with:
 
 - A one-line summary of what it's about to do
-- A token cost estimate (including the re-read of `token-reference.md` — see the self-cost figure in its header)
+- A token cost estimate (from `scripts/estimate_tokens.py`)
 - A to-do list of every file affected
 - "Shall I proceed?"
 
@@ -189,13 +212,13 @@ Whenever the agent recommends a change to your system, it will always show both 
 
 > **Note:** All token numbers below — and everywhere else in this system — are **estimates** derived from `chars ÷ 4`. Actual usage depends on the model's tokenizer, the exact file contents at read time, and runtime overhead from tool calls and the system prompt, so the real numbers will differ (sometimes noticeably). Use these figures for rough planning, not precise accounting.
 
-The context window is 200,000 tokens per session. The agent tracks estimated costs in `scheduled-tasks/ops/token-reference.md` and recalibrates after every ingest.
+The context window is 200,000 tokens per session. Token estimates are computed dynamically via `scripts/estimate_tokens.py` (file size ÷ 4).
 
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~7,780 |
-| Cold start with `!! ready` (full memory) | ~8,730 |
+| Cold start | ~1,080 |
+| Cold start with `!! ready` (full memory) | ~1,830 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all | ~8,000–12,000 (scales with page count) |
@@ -205,7 +228,7 @@ The context window is 200,000 tokens per session. The agent tracks estimated cos
 | `!! wrap` (realistic) | ~3,000 |
 | `!! ready` (realistic) | ~3,300 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~7,780 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~1,080 tokens to re-orient.
 
 ---
 
@@ -226,5 +249,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~7,780 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~1,080 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.
