@@ -10,7 +10,7 @@
 
 **Implementation model:** Use Claude Opus 4.7 — the Blueprint Sync cascade (12-row matrix, 34 cross-reference checks) requires strong multi-file consistency reasoning. Run `!! audit all` after Phase 8 to verify no cross-reference drift.
 
-**Spec:** `documents/specifications/2026-04-25-cold-start-optimization-design.md`
+**Spec:** `docs/superpowers/specs/2026-04-25-cold-start-optimization-design.md`
 
 ---
 
