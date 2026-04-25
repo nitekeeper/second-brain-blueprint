@@ -25,24 +25,38 @@ Read this file when the user says `!! wrap` or `!! ready`.
 
 2. Ask: "Anything specific you'd like included in the summary?"
 
-3. Compose a detailed summary structured as:
+3. **Snapshot pass:** Scan the conversation and compose a Claude-internal context snapshot. This is for Claude's use only — not for human reading.
+
+   **Include:**
+   - What task is in flight
+   - Exactly where in the task execution we stopped
+   - The single next action to take
+   - Decisions locked in that should not be revisited
+   - File paths actively in play
+   - Real blockers or gotchas (only if they exist)
+
+   **Exclude:**
+   - Anything already captured in the wiki
+   - Resolved steps and completed work
+   - Conversation history and back-and-forth
+   - Rationale visible by reading the current file state
+
+   **Format:**
    ```
-   # Session Memory — [YYYY-MM-DD]
-
-   ## Worked on
-   …
-
-   ## Key decisions
-   …
-
-   ## Files created / modified
-   …
-
-   ## Open questions / next steps
-   …
+   [SNAPSHOT]
+   TASK: <one sentence — what is being built or fixed>
+   STATE: <one sentence — exactly where in the task we stopped>
+   NEXT: <one sentence — the single first action to take next session>
+   LOCKED: <comma-separated decisions already made, not to revisit>
+   FILES: <comma-separated file paths currently in play>
+   WATCH: <one sentence — real blocker or gotcha only; omit line entirely if none>
+   [/SNAPSHOT]
    ```
+
+   Do not add prose, markdown headers, or explanation outside the `[SNAPSHOT]` block.
+
    Then pipe it to: `python scripts/wrap.py write`
-   The script writes the summary with the correct state markers and completion marker.
+   - **Exit 0:** Snapshot written. Confirm: "Snapshot saved (~N tokens). **Close this conversation and start a new one**, then say `!! ready` as your first message. Starting a new conversation is the only way to get a clean context — `!! wrap` saves state to a file but does not free the current session's context."
 
 4. Append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Session summary saved` (≤500 chars)
 
