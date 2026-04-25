@@ -40,10 +40,10 @@ def check() -> None:
 
 
 def write() -> None:
-    summary = sys.stdin.read().replace("\r\n", "\n").replace("\r", "\n")
-    chars = len(summary)
+    snapshot = sys.stdin.read().replace("\r\n", "\n").replace("\r", "\n")
+    chars = len(snapshot)
     tokens = chars // 4
-    content = f"{MARKER_WRAPPED}\n{summary}\n{MARKER_COMPLETE}\n"
+    content = f"{MARKER_WRAPPED}\n{snapshot}\n{MARKER_COMPLETE}\n"
     MEMORY.write_bytes(content.encode("utf-8"))
     print(f"[OK] Snapshot written to memory.md ({chars} chars, ~{tokens} tokens)")
 
