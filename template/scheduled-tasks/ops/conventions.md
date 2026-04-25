@@ -121,3 +121,18 @@ A file at `scheduled-tasks/ingest-hook.md` runs after Step 11 of the ingest op. 
 Never modify anything in `raw/` — these are the original source documents.
 
 `raw/` files use timestamped naming: `<slug>-<YYYY-MM-DD-HHMMSS>.md`. Every successful ingest writes a new timestamped snapshot — filenames are physically unique at second precision, so the directory grows monotonically. The user is free to prune `raw/` manually (e.g. keep only the most recent snapshot per slug) — the agent must not prune autonomously. A missing raw file only breaks the footnote trail for that specific snapshot; it does not affect the source page's `source_hash:` dedupe behavior.
+
+## Filing Answers (Query Step 2 / Step 3)
+
+After any Step 2 (wiki) or Step 3 (web) answer, ask: "Worth filing this as an analysis page?"
+
+If yes:
+1. Read this file (`@scheduled-tasks/ops/conventions.md`) — already loaded, no extra read needed
+2. Show approval request with token estimate (`python scripts/estimate_tokens.py wiki/pages/analyses/<slug>.md` after drafting) and file list
+3. Wait for confirmation
+4. Write to `wiki/pages/analyses/<slug>.md` following all conventions above
+5. Update `wiki/index.md` and append to `wiki/log.md` (≤500 chars):
+   `## [YYYY-MM-DD] query | [Question summary]`
+6. Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
+
+Log format: `## [YYYY-MM-DD] query | [Question summary]` (≤500 chars)
