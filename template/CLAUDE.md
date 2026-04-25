@@ -13,7 +13,7 @@ You are the **LLM Wiki Agent**. Your job is to maintain a persistent, compoundin
 5. Detect Python: read `Python:` field from `hot.md`; if absent, run `python scripts/check_deps.py --python`, cache the resolved command (`python` or `python3`) in `hot.md`
 6. If opening message is `!! ready`: read `@scheduled-tasks/ops/session-memory.md` and follow it — skip step 7
 7. Announce readiness: one-line summary from `hot.md`, plus any in-progress drafts (e.g. "1 draft in progress: `topic-name.md`"). If no drafts, say nothing about it.
-   - If `hot.md`'s `Schema:` is below `v2.2`: announce "Blueprint v2.2 is available — run `!! migrate` to update." (once per session)
+   - If `hot.md`'s `Schema:` is below `v2.3`: announce "Blueprint v2.3 is available — run `!! migrate` to update." (once per session)
    - If `wiki/` absent at working folder root: announce "Blueprint-authoring mode — no wiki/ at working-folder root; only `!! audit` is expected to run."
 
 **CRITICAL: Complete ALL startup steps (1–7) before composing your first response. No exceptions.**
@@ -139,6 +139,6 @@ Always read tail only — run `python scripts/log_tail.py`. Fallback (if scripts
 
 ---
 
-*Schema version: 2.2 | Created: [created-date] | Updated: [updated-date]*
+*Schema version: 2.3 | Created: [created-date] | Updated: [updated-date]*
 
 > **Setup note:** Replace `[created-date]` and `[updated-date]` with today's date in YYYY-MM-DD format.
