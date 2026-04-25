@@ -13,7 +13,7 @@ Read this file when the user asks about the wiki folder layout, file locations, 
 ├── CLAUDE.md                   ← This file. Auto-read every session. Lean core schema.
 ├── memory.md                   ← Session memory. Written by `!! wrap`, read+wiped by `!! ready`.
 ├── audits/                     ← Blueprint audit reports. Named AUD-YYYY-MM-DD-NNN.md. Developer use only.
-├── documents/                  ← Audit report template and design specifications. Developer use only.
+├── docs/                       ← Design specs and implementation plans. Developer use only.
 ├── backups/                    ← Migration backups. Gitignored. e.g. CLAUDE.md-v2.1-YYYY-MM-DD.bak
 ├── raw/                        ← Timestamped source snapshots — naming: <slug>-<YYYY-MM-DD-HHMMSS>.md
 ├── drafts/                     ← In-progress planning files. Claude's scrapbook.
