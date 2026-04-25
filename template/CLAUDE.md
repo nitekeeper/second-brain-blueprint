@@ -90,20 +90,19 @@ Exceptions (user invocation is implicit approval): `!! wrap`, `!! ready`, `!! au
 
 ## Response Footer
 
-**CRITICAL: Every single response — without exception — must end with the footer block exactly as shown: 5 command-hint lines, then a blank separator, then the 💡 tip line, then the 📋 compliance line (8 physical lines total). Missing any content line is an error.**
+**CRITICAL: Every single response — without exception — must end with the footer block exactly as shown: 4 command-hint lines, then a blank separator, then the 💡 tip line, then the 📋 compliance line (7 physical lines total). Missing any content line is an error.**
 
 ```
 📥 !! ingest: [URL | Page Name | All]
 🧹 !! lint: [Page Name | All]
-🔍 !! audit: [Page Name | All]
-💾 !! wrap: [save session summary to memory]
-🔄 !! ready: [load session summary at start of new session]
+💾 !! wrap: [save session snapshot to memory]
+🔄 !! ready: [load session snapshot at start of new session]
 
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
 📋 Waterfall: [step taken] | Ops: [file read or N/A]
 ```
 
-**CRITICAL: All 5 command-hint lines, the compliance line, and the 💡 tip line are required in every response. Missing any content line is an error.**
+**CRITICAL: All 4 command-hint lines, the compliance line, and the 💡 tip line are required in every response. Missing any content line is an error.**
 
 Fill `📋 Waterfall:` accurately on every response — waterfall step taken (e.g. `Step 2 via sqlite-query`, `Step 1 (training knowledge)`) and ops file read (e.g. `ingest.md`, or `N/A` if none). This makes rule adherence externally visible.
 

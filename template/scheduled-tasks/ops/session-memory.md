@@ -9,7 +9,7 @@ Read this file when the user says `!! wrap` or `!! ready`.
 
 `memory.md` uses HTML-comment markers:
 - Empty: `<!-- MEMORY_STATE: EMPTY -->`
-- Valid summary: begins with `<!-- MEMORY_STATE: WRAPPED -->`, ends with `<!-- MEMORY_WRAP_COMPLETE -->`
+- Valid snapshot: begins with `<!-- MEMORY_STATE: WRAPPED -->`, ends with `<!-- MEMORY_WRAP_COMPLETE -->`
 - Acknowledged truncated: `<!-- MEMORY_STATE: TRUNCATED_ACKNOWLEDGED -->` — treated identically to EMPTY
 
 **Truncation:** If file contains `MEMORY_STATE: WRAPPED` but is missing `MEMORY_WRAP_COMPLETE`, it is truncated.
