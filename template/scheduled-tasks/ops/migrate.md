@@ -56,7 +56,6 @@ Announce at most once per session (do not repeat on every response).
    Files UNTOUCHED:
      wiki/  (all pages, index, log, hot preserved)
      memory.md, raw/, drafts/
-     ingest.md (beyond advisory update)
      sqlite-query skill (if installed)
 
    Shall I proceed?
