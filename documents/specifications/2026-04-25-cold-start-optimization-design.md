@@ -20,6 +20,7 @@ The current `CLAUDE.md` is ~24,500 chars / ~7,700 tokens and is loaded in full o
 - Support both Claude Desktop Cowork and Claude Code CLI environments
 - Provide a safe, user-approved migration path for existing users
 - Handle Python and SQLite availability checks with OS-aware instructions
+- Remove `token-reference.md` and replace with dynamic file-size estimation at approval time
 
 ---
 
@@ -28,7 +29,7 @@ The current `CLAUDE.md` is ~24,500 chars / ~7,700 tokens and is loaded in full o
 - Changing any user-facing command syntax
 - Modifying the wiki page schema or ingest logic
 - Aggressive query routing changes
-- Reducing per-operation token cost (separate future effort)
+- Modifying existing ops file content beyond what is needed for the restructuring
 
 ---
 
@@ -85,13 +86,13 @@ template/
       session-memory.md                         ← NEW
       blueprint-sync.md                         ← NEW
       reference.md                              ← NEW
-      token-reference.md                        ← updated (new file rows, CLAUDE.md recalibrated)
   scripts/
     check_deps.py                               ← NEW (replaces planned check_python.py)
     wrap.py                                     ← NEW
     ready.py                                    ← NEW
     log_tail.py                                 ← NEW
     file_check.py                               ← NEW
+    estimate_tokens.py                          ← NEW
 
 blueprint/
   skills/
@@ -113,13 +114,21 @@ blueprint/
 
 | File | Change |
 |---|---|
-| `template/CLAUDE.md` | Rewritten — 3 large sections removed, bash commands replaced |
-| `ops/token-reference.md` | New rows for 8 new files; CLAUDE.md row recalibrated downward |
+| `template/CLAUDE.md` | Rewritten — 3 large sections removed, bash commands replaced, token-reference.md row removed from ops routing table |
 | `setup-guide.md` | New Step 2.5 (Python check); new Step 4.5 (environment offer); scripts/ copy step |
-| `user-guide.md` | Scripts section; claude-code-enhanced skill mention |
+| `user-guide.md` | Scripts section; claude-code-enhanced skill mention; token-reference.md references removed |
+| `ops/audit.md` | Remove per-file headroom check, envelope check, and recalibration rule sections |
+| `ops/conventions.md` | Append Filing Answers sub-section |
 | `ROADMAP.md` | Mark `claude-code-enhanced` as shipped |
 | `CHANGELOG.md` | New section — v2.2.0 |
 | `.gitignore` | Add `backups/` |
+
+### Deleted files
+
+| File | Reason |
+|---|---|
+| `template/scheduled-tasks/ops/token-reference.md` | Replaced by dynamic estimation via `estimate_tokens.py` |
+| `scheduled-tasks/ops/token-reference.md` | Deleted during `!! migrate` (working folder copy) |
 
 ---
 
@@ -138,6 +147,7 @@ Python is the exclusive scripting language. Bash commands currently in `CLAUDE.m
 | `ready.py` | 8 paragraphs of prose in CLAUDE.md | `memory.md` read / truncation detection / wipe |
 | `log_tail.py` | `grep -E "^## \[" log.md \| tail -5` | Cross-platform last-5-entries log read |
 | `file_check.py` | `[ -f path ] && echo exists` | Cross-platform file existence check |
+| `estimate_tokens.py` | Reading `token-reference.md` before every write | Dynamic token estimation from live file sizes |
 
 ### OS-aware patterns used throughout
 
@@ -153,6 +163,35 @@ MEMORY  = WORKDIR / "memory.md" # pathlib handles separators automatically
 with open(MEMORY, "w", encoding="utf-8", newline="\n") as f:
     ...
 ```
+
+### Dynamic Token Estimation (`estimate_tokens.py`)
+
+Replaces `token-reference.md` entirely. Called by the agent before any approval request to compute live token estimates from actual file sizes.
+
+```python
+# Usage: python scripts/estimate_tokens.py path/to/file1 path/to/file2 ...
+# Output: one line per file — "~N tokens  path/to/file"
+#         final line        — "Total: ~N tokens"
+
+import sys
+from pathlib import Path
+
+def estimate(path: Path) -> int:
+    return path.stat().st_size // 4
+
+paths = [Path(p) for p in sys.argv[1:]]
+total = 0
+for p in paths:
+    t = estimate(p)
+    total += t
+    print(f"~{t} tokens  {p}")
+print(f"Total: ~{total} tokens")
+```
+
+**Why this is better than `token-reference.md`:**
+- Always accurate — reads live file sizes, no drift between documented and actual
+- Zero maintenance — no recalibration rule, no headroom tables, no envelope math
+- Simpler audit — the per-file headroom check and envelope check sections are removed from `ops/audit.md`
 
 ### Python command resolution
 
@@ -216,7 +255,7 @@ Target: ~4,000 chars / ~1,000 tokens. Representative structure:
    If wiki/ absent: announce "Blueprint-authoring mode — only !! audit expected"
 
 ## Query Routing          [condensed waterfall — inline, no file read]
-## Ops Routing            [11-row table including 2 new rows]
+## Ops Routing            [10-row table — token-reference.md row removed, 2 new rows added]
 ## Core Rules             [Approval + Suggestion — condensed to 4 lines each]
 ## Response Footer        [8-line footer spec — unchanged]
 ## Formats                [index.md, hot.md, log.md — hot.md gains Python: field]
@@ -256,9 +295,10 @@ For existing users upgrading from v2.1.x.
    b. Write new `CLAUDE.md`
    c. Write `ops/session-memory.md`, `ops/blueprint-sync.md`, `ops/reference.md`
    d. Create `scripts/` directory; write 5 scripts
-   e. Update `token-reference.md`
-   f. Patch `hot.md` — add `Python:` field, update `Schema: v2.2`
-   g. Append to `log.md`: `## [YYYY-MM-DD] migrate | v2.1 → v2.2 — lean cold-start restructure`
+   e. Delete `scheduled-tasks/ops/token-reference.md`
+   f. Write `scripts/estimate_tokens.py`
+   g. Patch `hot.md` — add `Python:` field, update `Schema: v2.2`
+   h. Append to `log.md`: `## [YYYY-MM-DD] migrate | v2.1 → v2.2 — lean cold-start restructure`
 4. Confirm: *"Migration complete. Cold-start: ~7,780 → ~1,080 tokens. Backup at `backups/CLAUDE.md-v2.1-YYYY-MM-DD.bak` — delete when satisfied."*
 5. Offer: *"Using Claude Code CLI? Run `!! install claude-code-enhanced` for native slash commands."*
 
@@ -283,7 +323,7 @@ This is a **minor version bump: v2.1 → v2.2**.
 
 - User-facing commands unchanged
 - Startup token profile changes significantly
-- New files added, no files deleted
+- New files added; `token-reference.md` deleted
 - `hot.md` format gains one field (`Python:`)
 - `CHANGELOG.md` gets a new `v2.2.0` section
 
@@ -298,8 +338,9 @@ This is a **minor version bump: v2.1 → v2.2**.
 | Cold-start total | ~7,780 | ~1,080 | −86% |
 | Session memory op (additional) | 0 | ~750 | +750 (on !! wrap/ready only) |
 | Blueprint edit op (additional) | 0 | ~625 | +625 (on blueprint edits only) |
+| Per-write approval cost (token-reference.md read) | ~2,120 | 0 | −2,120 per write op |
 
-Net: users who never edit blueprint files or use `!! wrap`/`!! ready` see the full 86% saving. Heavy users pay back ~750 tokens per session on memory ops — still a large net gain.
+Net: users who never edit blueprint files or use `!! wrap`/`!! ready` see the full 86% cold-start saving plus ~2,120 tokens saved on every write approval. Heavy users pay back ~750 tokens per session on memory ops — still a significant net gain.
 
 ---
 
@@ -307,4 +348,4 @@ Net: users who never edit blueprint files or use `!! wrap`/`!! ready` see the fu
 
 - Implementation should be done with **Claude Opus 4.7** — the Blueprint Sync cascade (12-row matrix, 34 cross-reference checks) requires strong multi-file consistency reasoning
 - Run `!! audit all` after implementation to verify no cross-reference drift
-- Token-reference.md recalibration is required as part of implementation (new file rows + CLAUDE.md row updated)
+- `ops/audit.md` must be simplified as part of implementation — remove the per-file headroom check (Section 1.4) and envelope check (Section 1.5) sections; these are no longer needed without `token-reference.md`
