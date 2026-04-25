@@ -16,6 +16,7 @@ Audit every tracked file under `blueprint/` — specifically the files listed be
 - `blueprint/setup-guide.md`
 - `blueprint/user-guide.md`
 - `blueprint/troubleshooting.md`
+- `blueprint/CHANGELOG.md`
 - `blueprint/LICENSE`
 - `blueprint/.gitignore`
 - `blueprint/template/CLAUDE.md`

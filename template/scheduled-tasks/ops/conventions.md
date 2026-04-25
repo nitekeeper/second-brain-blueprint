@@ -122,9 +122,9 @@ Never modify anything in `raw/` — these are the original source documents.
 
 `raw/` files use timestamped naming: `<slug>-<YYYY-MM-DD-HHMMSS>.md`. Every successful ingest writes a new timestamped snapshot — filenames are physically unique at second precision, so the directory grows monotonically. The user is free to prune `raw/` manually (e.g. keep only the most recent snapshot per slug) — the agent must not prune autonomously. A missing raw file only breaks the footnote trail for that specific snapshot; it does not affect the source page's `source_hash:` dedupe behavior.
 
-## Filing Answers (Query Step 2 / Step 3)
+## Filing Answers (Query Step 1 / Step 2)
 
-After any Step 2 (wiki) or Step 3 (web) answer, ask: "Worth filing this as an analysis page?"
+After any Step 1 (wiki synthesis) or Step 2 (web) answer, ask: "Worth filing this as an analysis page?"
 
 If yes:
 1. Read this file (`@scheduled-tasks/ops/conventions.md`) — already loaded, no extra read needed
