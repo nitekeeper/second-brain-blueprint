@@ -3,6 +3,22 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.3.0 — 2026-04-25
+
+### Query Routing Rule redesign
+
+**Wiki-first waterfall:** Agent no longer leads with training knowledge.
+Routing is now deterministic — no judgment call at the top of the chain:
+
+- Step 1 — Wiki (always first, no conditions)
+- Step 2 — Web Search (when wiki misses or question needs current info);
+  successful results auto-ingest to `wiki/inbox/` with no user prompt
+- Step 3 — Training Knowledge (fallback only); always reports
+  `Confidence: N/10` with staleness caveat when score ≤ 7
+
+**`!! migrate` updated:** Handles v2.1 → v2.3 and v2.2 → v2.3 in a single
+command. v2.2 users get a lightweight patch (one section swap + Schema bump).
+
 ## v2.2.0 — 2026-04-25
 
 ### Cold-start optimization, cross-platform scripts, session hygiene
