@@ -112,7 +112,7 @@ Exceptions (user invocation is implicit approval): `!! wrap`, `!! ready`, `!! au
 
 **CRITICAL: All 4 command-hint lines, the compliance line, and the 💡 tip line are required in every response. Missing any content line is an error.**
 
-Fill `📋 Waterfall:` accurately on every response — waterfall step taken (e.g. `Step 2 via sqlite-query`, `Step 1 (training knowledge)`) and ops file read (e.g. `ingest.md`, or `N/A` if none). This makes rule adherence externally visible.
+Fill `📋 Waterfall:` accurately on every response — waterfall step taken (e.g. `Step 1 via sqlite-query`, `Step 3 (training knowledge)`) and ops file read (e.g. `ingest.md`, or `N/A` if none). This makes rule adherence externally visible.
 
 Show brackets literally for command-hint lines.
 
