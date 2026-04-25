@@ -3,12 +3,15 @@
 Session memory write with marker-state handling.
 Usage:
   python scripts/wrap.py check         check memory.md state
-  python scripts/wrap.py write         write summary (reads body from stdin)
+  python scripts/wrap.py write         write snapshot (reads body from stdin)
 
 Exit codes for 'check':
   0 = EMPTY or file missing (safe to write)
-  1 = WRAPPED (existing summary present — warn user before overwrite)
-  2 = TRUNCATED_ACKNOWLEDGED (kept truncated summary — warn user before overwrite)
+  1 = WRAPPED (existing snapshot present — warn user before overwrite)
+  2 = TRUNCATED_ACKNOWLEDGED (kept truncated snapshot — warn user before overwrite)
+
+Exit codes for 'write':
+  0 = success
 """
 import sys
 from pathlib import Path
@@ -38,9 +41,11 @@ def check() -> None:
 
 def write() -> None:
     summary = sys.stdin.read().replace("\r\n", "\n").replace("\r", "\n")
+    chars = len(summary)
+    tokens = chars // 4
     content = f"{MARKER_WRAPPED}\n{summary}\n{MARKER_COMPLETE}\n"
     MEMORY.write_bytes(content.encode("utf-8"))
-    print("✓ Summary written to memory.md")
+    print(f"[OK] Snapshot written to memory.md ({chars} chars, ~{tokens} tokens)")
 
 
 if __name__ == "__main__":
