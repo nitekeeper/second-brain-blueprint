@@ -94,10 +94,12 @@ Omit the caveat when score is 8–10 and the topic is not time-sensitive.
 ---
 ```
 
-d. In `CLAUDE.md`, also update the startup detection line and schema footer:
-   - Line containing `below v2.2`: change to `below v2.3` and `Blueprint v2.3`
-   - Footer line `Schema version: 2.2`: change to `Schema version: 2.3`
-   *(Skip step d if the footer already reads `Schema version: 2.3` — check first.)*
+d. Read `CLAUDE.md` footer (last non-empty line). If it already reads
+   `Schema version: 2.3`, skip this step entirely.
+   Otherwise (footer reads `Schema version: 2.2`), make these two edits:
+   - Find the line containing `below v2.2` and replace the whole line with:
+     `   - If \`hot.md\`'s \`Schema:\` is below \`v2.3\`: announce "Blueprint v2.3 is available — run \`!! migrate\` to update." (once per session)`
+   - Find the footer line `*Schema version: 2.2 | Created:` and replace `2.2` with `2.3`.
 e. Patch `hot.md`: update `Schema: v2.2` → `Schema: v2.3`
 f. Append to `wiki/log.md`:
    `## [YYYY-MM-DD] migrate | v2.2 → v2.3 — wiki-first query routing redesign`
