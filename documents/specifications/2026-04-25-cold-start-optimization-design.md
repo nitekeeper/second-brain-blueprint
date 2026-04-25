@@ -21,6 +21,7 @@ The current `CLAUDE.md` is ~24,500 chars / ~7,700 tokens and is loaded in full o
 - Provide a safe, user-approved migration path for existing users
 - Handle Python and SQLite availability checks with OS-aware instructions
 - Remove `token-reference.md` and replace with dynamic file-size estimation at approval time
+- Add post-op soft block after `!! ingest`, `!! lint`, `!! audit` to guide users toward new sessions
 
 ---
 
@@ -86,6 +87,7 @@ template/
       session-memory.md                         ← NEW
       blueprint-sync.md                         ← NEW
       reference.md                              ← NEW
+      session-hygiene.md                        ← NEW
   scripts/
     check_deps.py                               ← NEW (replaces planned check_python.py)
     wrap.py                                     ← NEW
@@ -114,10 +116,12 @@ blueprint/
 
 | File | Change |
 |---|---|
-| `template/CLAUDE.md` | Rewritten — 3 large sections removed, bash commands replaced, token-reference.md row removed from ops routing table |
+| `template/CLAUDE.md` | Rewritten — 3 large sections removed, bash commands replaced, token-reference.md row removed from ops routing table, session hygiene rule added |
 | `setup-guide.md` | New Step 2.5 (Python check); new Step 4.5 (environment offer); scripts/ copy step |
-| `user-guide.md` | Scripts section; claude-code-enhanced skill mention; token-reference.md references removed |
-| `ops/audit.md` | Remove per-file headroom check, envelope check, and recalibration rule sections |
+| `user-guide.md` | Scripts section; claude-code-enhanced skill mention; token-reference.md references removed; session hygiene + soft block behavior documented |
+| `ops/audit.md` | Remove per-file headroom check, envelope check, and recalibration rule sections; add post-op advisory step |
+| `ops/ingest.md` | Add post-op advisory step |
+| `ops/lint.md` | Add post-op advisory step |
 | `ops/conventions.md` | Append Filing Answers sub-section |
 | `ROADMAP.md` | Mark `claude-code-enhanced` as shipped |
 | `CHANGELOG.md` | New section — v2.2.0 |
@@ -344,7 +348,85 @@ Net: users who never edit blueprint files or use `!! wrap`/`!! ready` see the fu
 
 ---
 
-## 17. Implementation Notes
+## 17. Session Hygiene — Post-Op Soft Block
+
+### Motivation
+
+Every turn in a session re-reads the full conversation history. After a heavy operation (`!! ingest`, `!! lint`, `!! audit`), the session context is already large. Any follow-up work in the same session compounds this cost unnecessarily — all prior tool results and responses are reprocessed on every subsequent turn.
+
+### Behavior
+
+After `!! ingest`, `!! lint`, or `!! audit` completes, the agent appends the following soft-block advisory as the final element of its response:
+
+```
+---
+⚠️  Session advisory: This session has completed a !! [op] operation and the context
+is now heavy. Starting a new session for follow-up work avoids reprocessing this
+session's history on every turn.
+
+Before you leave:
+  💾 Say !! wrap to save a session summary.
+  🔄 Say !! ready at the start of your next session to restore it.
+
+To continue in this session anyway, say !! proceed.
+---
+```
+
+If the user issues any `!! command` (other than `!! wrap`, `!! ready`, or `!! proceed`) after this advisory has been shown in the current session, the agent intercepts it and responds:
+
+```
+⚠️  A !! [op] operation completed earlier in this session. Continuing will reprocess
+~[N] tokens of prior context on every turn.
+
+  💾 !! wrap  — save context now, then start a new session
+  🔄 !! ready — restore it next session
+
+Say !! proceed to continue here anyway.
+```
+
+`!! wrap` and `!! ready` are always allowed — they are the recommended exit path. `!! proceed` clears the soft block for the remainder of the session.
+
+### Scope
+
+| Op | Soft block applied |
+|---|---|
+| `!! ingest [file]` | ✓ |
+| `!! ingest all` | ✓ |
+| `!! lint [page]` | ✓ |
+| `!! lint all` | ✓ |
+| `!! audit [page]` | ✓ |
+| `!! audit all` | ✓ |
+| `!! wrap` | ✗ (always allowed) |
+| `!! ready` | ✗ (always allowed) |
+| `!! update`, `!! install`, queries | ✗ (no block) |
+
+### Implementation
+
+Each of the three ops files (`ops/ingest.md`, `ops/lint.md`, `ops/audit.md`) gains a new final step:
+
+> **Post-op: session advisory**
+> Append the soft-block advisory block (from Section 17 of the design spec) to the final response. Set an in-memory flag `SESSION_HEAVY = true`. For the remainder of this session, intercept any `!! command` (except `!! wrap`, `!! ready`, `!! proceed`) and show the intercept message. `!! proceed` clears the flag.
+
+`CLAUDE.md` gains one line in Core Rules:
+
+> **Session hygiene:** If `SESSION_HEAVY` is set, intercept `!! commands` per `ops/session-hygiene.md`.
+
+A new file `ops/session-hygiene.md` holds the intercept message template and the flag-clearing logic — keeping the two message strings in one place so they stay in sync if wording changes.
+
+### Files affected (additions to Section 7)
+
+| File | Change |
+|---|---|
+| `template/scheduled-tasks/ops/ingest.md` | Add post-op advisory step |
+| `template/scheduled-tasks/ops/lint.md` | Add post-op advisory step |
+| `template/scheduled-tasks/ops/audit.md` | Add post-op advisory step |
+| `template/scheduled-tasks/ops/session-hygiene.md` | NEW — intercept message template + flag logic |
+| `template/CLAUDE.md` | Add one-line session hygiene rule to Core Rules |
+| `user-guide.md` | Document soft block behavior and `!! proceed` override |
+
+---
+
+## 18. Implementation Notes
 
 - Implementation should be done with **Claude Opus 4.7** — the Blueprint Sync cascade (12-row matrix, 34 cross-reference checks) requires strong multi-file consistency reasoning
 - Run `!! audit all` after implementation to verify no cross-reference drift
