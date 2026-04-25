@@ -31,19 +31,41 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
 
 ## Steps
 
+0. **Load prior audit context.** Check whether an `audits/` directory exists (`python scripts/file_check.py audits/`). If it does, list `.md` files inside and identify the most recent audit report (reports are named `AUD-YYYY-MM-DD-NNN.md` — sort lexicographically, take the last). Read its **Action Items** and **Detailed Findings** sections. Extract all findings whose **Status** is `OPEN` or `IN PROGRESS` — these are "carried-over findings" to verify in the new report's **Previous Findings Verification** section. Flag any finding that appeared in the two most recent reports as a **repeat finding** (`⚠️ Repeat finding — systemic drift`). If `audits/` is absent or empty, set carried-over findings to none.
+
 1. Resolve scope (all blueprint files, or a single matched file).
 2. Read the file(s) in scope.
-3. Apply the **Audit Prompt** below verbatim as your operating instructions while reviewing.
-4. Report findings to the user. No approval request is needed to run the audit — it is read-only.
-5. If the user asks for any fix to be applied:
-   - Blueprint files are not wiki pages — `ops/conventions.md` does not apply. Edit blueprint files directly; the Blueprint Sync Rule bullet below governs any downstream propagation.
-   - Show a normal approval request (summary + token estimate including the `token-reference.md` self-cost (see `@scheduled-tasks/ops/token-reference.md` header) + to-do list of affected files).
+3. Apply the **Audit Prompt** below verbatim as your operating instructions while reviewing. Hold the findings in working memory — do not print them yet.
+
+4. **Generate and save the audit report.**
+
+   a. Assign report ID: `AUD-YYYY-MM-DD-NNN` — NNN starts at `001`; if a report with today's date already exists in `audits/`, increment NNN.
+   b. Read `@blueprint/documents/audit-report-template.md` (blueprint-authoring mode: `@documents/audit-report-template.md`).
+   c. Fill in every section of the template:
+      - **Report Header**: report ID, today's date, scope, schema version (read from `CLAUDE.md` footer), previous report ID or `None`.
+      - **Executive Summary**: 2–3 sentences; overall risk level (CRITICAL if any open CRITICALs → `CRITICAL`; open WARNINGs only → `HIGH`; open STYLEs only → `MEDIUM`; zero open findings → `CLEAN`); finding counts by severity broken into new vs. carried-over.
+      - **Previous Findings Verification**: for each carried-over finding, state its verified status (`RESOLVED` / `OPEN` / `IN PROGRESS`) with a one-line evidence note (e.g. `"Fixed in commit abc1234"` or `"Still present at Step 3"`). Repeat findings get the `⚠️ Repeat finding` flag.
+      - **Scope**: list every file read in Step 2.
+      - **Detailed Findings**: one `###` section per finding, IDs assigned in discovery order. Fill all five fields — **Condition** (quoted evidence), **Criteria** (the rule violated), **Cause** (root cause), **Consequence** (specific failure mode), **Recommendation** (exact fix). If no findings: replace the section with "No findings. The blueprint is logically sound in the audited scope."
+      - **Action Items**: `- [ ]` checklist sorted by severity (CRITICAL first). One line per finding: `` `ID` **[SEV]** Title — Owner: ___ | Target: ___ ``
+      - **Appendix**: list of files audited with token estimates from `python scripts/estimate_tokens.py <files>`.
+   d. Create `audits/` directory if absent (`mkdir -p audits` via Bash, or Write tool — Write creates parent directories automatically).
+   e. Write the completed report to `audits/AUD-YYYY-MM-DD-NNN.md`. Writing the audit report is an implicit side-effect of `!! audit` — no separate approval is needed (even for a clean audit).
+
+5. **Report summary to the user.** Print: overall risk level, finding counts by severity (new + carried-over), and the report path. Example: `"Audit complete. Risk: HIGH — 0 CRITICALs, 3 WARNINGs, 1 STYLE. Carried over: 1 (now RESOLVED). Report saved to audits/AUD-2026-04-25-001.md."`
+
+6. **If the user asks for any fix to be applied:**
+   - Blueprint files are not wiki pages — `ops/conventions.md` does not apply. Edit blueprint files directly; the Blueprint Sync Rule governs downstream propagation.
+   - Show a normal approval request (summary + token estimate via `python scripts/estimate_tokens.py <affected-files>` + to-do list of affected files).
    - After approval, apply fixes.
-   - If any fix touches the schema, startup behavior, operations, or conventions, follow the Blueprint Sync Rule in `CLAUDE.md` — update every downstream doc the table lists before closing the op.
-   - **Blueprint-authoring mode:** if `wiki/` is absent at the working folder root, skip the `wiki/log.md` append below AND step 6's `hot.md` refresh — see `@template/CLAUDE.md` Blueprint-authoring Mode. Check once (single `[ -e wiki/log.md ]` or equivalent) and skip transparently without prompting. The audit is the op most likely to run in this mode (it's the only op that makes sense on a blueprint-only checkout), so this check is load-bearing.
-   - Append one entry to `wiki/log.md` (≤500 chars): `## [YYYY-MM-DD] audit | [fix summary]` — this label supersedes the `sync | …` entry from CLAUDE.md's Blueprint Sync Rule for audit-driven edits. Do not write both; the single `audit` entry preserves audit provenance and covers the sync side-effect implicitly.
-6. If a fix was applied in step 5, refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`. The log-append is a wiki-state mutation, so `hot.md`'s `Last op` must reflect it. If no fix was applied (read-only audit), skip — the audit leaves no trace. **Blueprint-authoring mode:** also skip — no `hot.md` to refresh when `wiki/` is absent.
-7. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if an applied fix changed a tracked file's size enough to exceed its documented Chars value.
+   - Re-open the saved audit report and update each resolved finding: set **Status** to `RESOLVED`, check off the corresponding Action Items entry (`- [x]`).
+   - If any fix touches the schema, startup behavior, operations, or conventions, follow the Blueprint Sync Rule in `CLAUDE.md`.
+   - **Blueprint-authoring mode:** if `wiki/` is absent, skip the `wiki/log.md` append below AND step 7's `hot.md` refresh. Check once (`python scripts/file_check.py wiki/log.md`) and skip transparently without prompting.
+   - Append one entry to `wiki/log.md` (≤500 chars): `## [YYYY-MM-DD] audit | [fix summary]`
+
+7. If a fix was applied in step 6, refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`. **Blueprint-authoring mode:** skip.
+
+8. **Post-op advisory.** Append the session advisory block from `@scheduled-tasks/ops/session-hygiene.md` (Post-op advisory block section) to this response. Set `SESSION_HEAVY = true`.
 
 ---
 
@@ -68,5 +90,5 @@ Use the prompt below **verbatim** as the operating instructions when reading the
 
 - Audits of instructional markdown are still meaningful: rules can contradict each other, state machines can have unreachable branches, approval paths can leak, documented token estimates can drift from reality. Treat these as the analog of "logic errors" for this codebase.
 - Keep the severity bar high. If the blueprint is sound, say so.
-- For `!! audit all`, expect ~30,000–47,000 tokens of reads for the tracked files (re-derive by summing the blueprint-doc and template-side rows in `token-reference.md`). Warn the user up front if the session is already close to context limits.
+- For `!! audit all`, expect ~30,000–47,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md` for a live estimate. Warn the user up front if the session is already close to context limits.
 - For `!! audit [Page Name]`, expect ~1,000–5,000 tokens depending on file size.

@@ -3,6 +3,36 @@
 > Version history for the blueprint schema. See `troubleshooting.md` for specific
 > symptom/cause/fix entries tied to these versions.
 
+## v2.2.0 — 2026-04-25
+
+### Cold-start optimization, cross-platform scripts, session hygiene
+
+**Cold-start reduction (~86%):** `CLAUDE.md` rewritten from ~7,700 to ~1,000 tokens. Three large sections extracted into deferred ops files loaded only when triggered:
+- `ops/session-memory.md` — `!! wrap`/`!! ready` full state machine (~750 tokens, loaded on command)
+- `ops/blueprint-sync.md` — Blueprint Sync 12-row cascade (~625 tokens, loaded on blueprint edit)
+- `ops/reference.md` — directory structure + tiered read table (~400 tokens, on demand)
+
+**Cross-platform Python scripts:** Six scripts added to `template/scripts/`. Bash commands replaced:
+- `log_tail.py` replaces `grep -E "^## \[" log.md | tail -5`
+- `file_check.py` replaces `[ -f path ] && echo exists`
+- `wrap.py` / `ready.py` replace `!! wrap`/`!! ready` state machine prose
+- `check_deps.py` — OS-aware Python 3.8+ and SQLite availability checks (Windows/macOS/Linux)
+- `estimate_tokens.py` — dynamic token estimation replacing `token-reference.md`
+
+**token-reference.md removed:** Replaced by `estimate_tokens.py` which reads live file sizes at approval time. No more recalibration rule, headroom tables, or envelope math. `ops/audit.md` simplified accordingly.
+
+**Session hygiene soft block:** After `!! ingest`, `!! lint`, or `!! audit` completes, agent shows advisory recommending a new session. Follow-up `!! commands` trigger a soft intercept with `!! wrap`/`!! ready` instructions. `!! proceed` clears the block.
+
+**New commands:** `!! migrate` upgrades existing v2.1.x working folders to v2.2 with full backup and rollback support.
+
+**Optional claude-code-enhanced skill:** Claude Code CLI users can `!! install claude-code-enhanced` for native `/wrap`, `/ready`, `/migrate` slash commands.
+
+**hot.md format:** New `Python:` field stores resolved Python command (`python` or `python3`) at setup time.
+
+**Schema:** v2.1 → v2.2. No user-facing command syntax changes.
+
+---
+
 ## v2.1.8 — 2026-04-20
 
 ### Token recalibration, envelope widening, and directional reference fix (audit #31)
