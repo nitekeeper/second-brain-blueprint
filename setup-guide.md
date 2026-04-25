@@ -45,6 +45,8 @@ mkdir -p wiki/pages/entities
 mkdir -p wiki/pages/sources
 mkdir -p wiki/pages/analyses
 mkdir -p scheduled-tasks/ops
+mkdir -p scripts
+mkdir -p backups
 ```
 
 All subsequent shell commands in this setup run with your working folder as cwd. Cowork's Bash tool preserves cwd between commands (env vars like `$WORKDIR` do **not** persist between Bash calls, but cwd does), so no re-cd is required. Verify with `pwd` if uncertain.
@@ -72,7 +74,26 @@ Show approval request, then copy all files from `blueprint/template/` to their c
 | `blueprint/template/scheduled-tasks/ops/audit.md` | `scheduled-tasks/ops/audit.md` |
 | `blueprint/template/scheduled-tasks/ops/update.md` | `scheduled-tasks/ops/update.md` |
 | `blueprint/template/scheduled-tasks/ops/conventions.md` | `scheduled-tasks/ops/conventions.md` |
-| `blueprint/template/scheduled-tasks/ops/token-reference.md` | `scheduled-tasks/ops/token-reference.md` |
+| `blueprint/template/scheduled-tasks/ops/session-memory.md` | `scheduled-tasks/ops/session-memory.md` |
+| `blueprint/template/scheduled-tasks/ops/blueprint-sync.md` | `scheduled-tasks/ops/blueprint-sync.md` |
+| `blueprint/template/scheduled-tasks/ops/reference.md` | `scheduled-tasks/ops/reference.md` |
+| `blueprint/template/scheduled-tasks/ops/session-hygiene.md` | `scheduled-tasks/ops/session-hygiene.md` |
+| `blueprint/template/scheduled-tasks/ops/migrate.md` | `scheduled-tasks/ops/migrate.md` |
+| `blueprint/template/scripts/check_deps.py` | `scripts/check_deps.py` |
+| `blueprint/template/scripts/wrap.py` | `scripts/wrap.py` |
+| `blueprint/template/scripts/ready.py` | `scripts/ready.py` |
+| `blueprint/template/scripts/log_tail.py` | `scripts/log_tail.py` |
+| `blueprint/template/scripts/file_check.py` | `scripts/file_check.py` |
+| `blueprint/template/scripts/estimate_tokens.py` | `scripts/estimate_tokens.py` |
+
+---
+
+## Step 2.5 — Check Python
+
+Run `python scripts/check_deps.py --python` (or `python3 scripts/check_deps.py --python` on macOS/Linux).
+
+- If it prints `✓ Python X.Y.Z`: record the working command (`python` or `python3`) — you will write it to `hot.md` in Step 4.
+- If it prints installation instructions: follow them, then retry before continuing.
 
 ---
 
@@ -173,7 +194,9 @@ Last op: init YYYY-MM-DD (wiki created, ready for first ingest)
 Gaps: none yet — add sources to discover gaps
 Hot: none yet
 Active skills: none
+Python: python
 ```
+(or `python3` depending on what Step 2.5 resolved)
 
 **`memory.md`** (at working folder root)
 ```markdown
@@ -195,6 +218,10 @@ Ask the user:
 
 - **If yes:** run the `!! install sqlite-query` flow from `blueprint/skills/sqlite-query/SKILL.md` — skip the backfill step (no pages exist yet). On completion, continue to Step 5.
 - **If no:** continue to Step 5. The basic grep layer is active by default.
+
+**Claude Code CLI users:** If you are using Claude Code CLI (not Claude Desktop Cowork), also ask:
+
+> "Would you like to install the Claude Code enhanced skill? It adds native slash commands `/wrap`, `/ready`, and `/migrate` as alternatives to the `!! command` syntax. Install with `!! install claude-code-enhanced`."
 
 ---
 
@@ -242,7 +269,10 @@ Check the following and report status to the user:
 - [ ] `wiki/index.md` exists with 0 pages
 - [ ] `wiki/log.md` exists with init entry
 - [ ] `wiki/hot.md` exists with today's date
-- [ ] All 6 ops files exist in `scheduled-tasks/ops/`
+- [ ] All 11 ops files exist in `scheduled-tasks/ops/`
+      (ingest, lint, audit, update, conventions, session-memory, blueprint-sync, reference, session-hygiene, migrate, refresh-hot)
+- [ ] All 6 scripts exist in `scripts/`
+      (check_deps.py, wrap.py, ready.py, log_tail.py, file_check.py, estimate_tokens.py)
 - [ ] `scheduled-tasks/refresh-hot.md` exists
 - [ ] `raw/` folder exists
 - [ ] `drafts/` folder exists
