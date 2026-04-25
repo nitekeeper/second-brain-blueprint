@@ -37,13 +37,13 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
 4. Report findings to the user. No approval request is needed to run the audit — it is read-only.
 5. If the user asks for any fix to be applied:
    - Blueprint files are not wiki pages — `ops/conventions.md` does not apply. Edit blueprint files directly; the Blueprint Sync Rule bullet below governs any downstream propagation.
-   - Show a normal approval request (summary + token estimate including the `token-reference.md` self-cost (see `@scheduled-tasks/ops/token-reference.md` header) + to-do list of affected files).
+   - Show a normal approval request (summary + token estimate via `python scripts/estimate_tokens.py <affected-files>` + to-do list of affected files).
    - After approval, apply fixes.
    - If any fix touches the schema, startup behavior, operations, or conventions, follow the Blueprint Sync Rule in `CLAUDE.md` — update every downstream doc the table lists before closing the op.
    - **Blueprint-authoring mode:** if `wiki/` is absent at the working folder root, skip the `wiki/log.md` append below AND step 6's `hot.md` refresh — see `@template/CLAUDE.md` Blueprint-authoring Mode. Check once (single `[ -e wiki/log.md ]` or equivalent) and skip transparently without prompting. The audit is the op most likely to run in this mode (it's the only op that makes sense on a blueprint-only checkout), so this check is load-bearing.
    - Append one entry to `wiki/log.md` (≤500 chars): `## [YYYY-MM-DD] audit | [fix summary]` — this label supersedes the `sync | …` entry from CLAUDE.md's Blueprint Sync Rule for audit-driven edits. Do not write both; the single `audit` entry preserves audit provenance and covers the sync side-effect implicitly.
 6. If a fix was applied in step 5, refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`. The log-append is a wiki-state mutation, so `hot.md`'s `Last op` must reflect it. If no fix was applied (read-only audit), skip — the audit leaves no trace. **Blueprint-authoring mode:** also skip — no `hot.md` to refresh when `wiki/` is absent.
-7. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if an applied fix changed a tracked file's size enough to exceed its documented Chars value.
+7. **Post-op advisory.** Append the session advisory block from `@scheduled-tasks/ops/session-hygiene.md` (Post-op advisory block section) to this response. Set `SESSION_HEAVY = true`.
 
 ---
 
@@ -68,5 +68,5 @@ Use the prompt below **verbatim** as the operating instructions when reading the
 
 - Audits of instructional markdown are still meaningful: rules can contradict each other, state machines can have unreachable branches, approval paths can leak, documented token estimates can drift from reality. Treat these as the analog of "logic errors" for this codebase.
 - Keep the severity bar high. If the blueprint is sound, say so.
-- For `!! audit all`, expect ~30,000–47,000 tokens of reads for the tracked files (re-derive by summing the blueprint-doc and template-side rows in `token-reference.md`). Warn the user up front if the session is already close to context limits.
+- For `!! audit all`, expect ~30,000–47,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md` for a live estimate. Warn the user up front if the session is already close to context limits.
 - For `!! audit [Page Name]`, expect ~1,000–5,000 tokens depending on file size.
