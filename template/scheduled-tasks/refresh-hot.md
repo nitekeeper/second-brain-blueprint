@@ -24,7 +24,7 @@ Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation th
    grep -E '^Gaps:' wiki/log.md | tail -1 | sed -E 's/^Gaps:[[:space:]]*//'
    ```
    If no lint entry exists yet (no `Gaps:` line anywhere in `log.md`), use `none yet — add sources to discover gaps` as the Gaps value. If the most recent lint wrote `Gaps: none`, pass `none` through verbatim — it correctly reflects "lint ran and found no open gaps", which is different from "never linted".
-3. **Derive `Active skills`:** Check whether `scheduled-tasks/query-layer.md` exists (`[ -f scheduled-tasks/query-layer.md ]`). If it does, the `sqlite-query` skill is installed — emit `sqlite-query`. If absent, emit `none`. (As additional skills are added, this step expands to check their respective hook files and append their names to the list.)
+3. **Derive `Active skills`:** Check whether `scheduled-tasks/query-layer.md` exists (`python scripts/file_check.py scheduled-tasks/query-layer.md`). If it exists, the `sqlite-query` skill is installed — emit `sqlite-query`. If absent, emit `none`. (As additional skills are added, this step expands to check their respective hook files and append their names to the list.)
 
 ## Output Format
 
@@ -39,6 +39,7 @@ Last op: [operation] YYYY-MM-DD ([one-line result])
 Gaps: [comma-separated open data gaps]
 Hot: [comma-separated titles of 5 most recently updated pages]
 Active skills: [comma-separated installed skill names, or "none"]
+Python: [python | python3]
 ```
 
 ## Field Reference
@@ -53,6 +54,7 @@ Active skills: [comma-separated installed skill names, or "none"]
 | `Gaps` | Open gaps list from most recent lint entry in log.md |
 | `Hot` | 5 pages with highest `updated:` dates in index.md |
 | `Active skills` | `none` if no skill hook files present; otherwise comma-separated skill names derived from hook files in `scheduled-tasks/` (see Step 3) |
+| `Python` | Preserved from existing `hot.md` — do not overwrite this field; copy the current value forward unchanged |
 
 ## Rules
 

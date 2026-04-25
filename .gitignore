@@ -5,3 +5,8 @@
 
 # macOS
 .DS_Store
+
+# Migration backups
+backups/
+
+.claude/

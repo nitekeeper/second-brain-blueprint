@@ -6,12 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~7,700 tokens)
+1. `CLAUDE.md` — its operating instructions (~1,000 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~80 tokens)
 
-**Total cold-start cost: ~7,780 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~1,080 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session summary with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and read that summary before clearing it (~8,730 tokens total when the summary is full).
+If you saved a session snapshot with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and restore it before clearing it (~1,830 tokens total).
 
 ---
 
@@ -87,33 +87,43 @@ The agent always reports findings first and asks approval before fixing anything
 
 ---
 
-### Blueprint Audit — `!! audit`
+### Blueprint Audit *(developer / maintainer tool)*
 
-Runs a strict, Senior-Software-Architect-style audit of the blueprint files themselves (the schema, the ops files, the guides). Unlike `!! lint` (which targets your wiki pages), audit targets only `blueprint/` — the distribution template and its docs.
+> **Regular wiki users do not need this command.** `!! audit` is a blueprint-maintainer tool — it audits the blueprint files themselves (schema, ops files, guides), not your wiki pages. It is not shown in the response footer. Use `!! lint` for wiki health checks.
 
-- `!! audit all` — audit every file under `blueprint/` (~30,000–47,000 tokens)
-- `!! audit [page-name]` — audit one matched file (~1,000–5,000 tokens)
+If you are maintaining or distributing the blueprint and need to check its internal consistency:
 
-**What audit checks:**
-- Logic contradictions (rules that conflict, unreachable branches, missing edge cases in state machines)
-- Security / safety footguns (approval bypasses, silent overwrites, data-loss paths)
-- Performance / token waste (redundant reads, cold-start bloat, tiered-read violations)
-- Blueprint-sync drift (the template and its downstream docs falling out of step)
+- `!! audit all` — audits every blueprint file; generates a structured report saved to `audits/`
+- `!! audit [file-name]` — audits one matched file; same report format, narrower scope
 
-Audits are **read-only by default** — no approval needed to run one. If the audit surfaces fixes you want applied, the agent will go through the normal approval flow before writing anything. Each finding comes with quoted evidence and a severity label (CRITICAL / WARNING / STYLE); if nothing is wrong the audit says so instead of padding the list.
+**What it checks:** logic contradictions, approval-path leaks, cross-file drift, stale references, token-estimate accuracy.
+
+Each run produces a professional audit report (`audits/AUD-YYYY-MM-DD-NNN.md`) with: executive summary, previous-findings verification, per-finding detail (condition, criteria, cause, consequence, recommendation), and an action-item to-do checklist. Findings from prior reports are carried forward until resolved — the next run verifies them before adding new ones.
 
 ---
 
 ### Installing Skills — `!! install`
 
-Skills extend the core system without changing the blueprint itself. The only skill currently available is `sqlite-query`.
+Skills extend the core system without changing the blueprint itself. Available skills:
 
 - `!! install sqlite-query` — installs the SQLite query layer. Replaces the built-in grep lookup with a local `wiki.db` index. Recommended when your wiki grows beyond ~500 pages. If your wiki already has pages, the agent will offer to backfill `wiki.db` from them.
 - `!! uninstall sqlite-query` — removes the skill and reverts to the grep layer.
+- `!! install claude-code-enhanced` — (Claude Code CLI only) registers `/wrap`, `/ready`, and `/migrate` as native slash commands. Works alongside the `!! command` syntax — both remain available.
+- `!! uninstall claude-code-enhanced` — removes the slash commands.
 
 **Fallback:** if SQLite is unavailable or a query fails at runtime, the system falls back to grep automatically.
 
 **Query layer precedence:** Basic (grep) → SQLite (if installed) → future skills. Only one query layer is active at a time.
+
+---
+
+### Cross-Platform Scripts
+
+The agent uses a set of Python scripts under `scripts/` for file operations that previously required bash. These scripts work identically on Windows, macOS, and Linux.
+
+You do not need to call them directly — the agent uses them automatically. If a script fails, the agent will show the error and suggest a fix.
+
+Python 3.8+ is required. If Python is not installed, the agent will show OS-specific installation instructions the first time a script is needed.
 
 ---
 
@@ -129,36 +139,50 @@ You can also say it explicitly: `!! update [page-name]` or `"Update the Claude C
 
 **This is temporary, intentional memory — designed to bridge one session to the next. It is not a permanent log.**
 
-At the end of a productive session, say `!! wrap`. The agent will ask if there's anything specific to include, then write a detailed summary to `memory.md` — covering what was worked on, key decisions, files changed, and open next steps. Each `!! wrap` overwrites the previous summary, so only one summary exists at a time. **If a prior wrapped summary — or a truncated summary you preserved via `!! ready` → `keep` — is still in `memory.md`, the agent will warn you before overwriting.** Reply `no` to cancel, then consume or clear the existing content first.
+At the end of a productive session, say `!! wrap`. The agent will ask if there's anything specific to include, then write a compact context snapshot to `memory.md` capturing the task in flight, exact stopping point, next action, locked decisions, and active files. The format is machine-oriented and intentionally terse — the wiki stores permanent knowledge; the snapshot only bridges the current task thread to the next session.
 
-At the start of your next session, say `!! ready` as your first message. The agent will display the summary in full (verbatim) to bring you back up to speed, then immediately wipe `memory.md` and confirm it's clear. From that point, the session proceeds normally.
+> **`!! wrap` saves a file — it does not free the current session's context.** To actually get a clean slate, **close this conversation and open a new one**, then say `!! ready` as your first message. That new session starts at ~1,080 tokens regardless of how heavy the previous one was. Running `!! ready` in the same conversation (or after `/compact`) does not reset the context window.
 
-**Mid-session safeguard:** If you accidentally say `!! ready` in the middle of a session (not as the first message), the agent will refuse to wipe memory without explicit `!! ready confirm`. This prevents the older footgun where a casual "ready" wiped a saved summary.
+Each `!! wrap` overwrites the previous snapshot, so only one snapshot exists at a time. **If a prior wrapped snapshot — or a truncated snapshot you preserved via `!! ready` → `keep` — is still in `memory.md`, the agent will warn you before overwriting.** Reply `no` to cancel, then consume or clear the existing content first.
 
-**Truncation detection:** If `!! wrap` was interrupted before writing the completion marker, `!! ready` will display what's present, warn that the summary appears truncated, and ask you to choose one of three options — `clear` (wipe back to empty), `keep` (mark the partial summary as acknowledged so the warning stops firing), or `edit` (hand the file back untouched for manual repair). It will never silently wipe truncated content. In schema v1.14+, `clear` and `keep` each log their recovery choice to `log.md` and refresh `hot.md`, so the audit trail stays intact; `edit` leaves the file untouched and writes nothing.
+At the start of your next session, say `!! ready` as your first message. The agent will silently parse the snapshot to restore context, then announce: "Resuming: [task]. Next: [next action]. Ready to continue." It will then wipe `memory.md` and confirm it's clear. From that point, the session proceeds normally.
 
-If you start a session without saying `!! ready`, the summary stays in `memory.md` untouched until you explicitly ask for it. It won't be read automatically.
+**Mid-session safeguard:** If you accidentally say `!! ready` in the middle of a session (not as the first message), the agent will refuse to wipe memory without explicit `!! ready confirm`. This prevents the older footgun where a casual "ready" wiped a saved snapshot.
 
-> **Note:** This is not a history log — it's a single-use memory bridge. Once consumed with `!! ready`, the summary is gone. If you need a permanent record of a decision, ingest it or file it as an analysis page.
+**Truncation detection:** If `!! wrap` was interrupted before writing the completion marker, `!! ready` will display what's present, warn that the snapshot appears truncated, and ask you to choose one of three options — `clear` (wipe back to empty), `keep` (mark the partial snapshot as acknowledged so the warning stops firing), or `edit` (hand the file back untouched for manual repair). It will never silently wipe truncated content. In schema v1.14+, `clear` and `keep` each log their recovery choice to `log.md` and refresh `hot.md`, so the audit trail stays intact; `edit` leaves the file untouched and writes nothing.
+
+If you start a session without saying `!! ready`, the snapshot stays in `memory.md` untouched until you explicitly ask for it. It won't be read automatically.
+
+> **Note:** This is not a history log — it's a single-use memory bridge. Once consumed with `!! ready`, the snapshot is gone. If you need a permanent record of a decision, ingest it or file it as an analysis page.
+
+### Session Hygiene
+
+After `!! ingest`, `!! lint`, or `!! audit` completes, the agent will show a session advisory recommending you start a new session before doing more work. This is because each turn in a long session re-reads the entire conversation history, increasing cost non-linearly.
+
+**Recommended workflow:**
+- One ingest (or batch ingest) per session
+- One lint pass per session
+- `!! audit all` always in its own session
+
+To dismiss the advisory and continue anyway, say `!! proceed`. The agent will resume normally.
 
 ---
 
 ## Footer Commands
 
-Every agent response ends with the footer block: five command hints, a blank separator, the 💡 Web Clipper tip, and a compliance line (8 physical lines total):
+Every agent response ends with the footer block: four command hints, a blank separator, the 💡 Web Clipper tip, and a compliance line (7 physical lines total):
 
 ```
 📥 !! ingest: [URL | Page Name | All]
 🧹 !! lint: [Page Name | All]
-🔍 !! audit: [Page Name | All]
-💾 !! wrap: [save session summary to memory]
-🔄 !! ready: [load session summary at start of new session]
+💾 !! wrap: [save session snapshot to memory]
+🔄 !! ready: [load session snapshot at start of new session]
 
 💡 Using Obsidian Web Clipper to save articles as markdown before ingesting is 40–60% cheaper in token usage than fetching directly from a URL.
 📋 Waterfall: [step taken] | Ops: [file read or N/A]
 ```
 
-The first five lines are command hints — just type them naturally, e.g. `!! ingest my-article.md`, `!! lint all`, `!! audit all`, `!! wrap`, or `!! ready`.
+The first four lines are command hints — just type them naturally, e.g. `!! ingest my-article.md`, `!! lint all`, `!! wrap`, or `!! ready`.
 
 The `📋 Waterfall:` line is a compliance indicator filled in by the agent on every response — it shows which query waterfall step was taken and which ops file was read. If you see `Step 1` on a wiki question, or a missing ops file read before an operation, the agent skipped a mandatory step and you can call it out immediately.
 
@@ -169,13 +193,13 @@ The `📋 Waterfall:` line is a compliance indicator filled in by the agent on e
 The agent will never edit or create files without showing you a plan first. Every write action comes with:
 
 - A one-line summary of what it's about to do
-- A token cost estimate (including the re-read of `token-reference.md` — see the self-cost figure in its header)
+- A token cost estimate (from `scripts/estimate_tokens.py`)
 - A to-do list of every file affected
 - "Shall I proceed?"
 
 Read-only actions (answering questions, reading files) happen without approval.
 
-**Documented exceptions (no separate approval prompt):** `!! wrap`, `!! ready`, and `!! audit`. Your invocation is implicit approval — `!! wrap` and `!! ready` have built-in safeguards (`!! wrap` warns before overwriting an existing summary, `!! ready` refuses to wipe memory mid-session without explicit `!! ready confirm`); `!! audit` is read-only by default, and any fix you request afterward goes through the normal approval flow.
+**Documented exceptions (no separate approval prompt):** `!! wrap`, `!! ready`, and `!! audit`. Your invocation is implicit approval — `!! wrap` and `!! ready` have built-in safeguards (`!! wrap` warns before overwriting an existing snapshot, `!! ready` refuses to wipe memory mid-session without explicit `!! ready confirm`); `!! audit` is read-only by default, and any fix you request afterward goes through the normal approval flow.
 
 ---
 
@@ -189,23 +213,22 @@ Whenever the agent recommends a change to your system, it will always show both 
 
 > **Note:** All token numbers below — and everywhere else in this system — are **estimates** derived from `chars ÷ 4`. Actual usage depends on the model's tokenizer, the exact file contents at read time, and runtime overhead from tool calls and the system prompt, so the real numbers will differ (sometimes noticeably). Use these figures for rough planning, not precise accounting.
 
-The context window is 200,000 tokens per session. The agent tracks estimated costs in `scheduled-tasks/ops/token-reference.md` and recalibrates after every ingest.
+The context window is 200,000 tokens per session. Token estimates are computed dynamically via `scripts/estimate_tokens.py` (file size ÷ 4).
 
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~7,780 |
-| Cold start with `!! ready` (full memory) | ~8,730 |
+| Cold start | ~1,080 |
+| Cold start with `!! ready` (full memory) | ~1,830 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all | ~8,000–12,000 (scales with page count) |
 | Simple query (wiki) | ~2,000–4,000 |
 | Audit a single blueprint file | ~1,000–5,000 |
 | Audit all (full blueprint) | ~30,000–47,000 |
-| `!! wrap` (realistic) | ~3,000 |
-| `!! ready` (realistic) | ~3,300 |
+| `!! wrap` (realistic) | ~1,500–2,500 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~7,780 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~1,080 tokens to re-orient.
 
 ---
 
@@ -226,5 +249,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~7,780 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~1,080 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.
