@@ -48,11 +48,11 @@ You can also pass a URL directly: `!! ingest https://example.com/article`. The a
 
 Just ask naturally. No special command needed. The agent follows a waterfall:
 
-1. **High confidence** → answers directly from training knowledge
-2. **Wiki topic** → checks `index.md`, reads relevant pages, answers with citations
-3. **Not in wiki** → searches the web, summarizes findings, asks if you want to ingest the source
+1. **Wiki** → checks recent log, reads relevant pages via `index.md`, answers with `[[wiki link]]` citations
+2. **Web search** → when wiki has nothing useful, or question needs current information; successful results auto-save to `wiki/inbox/`
+3. **Training knowledge** *(fallback)* → when wiki and web both miss; answer includes `Confidence: N/10` staleness caveat
 
-After a Step 2 or Step 3 answer, the agent will ask: *"Worth filing this as an analysis page?"* Say yes to preserve the answer in your wiki permanently.
+After a Step 1 (wiki synthesis) or Step 2 (web) answer, the agent will ask: *"Worth filing this as an analysis page?"* Say yes to preserve the answer in your wiki permanently.
 
 ---
 
@@ -184,7 +184,7 @@ Every agent response ends with the footer block: four command hints, a blank sep
 
 The first four lines are command hints — just type them naturally, e.g. `!! ingest my-article.md`, `!! lint all`, `!! wrap`, or `!! ready`.
 
-The `📋 Waterfall:` line is a compliance indicator filled in by the agent on every response — it shows which query waterfall step was taken and which ops file was read. If you see `Step 1` on a wiki question, or a missing ops file read before an operation, the agent skipped a mandatory step and you can call it out immediately.
+The `📋 Waterfall:` line is a compliance indicator filled in by the agent on every response — it shows which query waterfall step was taken and which ops file was read. If you see `Step 3` (training knowledge) on a question that should be in your wiki, or a missing ops file read before an operation, the agent skipped a mandatory step and you can call it out immediately.
 
 ---
 

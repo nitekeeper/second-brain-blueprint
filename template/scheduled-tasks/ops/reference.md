@@ -34,6 +34,13 @@ Read this file when the user asks about the wiki folder layout, file locations, 
 │   ├── CHANGELOG.md
 │   ├── template/
 │   │   ├── CLAUDE.md
+│   │   ├── scripts/
+│   │   │   ├── check_deps.py
+│   │   │   ├── estimate_tokens.py
+│   │   │   ├── file_check.py
+│   │   │   ├── log_tail.py
+│   │   │   ├── ready.py
+│   │   │   └── wrap.py
 │   │   └── scheduled-tasks/
 │   │       ├── refresh-hot.md
 │   │       └── ops/

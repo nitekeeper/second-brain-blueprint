@@ -39,6 +39,7 @@ If wiki answers the question → stop here.
 Runs when: (a) wiki returned nothing useful, OR (b) question needs current or recent information.
 - Search and summarize
 - If the result **directly answered the question** → silently save to `wiki/inbox/` and read `@scheduled-tasks/ops/ingest.md` to ingest it
+- If the result **directly answered the question AND Step 1 returned partial wiki content** → ingest the web result; answer citing both the wiki pages and the web result
 - If the result is **loosely related but did not answer** → skip ingest; use partial findings to inform Step 3
 
 **Step 3 — Training Knowledge** *(fallback only)*
