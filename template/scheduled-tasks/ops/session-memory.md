@@ -20,8 +20,8 @@ Read this file when the user says `!! wrap` or `!! ready`.
 
 1. **Pre-write safeguard:** Run `python scripts/wrap.py check`
    - Exit 0 (EMPTY): proceed without prompt
-   - Exit 1 (WRAPPED): warn user — "A previous session summary is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — wait for explicit confirmation
-   - Exit 2 (TRUNCATED_ACKNOWLEDGED): warn user — "A preserved (truncated) summary is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — wait for explicit confirmation
+   - Exit 1 (WRAPPED): warn user — "A previous session snapshot is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — wait for explicit confirmation
+   - Exit 2 (TRUNCATED_ACKNOWLEDGED): warn user — "A preserved (truncated) snapshot is still in memory.md. Overwriting will destroy it. Proceed? (yes/no)" — wait for explicit confirmation
 
 2. Ask: "Anything specific you'd like included in the snapshot?"
 
@@ -55,7 +55,7 @@ Read this file when the user says `!! wrap` or `!! ready`.
 
    Do not add prose, markdown headers, or explanation outside the `[SNAPSHOT]` block.
 
-   Then run `python scripts/wrap.py write` with the snapshot block as stdin.
+   Then run `python scripts/wrap.py write` with the snapshot block passed as stdin (use a heredoc or pipe the block directly).
    - **Exit 0:** Snapshot written. Parse the token count from stdout (format: `[OK] Snapshot written to memory.md (X chars, ~Y tokens)`). Confirm: "Snapshot saved (~Y tokens). **Close this conversation and start a new one**, then say `!! ready` as your first message. Starting a new conversation is the only way to get a clean context — `!! wrap` saves state to a file but does not free the current session's context."
 
 4. Append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Session snapshot saved` (≤500 chars)
@@ -68,22 +68,22 @@ Read this file when the user says `!! wrap` or `!! ready`.
 
 ## `!! ready`
 
-1. **Mid-session guard:** If this is NOT the first user message of the session, reply: "`!! ready` is meant as a session-opening command. You seem to be mid-session — say `!! ready confirm` if you really want to read and wipe the summary now." Only proceed on `!! ready confirm`.
+1. **Mid-session guard:** If this is NOT the first user message of the session, reply: "`!! ready` is meant as a session-opening command. You seem to be mid-session — say `!! ready confirm` if you really want to read and wipe the snapshot now." Only proceed on `!! ready confirm`.
 
 2. Run `python scripts/ready.py read` and check exit code:
 
 3. **Exit 0 (EMPTY or TRUNCATED_ACKNOWLEDGED):** Announce readiness normally from `hot.md`. Do not wipe. If TRUNCATED_ACKNOWLEDGED: prior session already shown content and user chose to keep it — leave it alone.
 
 4. **Exit 2 (TRUNCATED):** Display what was printed to stdout. Warn it appears incomplete. Do NOT wipe. Offer three options and wait for explicit choice:
-   - `clear` — run `python scripts/ready.py clear`, then append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Truncated summary cleared` (≤500 chars), refresh `hot.md`
-   - `keep`  — run `python scripts/ready.py keep`,  then append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Truncated summary acknowledged` (≤500 chars), refresh `hot.md`
+   - `clear` — run `python scripts/ready.py clear`, then append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Truncated snapshot cleared` (≤500 chars), refresh `hot.md`
+   - `keep`  — run `python scripts/ready.py keep`,  then append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Truncated snapshot acknowledged` (≤500 chars), refresh `hot.md`
    - `edit`  — hand control back to user; touch nothing, write nothing
 
 5. **Exit 1 (WRAPPED + COMPLETE):** Parse the `[SNAPSHOT]` block silently to restore working context. Do NOT display the raw snapshot to the user.
+   - Announce readiness using the TASK and NEXT fields: "Resuming: [TASK value]. Next: [NEXT value]. Ready to continue."
    - Append to `wiki/log.md`: `## [YYYY-MM-DD] memory | Session snapshot consumed` (≤500 chars)
    - Run `python scripts/ready.py clear` to wipe memory.md
    - Refresh `hot.md` — follow `@scheduled-tasks/refresh-hot.md`
-   - Announce readiness using the TASK and NEXT fields: "Resuming: [TASK value]. Next: [NEXT value]. Ready to continue."
    - Surface any in-progress drafts from `drafts/` (same as normal startup step 3). If `drafts/` is absent, skip transparently.
 
 **Blueprint-authoring mode:** If `wiki/` absent at working folder root, skip all `wiki/log.md` appends and `hot.md` refreshes above — see CLAUDE.md Blueprint-authoring mode note.
