@@ -65,15 +65,15 @@ Tier 2 — Deferred (loaded on trigger)
 
 | Section | Destination | Trigger |
 |---|---|---|
-| Session Memory Commands (`!! wrap`/`!! ready` full state machine) | `ops/session-memory.md` | `!! wrap` or `!! ready` detected |
-| Blueprint Sync Rule (12-row cascade matrix) | `ops/blueprint-sync.md` | Blueprint file edit detected |
+| Session Memory Commands (`!! wrap`/`!! ready` full state machine) | `ops/session-memory.md` | `!! wrap` or `!! ready` detected in user message |
+| Blueprint Sync Rule (12-row cascade matrix) | `ops/blueprint-sync.md` | Agent is about to edit any file under `blueprint/` or `template/` |
 | Directory Structure diagram | `ops/reference.md` | On demand |
 | Tiered Read Structure table | `ops/reference.md` | On demand |
-| Filing Answers sub-section | `ops/conventions.md` (merged) | Already loaded before page writes |
+| Filing Answers sub-section | `ops/conventions.md` (appended as new section at end of file) | Already loaded before page writes |
 
 ---
 
-## 6. File Structure Changes
+## 7. File Structure Changes
 
 ### New files added to template
 
@@ -123,7 +123,7 @@ blueprint/
 
 ---
 
-## 7. Cross-Platform Script Strategy
+## 8. Cross-Platform Script Strategy
 
 Python is the exclusive scripting language. Bash commands currently in `CLAUDE.md` are replaced with Python equivalents.
 
@@ -160,7 +160,7 @@ The resolved command (`python` on Windows, `python3` on macOS/Linux) is stored i
 
 ---
 
-## 8. Dependency Checks
+## 9. Dependency Checks
 
 ### Python check (`check_deps.py --python`)
 
@@ -184,7 +184,7 @@ The resolved command (`python` on Windows, `python3` on macOS/Linux) is stored i
 
 ---
 
-## 9. Dual Environment Support
+## 10. Dual Environment Support
 
 | Feature | Cowork | Claude Code CLI |
 |---|---|---|
@@ -198,7 +198,7 @@ The `claude-code-enhanced` skill is optional. It registers slash command wrapper
 
 ---
 
-## 10. Lean CLAUDE.md Structure
+## 11. Lean CLAUDE.md Structure
 
 Target: ~4,000 chars / ~1,000 tokens. Representative structure:
 
@@ -226,7 +226,7 @@ Target: ~4,000 chars / ~1,000 tokens. Representative structure:
 
 ---
 
-## 11. hot.md Format Change
+## 12. hot.md Format Change
 
 New `Python:` field added. Stores resolved command at setup/migration time.
 
@@ -241,7 +241,7 @@ Python: [python | python3]
 
 ---
 
-## 12. Migration Path (`!! migrate`)
+## 13. Migration Path (`!! migrate`)
 
 For existing users upgrading from v2.1.x.
 
@@ -268,7 +268,7 @@ For existing users upgrading from v2.1.x.
 
 ---
 
-## 13. Backup Storage
+## 14. Backup Storage
 
 **Location:** `backups/` directory at working folder root.  
 **Naming:** `<filename>-v<version>-<YYYY-MM-DD>.bak` (e.g. `CLAUDE.md-v2.1-2026-04-25.bak`)  
@@ -277,7 +277,7 @@ For existing users upgrading from v2.1.x.
 
 ---
 
-## 14. Schema Version
+## 15. Schema Version
 
 This is a **minor version bump: v2.1 → v2.2**.
 
@@ -289,7 +289,7 @@ This is a **minor version bump: v2.1 → v2.2**.
 
 ---
 
-## 15. Token Impact Summary
+## 16. Token Impact Summary
 
 | Metric | Before (v2.1) | After (v2.2) | Delta |
 |---|---|---|---|
@@ -303,7 +303,7 @@ Net: users who never edit blueprint files or use `!! wrap`/`!! ready` see the fu
 
 ---
 
-## 16. Implementation Notes
+## 17. Implementation Notes
 
 - Implementation should be done with **Claude Opus 4.7** — the Blueprint Sync cascade (12-row matrix, 34 cross-reference checks) requires strong multi-file consistency reasoning
 - Run `!! audit all` after implementation to verify no cross-reference drift
