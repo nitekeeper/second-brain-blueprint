@@ -10,16 +10,18 @@ Real issues encountered during the original setup, with fixes.
 
 **Cause:** The Glob tool can silently return empty results for specific file paths that exist on disk. This is distinct from a legitimate "no match" — the tool returns no error, just an empty result, making the failure invisible. The issue was first observed during skill-presence detection (checking for `query-layer.md` and `ingest-hook.md` in `scheduled-tasks/`), causing the agent to conclude no skill was installed and skip the SQLite query waterfall.
 
-**Fix:** Use Bash for all file existence checks:
+**Fix:** Use `python scripts/file_check.py` for all file existence checks (cross-platform, works on Windows/macOS/Linux):
 ```bash
-# Test existence
-[ -f scheduled-tasks/query-layer.md ] && echo "exists" || echo "missing"
+python scripts/file_check.py scheduled-tasks/query-layer.md
+# prints "exists" or "missing"
+```
 
-# Or just list the directory
+If `scripts/` is not yet set up (pre-v2.2), fall back to listing the directory:
+```bash
 ls scheduled-tasks/
 ```
 
-**Prevention (v2.1.1+):** A standing rule was added to `CLAUDE.md`'s Ops File Reminder section: "Never use the Glob tool to test whether a specific file exists. Always use Bash `[ -f path ]` or `ls path`." The `refresh-hot.md` Step 3 and `query-layer.md`'s page-resolution step already used Bash/`find` — this rule generalizes that pattern to all existence checks.
+**Prevention (v2.2+):** A standing rule in `CLAUDE.md`'s Ops File Reminder section: "Never use the Glob tool to test whether a specific file exists. Use `python scripts/file_check.py <path>`." This replaces the earlier v2.1.1 guidance that recommended Bash `[ -f path ]`, which is not portable to Windows.
 
 ---
 
@@ -144,7 +146,7 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 ## Session ended before `!! wrap` completed
 
-**Symptom:** You tried to save a session summary but the session closed or timed out before the agent finished writing `memory.md`. The file is empty or incomplete next session.
+**Symptom:** You tried to save a session snapshot but the session closed or timed out before the agent finished writing `memory.md`. The file is empty or incomplete next session.
 
 **Cause:** `!! wrap` requires the agent to write a file — if the session ends mid-write, `memory.md` may be blank or contain only partial content.
 
@@ -156,35 +158,35 @@ Claude will request file deletion permission via the Cowork allow-delete prompt,
 
 ## `!! ready` was triggered mid-session and wiped memory unexpectedly
 
-**Symptom:** You said something like "I'm ready" or typed `!! ready` during a session (not at the start), and the agent read and wiped `memory.md`, destroying the saved summary before you intended.
+**Symptom:** You said something like "I'm ready" or typed `!! ready` during a session (not at the start), and the agent read and wiped `memory.md`, destroying the saved snapshot before you intended.
 
 **Cause:** Older schema versions (≤1.9) did not gate `!! ready` by session position. In schema v1.10+, the agent requires `!! ready confirm` if invoked mid-session.
 
-**Fix:** The summary is gone and cannot be recovered.
+**Fix:** The snapshot is gone and cannot be recovered.
 
 **Prevention:** Keep `CLAUDE.md` on schema v1.10 or newer — the mid-session guard will catch accidental mid-session invocations and require explicit `!! ready confirm`.
 
 ---
 
-## `!! wrap` overwrote an existing session summary
+## `!! wrap` overwrote an existing session snapshot
 
-**Symptom:** You invoked `!! wrap` and discovered afterward that a previous session summary (that you hadn't consumed with `!! ready`) was overwritten and lost.
+**Symptom:** You invoked `!! wrap` and discovered afterward that a previous session snapshot (that you hadn't consumed with `!! ready`) was overwritten and lost.
 
 **Cause:** Older schema versions (≤1.9) did not check for existing wrapped content before overwriting.
 
-**Fix:** The previous summary is gone and cannot be recovered.
+**Fix:** The previous snapshot is gone and cannot be recovered.
 
-**Prevention:** Schema v1.10+ requires explicit user confirmation when `!! wrap` detects a prior `MEMORY_STATE: WRAPPED` marker in `memory.md`. The current schema also catches `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED` — a summary you preserved via `!! ready` → `keep` — with the same overwrite warning, so `keep` is no longer a one-shot preservation that the next `!! wrap` can silently destroy. If you see the overwrite warning, say `no` if you need to preserve the existing content first — consume it with `!! ready` in the current session, then `!! wrap` fresh.
+**Prevention:** Schema v1.10+ requires explicit user confirmation when `!! wrap` detects a prior `MEMORY_STATE: WRAPPED` marker in `memory.md`. The current schema also catches `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED` — a snapshot you preserved via `!! ready` → `keep` — with the same overwrite warning, so `keep` is no longer a one-shot preservation that the next `!! wrap` can silently destroy. If you see the overwrite warning, say `no` if you need to preserve the existing content first — consume it with `!! ready` in the current session, then `!! wrap` fresh.
 
 ---
 
 ## `memory.md` appears truncated after `!! wrap`
 
-**Symptom:** `!! ready` next session shows only partial content and warns that the summary appears incomplete.
+**Symptom:** `!! ready` next session shows only partial content and warns that the snapshot appears incomplete.
 
 **Cause:** The session ended (or the agent was interrupted) before `!! wrap` finished writing. In schema v1.10+, the trailing `<!-- MEMORY_WRAP_COMPLETE -->` marker is missing, which is how `!! ready` detects truncation.
 
-**Fix:** `!! ready` will NOT auto-wipe truncated memory. In schema v1.11+, it offers three options: `clear` (wipe back to EMPTY), `keep` (rewrite the opening marker to `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED` so the warning does not re-fire on subsequent `!! ready` calls), or `edit` (hand the file back to you untouched for manual repair). In schema v1.10 there was no `keep` option — repeated `!! ready` calls would loop on the same warning until you manually cleared or edited the file. In schema v1.14+, `clear` and `keep` each append a `memory | Truncated summary cleared` or `memory | Truncated summary acknowledged` entry to `log.md` and refresh `hot.md`, so the recovery choice is visible in the operational trail; `edit` remains a no-op.
+**Fix:** `!! ready` will NOT auto-wipe truncated memory. In schema v1.11+, it offers three options: `clear` (wipe back to EMPTY), `keep` (rewrite the opening marker to `MEMORY_STATE: TRUNCATED_ACKNOWLEDGED` so the warning does not re-fire on subsequent `!! ready` calls), or `edit` (hand the file back to you untouched for manual repair). In schema v1.10 there was no `keep` option — repeated `!! ready` calls would loop on the same warning until you manually cleared or edited the file. In schema v1.14+, `clear` and `keep` each append a `memory | Truncated snapshot cleared` or `memory | Truncated snapshot acknowledged` entry to `log.md` and refresh `hot.md`, so the recovery choice is visible in the operational trail; `edit` remains a no-op.
 
 **Prevention:** Say `!! wrap` earlier in the session — not at the very last message — so the agent has time to finish writing and append the completion marker.
 
