@@ -38,7 +38,7 @@ If wiki answers the question → stop here.
 **Step 2 — Web Search**
 Runs when: (a) wiki returned nothing useful, OR (b) question needs current or recent information.
 - Search and summarize
-- If the result **directly answered the question** → silently save to `wiki/inbox/` and run INGEST op
+- If the result **directly answered the question** → silently save to `wiki/inbox/` and read `@scheduled-tasks/ops/ingest.md` to ingest it
 - If the result is **loosely related but did not answer** → skip ingest; use partial findings to inform Step 3
 
 **Step 3 — Training Knowledge** *(fallback only)*
