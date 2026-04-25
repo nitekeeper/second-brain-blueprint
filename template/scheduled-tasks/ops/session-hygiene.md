@@ -35,7 +35,7 @@ context is now heavy. Starting a new session for follow-up work avoids
 reprocessing this history on every turn.
 
 Before you leave:
-  💾 Say !! wrap to save a session summary.
+  💾 Say !! wrap to save a session snapshot.
   🔄 Say !! ready at the start of your next session to restore it.
 
 To continue in this session anyway, say !! proceed.

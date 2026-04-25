@@ -4,11 +4,11 @@ Session memory read, truncation detection, and state transitions.
 Usage:
   python scripts/ready.py read    read state + full content
   python scripts/ready.py clear   wipe memory.md to EMPTY
-  python scripts/ready.py keep    mark truncated summary as acknowledged
+  python scripts/ready.py keep    mark truncated snapshot as acknowledged
 
 Exit codes for 'read':
-  0 = EMPTY or TRUNCATED_ACKNOWLEDGED (no valid summary to consume)
-  1 = WRAPPED + COMPLETE (valid summary, safe to display and wipe)
+  0 = EMPTY or TRUNCATED_ACKNOWLEDGED (no valid snapshot to consume)
+  1 = WRAPPED + COMPLETE (valid snapshot, safe to consume and wipe)
   2 = WRAPPED but COMPLETE marker missing (truncated — do NOT auto-wipe)
 """
 import sys
@@ -24,7 +24,7 @@ MARKER_COMPLETE = "<!-- MEMORY_WRAP_COMPLETE -->"
 EMPTY_CONTENT = (
     "<!-- MEMORY_STATE: EMPTY -->\n"
     "# Session Memory\n\n"
-    "*(empty — use `!! wrap` at the end of a session to save a summary here)*\n"
+    "*(empty — use `!! wrap` at the end of a session to save a snapshot here)*\n"
 )
 
 
@@ -51,7 +51,7 @@ def read() -> None:
 
 def clear() -> None:
     MEMORY.write_bytes(EMPTY_CONTENT.encode("utf-8"))
-    print("✓ memory.md cleared to EMPTY state")
+    print("[OK] memory.md cleared to EMPTY state")
 
 
 def keep() -> None:
@@ -64,7 +64,7 @@ def keep() -> None:
         sys.exit(1)
     updated = content.replace(MARKER_WRAPPED, MARKER_TRUNC, 1)
     MEMORY.write_bytes(updated.encode("utf-8"))
-    print("✓ memory.md marked as TRUNCATED_ACKNOWLEDGED")
+    print("[OK] memory.md marked as TRUNCATED_ACKNOWLEDGED")
 
 
 if __name__ == "__main__":
