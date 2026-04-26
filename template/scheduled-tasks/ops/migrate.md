@@ -42,11 +42,12 @@ Migration: v2.2 → v2.3
 
 Files UPDATED:
   CLAUDE.md  (Query Routing Rule section replaced — behavior change, no size change)
+  scheduled-tasks/ops/conventions.md  (Filing Answers step labels updated to v2.3 numbering)
 
 Files UNTOUCHED:
   wiki/  (all pages, index, log, hot preserved)
   memory.md, raw/, drafts/
-  scheduled-tasks/ops/  (all ops files preserved)
+  scheduled-tasks/ops/  (all other ops files preserved)
   scripts/  (all scripts preserved)
   sqlite-query skill (if installed)
 
@@ -79,6 +80,7 @@ If wiki answers the question → stop here.
 Runs when: (a) wiki returned nothing useful, OR (b) question needs current or recent information.
 - Search and summarize
 - If the result **directly answered the question** → silently save to `wiki/inbox/` and read `@scheduled-tasks/ops/ingest.md` to ingest it
+- If the result **directly answered the question AND Step 1 returned partial wiki content** → ingest the web result; answer citing both the wiki pages and the web result
 - If the result is **loosely related but did not answer** → skip ingest; use partial findings to inform Step 3
 
 **Step 3 — Training Knowledge** *(fallback only)*
@@ -94,6 +96,7 @@ Omit the caveat when score is 8–10 and the topic is not time-sensitive.
 ---
 ```
 
+c2. Copy `blueprint/template/scheduled-tasks/ops/conventions.md` → `scheduled-tasks/ops/conventions.md`
 d. Read `CLAUDE.md` footer (last non-empty line). If it already reads
    `Schema version: 2.3`, skip this step entirely.
    Otherwise (footer reads `Schema version: 2.2`), make these two edits:

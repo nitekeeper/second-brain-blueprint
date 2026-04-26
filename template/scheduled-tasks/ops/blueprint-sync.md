@@ -19,6 +19,8 @@ Read this file whenever you are about to edit any file under `blueprint/` or `te
 | Schema version bump | `blueprint/CHANGELOG.md` (new section) in addition to any rows above |
 | New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical) + `ops/token-reference.md` (removed in v2.2; skip) + `setup-guide.md` + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md` |
 | New skill bundle added | `blueprint/skills/<skill>/` + `blueprint/user-guide.md` + `blueprint/setup-guide.md` + `blueprint/ROADMAP.md` + `ops/conventions.md` if skill introduces a new hook contract |
+| Query Routing Rule change | `blueprint/template/CLAUDE.md` (always) + `blueprint/template/scheduled-tasks/ops/migrate.md` (update the step c replacement block in the active migration path to match the new rule) |
+| Ops file change that is copied by the v2.1→v2.3 migration step g | `blueprint/template/scheduled-tasks/ops/migrate.md` (verify the updated file is listed in step g; add it if absent) |
 
 > **Non-cascade exception:** For startup or schema changes that are agent-internal with no user-facing behavioral impact, listed cascade files may require no content update. Document any deliberate non-cascade in `CHANGELOG.md` with explicit justification.
 
