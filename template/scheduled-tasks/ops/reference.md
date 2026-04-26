@@ -33,6 +33,8 @@ Read this file when the user asks about the wiki folder layout, file locations, 
 │   ├── troubleshooting.md
 │   ├── CHANGELOG.md
 │   ├── ROADMAP.md
+│   ├── docs/                   ← Audit report template and design specs. Developer use only.
+│   │   └── audit-report-template.md
 │   ├── template/
 │   │   ├── CLAUDE.md
 │   │   ├── scripts/

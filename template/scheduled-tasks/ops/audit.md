@@ -22,6 +22,7 @@ Audit every tracked file under `blueprint/` — specifically the files listed be
 - Every file directly under `blueprint/template/scheduled-tasks/` (currently `refresh-hot.md`; do not recurse into `ops/`)
 - Every file under `blueprint/template/scheduled-tasks/ops/`
 - Every file under `blueprint/skills/` (skill bundles — recurse into subdirectories)
+- `blueprint/docs/audit-report-template.md`
 
 > **Note:** `CHANGELOG.md` is excluded — it is an append-only log and is not auditable for logic errors.
 
@@ -45,7 +46,7 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
    b. Read `@blueprint/docs/audit-report-template.md` (blueprint-authoring mode: `@docs/audit-report-template.md`).
    c. Fill in every section of the template:
       - **Report Header**: report ID, today's date, scope, schema version (read from `CLAUDE.md` footer), previous report ID or `None`.
-      - **Executive Summary**: 2–3 sentences; overall risk level (CRITICAL if any open CRITICALs → `CRITICAL`; open WARNINGs only → `HIGH`; open STYLEs only → `MEDIUM`; zero open findings → `CLEAN`); finding counts by severity broken into new vs. carried-over.
+      - **Executive Summary**: 2–3 sentences; overall risk level (CRITICAL if any open CRITICALs → `CRITICAL`; open WARNINGs only → `HIGH`; open STYLEs only → `LOW`; zero open findings → `CLEAN`); finding counts by severity broken into new vs. carried-over.
       - **Previous Findings Verification**: for each carried-over finding, state its verified status (`RESOLVED` / `OPEN` / `IN PROGRESS`) with a one-line evidence note (e.g. `"Fixed in commit abc1234"` or `"Still present at Step 3"`). Repeat findings get the `⚠️ Repeat finding` flag.
       - **Scope**: list every file read in Step 2.
       - **Detailed Findings**: one `###` section per finding, IDs assigned in discovery order. Fill all five fields — **Condition** (quoted evidence), **Criteria** (the rule violated), **Cause** (root cause), **Consequence** (specific failure mode), **Recommendation** (exact fix). If no findings: replace the section with "No findings. The blueprint is logically sound in the audited scope."
@@ -92,5 +93,5 @@ Use the prompt below **verbatim** as the operating instructions when reading the
 
 - Audits of instructional markdown are still meaningful: rules can contradict each other, state machines can have unreachable branches, approval paths can leak, documented token estimates can drift from reality. Treat these as the analog of "logic errors" for this codebase.
 - Keep the severity bar high. If the blueprint is sound, say so.
-- For `!! audit all`, expect ~35,000–45,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md` for a live estimate. Warn the user up front if the session is already close to context limits.
+- For `!! audit all`, expect ~35,000–45,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md blueprint/docs/audit-report-template.md` for a live estimate. Warn the user up front if the session is already close to context limits.
 - For `!! audit [Page Name]`, expect ~1,000–5,000 tokens depending on file size.

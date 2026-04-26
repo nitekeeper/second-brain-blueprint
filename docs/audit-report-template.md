@@ -24,7 +24,7 @@
 
 **Overall Risk:** `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` / `CLEAN`
 
-> Risk is derived from the highest-severity open finding: any unresolved CRITICAL → CRITICAL; all resolved CRITICALs but open WARNINGs → HIGH; all resolved WARNINGs but open STYLEs → MEDIUM; only resolved or STYLE findings → LOW; zero findings → CLEAN.
+> Risk is derived from the highest-severity open finding in priority order: (1) any unresolved CRITICAL → CRITICAL; (2) open WARNINGs (no open CRITICALs) → HIGH; (3) only resolved findings and/or open STYLEs → LOW; (4) zero findings → CLEAN. STYLE findings do not elevate risk above LOW — they are documentation-only.
 
 | Severity | New This Cycle | Carried Over | Total Open | Resolved This Cycle |
 |---|---|---|---|---|

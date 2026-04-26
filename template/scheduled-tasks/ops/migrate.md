@@ -61,6 +61,7 @@ Shall I proceed?
 a. Create `backups/` directory if absent.
 b. Copy `CLAUDE.md` → `backups/CLAUDE.md-v2.2-<YYYY-MM-DD>.bak`
 b2. Copy `scheduled-tasks/ops/conventions.md` → `backups/conventions.md-v2.2-<YYYY-MM-DD>.bak`
+b3. Copy `scheduled-tasks/ops/blueprint-sync.md` → `backups/blueprint-sync.md-v2.2-<YYYY-MM-DD>.bak`
 c. In `CLAUDE.md`, replace the entire `## Query Routing Rule` section (from the
    `## Query Routing Rule` heading through and including its closing `---` separator,
    up to but not including `## Ops Routing`) with the following exact text:
@@ -115,7 +116,7 @@ f. Append to `wiki/log.md`:
 ### Confirm
 
 > "Migration complete. Query routing is now wiki-first.
-> Backups saved to `backups/CLAUDE.md-v2.2-<date>.bak` and `backups/conventions.md-v2.2-<date>.bak` — delete when satisfied."
+> Backups saved to `backups/CLAUDE.md-v2.2-<date>.bak`, `backups/conventions.md-v2.2-<date>.bak`, and `backups/blueprint-sync.md-v2.2-<date>.bak` — delete when satisfied."
 
 ---
 
@@ -219,5 +220,5 @@ j. Append to `wiki/log.md`:
 
 ## Rollback
 
-- **v2.2→v2.3:** Rename `backups/CLAUDE.md-v2.2-<date>.bak` → `CLAUDE.md`; rename `backups/conventions.md-v2.2-<date>.bak` → `scheduled-tasks/ops/conventions.md`; revert `Schema:` in `hot.md` to `v2.2`.
+- **v2.2→v2.3:** Rename `backups/CLAUDE.md-v2.2-<date>.bak` → `CLAUDE.md`; rename `backups/conventions.md-v2.2-<date>.bak` → `scheduled-tasks/ops/conventions.md`; rename `backups/blueprint-sync.md-v2.2-<date>.bak` → `scheduled-tasks/ops/blueprint-sync.md`; revert `Schema:` in `hot.md` to `v2.2`.
 - **v2.1→v2.3:** Rename `backups/CLAUDE.md-v2.1-<date>.bak` → `CLAUDE.md`; rename `backups/conventions.md-v2.1-<date>.bak` → `scheduled-tasks/ops/conventions.md`; revert `Schema:` in `hot.md` to `v2.1`. All new ops files and scripts/ are inert without the v2.1 `CLAUDE.md` referencing them.
