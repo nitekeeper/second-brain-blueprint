@@ -10,7 +10,7 @@ Read this file when `SESSION_HEAVY` is set and the user issues a `!! command`
 Reply with exactly this (substitute `[op]` and `[N]`):
 
 ```
-⚠️  A !![op] operation completed earlier in this session. Continuing will
+⚠️  A !! [op] operation completed earlier in this session. Continuing will
 reprocess ~[N] tokens of prior context on every turn.
 
   💾 !! wrap  — save context now, then start a new session
@@ -30,7 +30,7 @@ Append to the final response of every `!! ingest`, `!! lint`, and `!! audit` op:
 
 ```
 ---
-⚠️  Session advisory: This session has completed a !![op] operation and the
+⚠️  Session advisory: This session has completed a !! [op] operation and the
 context is now heavy. Starting a new session for follow-up work avoids
 reprocessing this history on every turn.
 
