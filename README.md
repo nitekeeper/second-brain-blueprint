@@ -70,7 +70,7 @@ Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 ## Key Features
 
 - **Lean startup** — agent cold-starts in ~1,080 tokens; reads only what it needs
-- **Approval before every wiki write** — `!! wrap` and `!! ready` are the only exceptions (each gated by built-in safeguards); every other write pauses with a plan + token estimate before touching a file
+- **Approval before every wiki write** — `!! wrap`, `!! ready`, and `!! audit` are the only exceptions (`!! audit` writes its report as an implicit side-effect; `!! wrap` and `!! ready` have additional built-in safeguards); every other write pauses with a plan + token estimate before touching a file
 - **Query waterfall** — wiki first, then web search, then training knowledge (fallback only, with confidence score)
 - **Self-auditing blueprint** — a strict architect-style audit op keeps the schema and ops internally consistent as they evolve (developer / blueprint-maintainer tool)
 - **Web Clipper optimized** — clipping articles before ingesting saves 40–60% in tokens vs URL fetch
