@@ -12,9 +12,9 @@
 | **Date** | YYYY-MM-DD |
 | **Trigger** | `!! audit all` / `!! audit [file]` |
 | **Scope** | All blueprint files / `[specific file or directory]` |
-| **Schema Version** | v2.2 |
+| **Schema Version** | v2.3 |
 | **Previous Report** | AUD-YYYY-MM-DD-NNN / None |
-| **Auditor** | LLM Wiki Agent — audit.md v2.2 |
+| **Auditor** | LLM Wiki Agent — audit.md v2.3 |
 
 ---
 
