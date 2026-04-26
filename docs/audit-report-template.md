@@ -22,7 +22,7 @@
 
 [2–3 sentences: overall health of the blueprint, most pressing concern if any, and recommended immediate action. If no findings: "The blueprint is logically sound across all audited files. No action required."]
 
-**Overall Risk:** `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` / `CLEAN`
+**Overall Risk:** `CRITICAL` / `HIGH` / `LOW` / `CLEAN`
 
 > Risk is derived from the highest-severity open finding in priority order: (1) any unresolved CRITICAL → CRITICAL; (2) open WARNINGs (no open CRITICALs) → HIGH; (3) only resolved findings and/or open STYLEs → LOW; (4) zero findings → CLEAN. STYLE findings do not elevate risk above LOW — they are documentation-only.
 
