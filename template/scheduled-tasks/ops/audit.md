@@ -16,13 +16,14 @@ Audit every tracked file under `blueprint/` — specifically the files listed be
 - `blueprint/setup-guide.md`
 - `blueprint/user-guide.md`
 - `blueprint/troubleshooting.md`
-- `blueprint/CHANGELOG.md`
 - `blueprint/LICENSE`
 - `blueprint/.gitignore`
 - `blueprint/template/CLAUDE.md`
 - Every file directly under `blueprint/template/scheduled-tasks/` (currently `refresh-hot.md`; do not recurse into `ops/`)
 - Every file under `blueprint/template/scheduled-tasks/ops/`
 - Every file under `blueprint/skills/` (skill bundles — recurse into subdirectories)
+
+> **Note:** `CHANGELOG.md` is excluded — it is an append-only log and is not auditable for logic errors.
 
 ## If `!! audit [Page Name]`
 
@@ -91,5 +92,5 @@ Use the prompt below **verbatim** as the operating instructions when reading the
 
 - Audits of instructional markdown are still meaningful: rules can contradict each other, state machines can have unreachable branches, approval paths can leak, documented token estimates can drift from reality. Treat these as the analog of "logic errors" for this codebase.
 - Keep the severity bar high. If the blueprint is sound, say so.
-- For `!! audit all`, expect ~60,000–70,000 tokens of reads for the tracked files (CHANGELOG.md alone accounts for ~30,000+ tokens and grows with every audit cycle). Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/CHANGELOG.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md` for a live estimate. Warn the user up front if the session is already close to context limits.
+- For `!! audit all`, expect ~35,000–45,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md` for a live estimate. Warn the user up front if the session is already close to context limits.
 - For `!! audit [Page Name]`, expect ~1,000–5,000 tokens depending on file size.
