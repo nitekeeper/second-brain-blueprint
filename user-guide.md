@@ -225,7 +225,7 @@ The context window is 200,000 tokens per session. Token estimates are computed d
 | Lint all | ~8,000–12,000 (scales with page count) |
 | Simple query (wiki) | ~2,000–4,000 |
 | Audit a single blueprint file | ~1,000–5,000 |
-| Audit all (full blueprint) | ~30,000–47,000 |
+| Audit all (full blueprint) | ~60,000–70,000 (CHANGELOG.md alone accounts for ~30,000+ tokens and grows with every audit cycle) |
 | `!! wrap` (realistic) | ~1,500–2,500 |
 
 If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~1,080 tokens to re-orient.
