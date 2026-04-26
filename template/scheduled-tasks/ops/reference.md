@@ -32,6 +32,7 @@ Read this file when the user asks about the wiki folder layout, file locations, 
 │   ├── user-guide.md
 │   ├── troubleshooting.md
 │   ├── CHANGELOG.md
+│   ├── ROADMAP.md
 │   ├── template/
 │   │   ├── CLAUDE.md
 │   │   ├── scripts/
