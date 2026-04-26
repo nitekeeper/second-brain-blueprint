@@ -64,7 +64,7 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
    ```bash
    grep -rl "topic-slug" wiki/pages --include="*.md"
    ```
-   If grep also returns nothing, proceed to Step 3 of the core query op (read `index.md`).
+   If grep also returns nothing, read `wiki/index.md` directly and continue from sub-step 4 of the query waterfall (read candidate pages; answer with [[wiki link]] citations).
 
 4. **If fallback triggered by exception:** log the warning inline ("Note: SQLite query failed, using grep fallback") and proceed with grep as above.
 
