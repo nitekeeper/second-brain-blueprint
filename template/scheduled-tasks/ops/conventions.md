@@ -105,7 +105,7 @@ The agent should always print the edit count and the resolved root path before c
 A file at `scheduled-tasks/query-layer.md` overrides the built-in grep query step. Skills that provide a query layer must follow this contract:
 
 - **Input:** a topic slug (lowercase-hyphenated) derived from the user's question, available in working memory as `slug`
-- **Output:** a list of candidate page file paths for the agent to read, or `None` / empty list to trigger fallback to grep. Paths must be fully resolved (e.g. `wiki/pages/concepts/slug.md`) — do NOT return glob patterns such as `wiki/pages/**/slug.md`. Python's `open()` and the Read tool do not expand globs; unmatched bash globs return the literal pattern string rather than empty. Use `find wiki/pages -name "<slug>.md"` (via `subprocess.run`) to resolve slugs to concrete paths.
+- **Output:** a list of candidate page file paths for the agent to read, or `None` / empty list to trigger fallback to grep. Paths must be fully resolved (e.g. `wiki/pages/concepts/slug.md`) — do NOT return glob patterns such as `wiki/pages/**/slug.md`. Python's `open()` and the Read tool do not expand globs; unmatched bash globs return the literal pattern string rather than empty. Use `pathlib.rglob(f"{slug}.md")` on the `wiki/pages` directory (cross-platform — works on Windows, macOS, and Linux). Do NOT use `subprocess.run(["find", ...])` — it invokes OS-specific utilities that fail silently on Windows.
 - **Fallback:** if the query layer fails or returns empty, the agent falls back to grep automatically — query layers must never hard-fail the op
 
 ## Ingest Hook Contract

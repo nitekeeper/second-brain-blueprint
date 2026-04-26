@@ -14,7 +14,7 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
 
 1. **Query `wiki.db`** for pages related to the topic slug — both directions:
    ```python
-   import sqlite3, pathlib, os, subprocess
+   import sqlite3, pathlib, os
 
    WORKDIR = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
    db = WORKDIR / "wiki" / "wiki.db"  # inside wiki/ folder; nolock+MEMORY avoids FUSE locking
@@ -36,20 +36,17 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
        conn.close()
 
        if rows:
-           # Resolve each slug to a concrete file path via `find`.
-           # Do NOT use glob patterns (e.g. wiki/pages/**/<slug>.md) — they are
-           # not expanded by Python's open() or the Read tool, and unmatched bash
-           # globs return the literal pattern string rather than empty.
+           # Resolve each slug to a concrete file path using pathlib.rglob() —
+           # cross-platform (works on Windows, macOS, and Linux).
+           # Do NOT pass glob patterns to Python's open() or the Read tool —
+           # they do not expand globs; unmatched bash globs return the literal
+           # pattern string rather than empty.
            candidate_paths = []
-           pages_dir = str(WORKDIR / "wiki" / "pages")
+           pages_dir = WORKDIR / "wiki" / "pages"
            for row in rows:
-               result = subprocess.run(
-                   ["find", pages_dir, "-name", f"{row[0]}.md"],
-                   capture_output=True, text=True
-               )
-               path = result.stdout.strip()
-               if path:
-                   candidate_paths.append(path)
+               matches = list(pages_dir.rglob(f"{row[0]}.md"))
+               if matches:
+                   candidate_paths.append(str(matches[0]))
        else:
            candidate_paths = []
 
