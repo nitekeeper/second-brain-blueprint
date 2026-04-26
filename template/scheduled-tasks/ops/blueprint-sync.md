@@ -17,8 +17,8 @@ Read this file whenever you are about to edit any file under `blueprint/` or `te
 | Any schema change | `blueprint/template/CLAUDE.md` always |
 | Footer content change | ALL of: `blueprint/template/CLAUDE.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md` (keep them identical) |
 | Schema version bump | `blueprint/CHANGELOG.md` (new section) in addition to any rows above |
-| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical) + `ops/token-reference.md` (removed in v2.2; skip) + `setup-guide.md` + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md` |
-| New skill bundle added | `blueprint/skills/<skill>/` + `blueprint/user-guide.md` + `blueprint/setup-guide.md` + `blueprint/ROADMAP.md` + `ops/conventions.md` if skill introduces a new hook contract |
+| New scheduled task | `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical) + `setup-guide.md` + `README.md` and `user-guide.md` if user-visible + `ops/reference.md` (blueprint/ scheduled-tasks subtree) + `CHANGELOG.md` |
+| New skill bundle added | `blueprint/skills/<skill>/` + `blueprint/user-guide.md` + `blueprint/setup-guide.md` + `blueprint/ROADMAP.md` + `ops/conventions.md` if skill introduces a new hook contract + `ops/reference.md` (blueprint/ skills subtree) |
 | Query Routing Rule change | `blueprint/template/CLAUDE.md` (always) + `blueprint/template/scheduled-tasks/ops/migrate.md` (update the step c replacement block in the active migration path to match the new rule) |
 | Ops file change that is copied by the v2.1→v2.3 migration step g | `blueprint/template/scheduled-tasks/ops/migrate.md` (verify the updated file is listed in step g; add it if absent) |
 

@@ -93,5 +93,9 @@ Use the prompt below **verbatim** as the operating instructions when reading the
 
 - Audits of instructional markdown are still meaningful: rules can contradict each other, state machines can have unreachable branches, approval paths can leak, documented token estimates can drift from reality. Treat these as the analog of "logic errors" for this codebase.
 - Keep the severity bar high. If the blueprint is sound, say so.
-- For `!! audit all`, expect ~35,000–45,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md blueprint/docs/audit-report-template.md` for a live estimate. Warn the user up front if the session is already close to context limits.
+- For `!! audit all`, expect ~35,000–45,000 tokens of reads for the tracked files.
+  - **Deployed-user mode:** `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md blueprint/docs/audit-report-template.md`
+  - **Blueprint-authoring mode** (`scripts/` absent): use `chars ÷ 4` as a manual estimate, or run `python template/scripts/estimate_tokens.py README.md setup-guide.md user-guide.md troubleshooting.md template/CLAUDE.md template/scheduled-tasks/refresh-hot.md template/scheduled-tasks/ops/*.md skills/sqlite-query/*.md skills/claude-code-enhanced/*.md docs/audit-report-template.md` from the repo root.
+
+  Warn the user up front if the session is already close to context limits.
 - For `!! audit [Page Name]`, expect ~1,000–5,000 tokens depending on file size.

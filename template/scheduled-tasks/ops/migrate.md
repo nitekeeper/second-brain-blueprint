@@ -122,13 +122,7 @@ f. Append to `wiki/log.md`:
 
 ## v2.1 → v2.3 Path
 
-Run all steps from the v2.1 → v2.2 migration (listed below), with two modifications:
-- **Step 3i:** write `Schema: v2.3` (not `v2.2`) when patching `hot.md`
-- **Step 3j:** append `## [YYYY-MM-DD] migrate | v2.1 → v2.3 — lean cold-start + wiki-first routing`
-
-Because step 3c copies `CLAUDE.md` from `blueprint/template/CLAUDE.md`, which
-already contains the v2.3 Query Routing Rule and v2.3 schema footer, the routing
-patch and version bump are implicit.
+Direct migration path from v2.1 to v2.3 in a single step — no intermediate v2.2 stop required. Step c copies `CLAUDE.md` from `blueprint/template/CLAUDE.md`, which already contains the v2.3 Query Routing Rule and v2.3 schema footer, so no separate routing patch is needed. The steps below are the complete v2.1→v2.3 procedure.
 
 ### Pre-flight
 
