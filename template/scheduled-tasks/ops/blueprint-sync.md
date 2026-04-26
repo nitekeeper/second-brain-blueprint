@@ -8,7 +8,7 @@ Read this file whenever you are about to edit any file under `blueprint/` or `te
 |---|---|
 | Schema or startup change | `blueprint/README.md`, `blueprint/setup-guide.md`, `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md` |
 | Operation step change | `blueprint/user-guide.md`, `blueprint/template/CLAUDE.md`, `blueprint/template/scheduled-tasks/ops/[op].md` |
-| Refresh-hot.md change | `blueprint/template/scheduled-tasks/refresh-hot.md`, `blueprint/template/CLAUDE.md` (hot.md Format block), `blueprint/setup-guide.md` (initial hot.md snippet) |
+| Refresh-hot.md change | `blueprint/template/scheduled-tasks/refresh-hot.md`, `blueprint/template/CLAUDE.md` (hot.md Format block), `blueprint/setup-guide.md` (initial hot.md snippet), `blueprint/template/scheduled-tasks/ops/migrate.md` (add copy step for both migration paths; update Files UPDATED lists) |
 | New known issue or fix | `blueprint/troubleshooting.md` |
 | Schema change that introduces a new footgun | `blueprint/troubleshooting.md` in addition to the Schema row above |
 | Setup step change | `blueprint/setup-guide.md` |

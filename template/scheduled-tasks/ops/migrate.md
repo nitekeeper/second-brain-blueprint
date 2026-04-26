@@ -44,6 +44,7 @@ Files UPDATED:
   CLAUDE.md  (Query Routing Rule section replaced — behavior change, no size change)
   scheduled-tasks/ops/conventions.md  (Filing Answers step labels updated to v2.3 numbering)
   scheduled-tasks/ops/blueprint-sync.md  (two new v2.3 cascade rows added)
+  scheduled-tasks/refresh-hot.md  (Step 3 updated to detect claude-code-enhanced skill)
   wiki/hot.md  (Schema: v2.2 → v2.3)
 
 Files UNTOUCHED:
@@ -103,6 +104,7 @@ Omit the caveat when score is 8–10 and the topic is not time-sensitive.
 
 c2. Copy `blueprint/template/scheduled-tasks/ops/conventions.md` → `scheduled-tasks/ops/conventions.md`
 c3. Copy `blueprint/template/scheduled-tasks/ops/blueprint-sync.md` → `scheduled-tasks/ops/blueprint-sync.md`
+c4. Copy `blueprint/template/scheduled-tasks/refresh-hot.md` → `scheduled-tasks/refresh-hot.md`
 d. Read `CLAUDE.md` footer (last non-empty line). If it already reads
    `Schema version: 2.3`, skip this step entirely.
    Otherwise (footer reads `Schema version: 2.2`), make these two edits:
@@ -161,6 +163,7 @@ Files UPDATED:
   scheduled-tasks/ops/ingest.md      (bash → Python, post-op advisory added)
   scheduled-tasks/ops/lint.md        (bash → Python, post-op advisory added)
   scheduled-tasks/ops/conventions.md (updated for v2.3)
+  scheduled-tasks/refresh-hot.md  (Step 3 updated to detect claude-code-enhanced skill)
   wiki/hot.md  (Schema bumped to v2.3; Python: field added)
 
 Files UNTOUCHED:
@@ -190,6 +193,7 @@ f. Copy each script from `blueprint/template/scripts/` to `scripts/`:
 g. Copy updated ops files from `blueprint/template/scheduled-tasks/ops/` to
    `scheduled-tasks/ops/`:
    `audit.md`, `ingest.md`, `lint.md`, `conventions.md`
+g2. Copy `blueprint/template/scheduled-tasks/refresh-hot.md` → `scheduled-tasks/refresh-hot.md`
 h. Delete `scheduled-tasks/ops/token-reference.md` if it exists.
 i. Patch `hot.md`:
    - Add `Python: [python | python3]` line (detect by running
