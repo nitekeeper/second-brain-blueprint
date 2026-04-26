@@ -34,7 +34,7 @@ Resolve the name to a single file under `blueprint/`, matching by slug (case-ins
 
 ## Steps
 
-0. **Load prior audit context.** Check whether an `audits/` directory exists (`python scripts/file_check.py audits/`). If it does, list `.md` files inside and identify the most recent audit report (reports are named `AUD-YYYY-MM-DD-NNN.md` — sort lexicographically, take the last). Read its **Action Items** and **Detailed Findings** sections. Extract all findings whose **Status** is `OPEN` or `IN PROGRESS` — these are "carried-over findings" to verify in the new report's **Previous Findings Verification** section. Flag any finding that appeared in the two most recent reports as a **repeat finding** (`⚠️ Repeat finding — systemic drift`). If `audits/` is absent or empty, set carried-over findings to none.
+0. **Load prior audit context.** Check whether an `audits/` directory exists (`python scripts/file_check.py audits/`; blueprint-authoring mode: `python template/scripts/file_check.py audits/` or `ls audits/`). If it does, list `.md` files inside and identify the most recent audit report (reports are named `AUD-YYYY-MM-DD-NNN.md` — sort lexicographically, take the last). Read its **Action Items** and **Detailed Findings** sections. Extract all findings whose **Status** is `OPEN` or `IN PROGRESS` — these are "carried-over findings" to verify in the new report's **Previous Findings Verification** section. Flag any finding that appeared in the two most recent reports as a **repeat finding** (`⚠️ Repeat finding — systemic drift`). If `audits/` is absent or empty, set carried-over findings to none.
 
 1. Resolve scope (all blueprint files, or a single matched file).
 2. Read the file(s) in scope.
