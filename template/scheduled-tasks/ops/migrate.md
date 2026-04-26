@@ -44,7 +44,7 @@ Files UPDATED:
   CLAUDE.md  (Query Routing Rule section replaced — behavior change, no size change)
   scheduled-tasks/ops/conventions.md  (Filing Answers step labels updated to v2.3 numbering)
   scheduled-tasks/ops/blueprint-sync.md  (two new v2.3 cascade rows added)
-  scheduled-tasks/refresh-hot.md  (Step 3 updated to detect claude-code-enhanced skill)
+  scheduled-tasks/refresh-hot.md  (Step 3 updated to detect claude-code-enhanced skill; backed up to backups/)
   wiki/hot.md  (Schema: v2.2 → v2.3)
 
 Files UNTOUCHED:
@@ -63,6 +63,7 @@ a. Create `backups/` directory if absent.
 b. Copy `CLAUDE.md` → `backups/CLAUDE.md-v2.2-<YYYY-MM-DD>.bak`
 b2. Copy `scheduled-tasks/ops/conventions.md` → `backups/conventions.md-v2.2-<YYYY-MM-DD>.bak`
 b3. Copy `scheduled-tasks/ops/blueprint-sync.md` → `backups/blueprint-sync.md-v2.2-<YYYY-MM-DD>.bak`
+b4. Copy `scheduled-tasks/refresh-hot.md` → `backups/refresh-hot.md-v2.2-<YYYY-MM-DD>.bak`
 c. In `CLAUDE.md`, replace the entire `## Query Routing Rule` section (from the
    `## Query Routing Rule` heading through and including its closing `---` separator,
    up to but not including `## Ops Routing`) with the following exact text:
@@ -119,7 +120,7 @@ f. Append to `wiki/log.md`:
 ### Confirm
 
 > "Migration complete. Query routing is now wiki-first.
-> Backups saved to `backups/CLAUDE.md-v2.2-<date>.bak`, `backups/conventions.md-v2.2-<date>.bak`, and `backups/blueprint-sync.md-v2.2-<date>.bak` — delete when satisfied."
+> Backups saved to `backups/CLAUDE.md-v2.2-<date>.bak`, `backups/conventions.md-v2.2-<date>.bak`, `backups/blueprint-sync.md-v2.2-<date>.bak`, and `backups/refresh-hot.md-v2.2-<date>.bak` — delete when satisfied."
 
 ---
 
@@ -163,7 +164,7 @@ Files UPDATED:
   scheduled-tasks/ops/ingest.md      (bash → Python, post-op advisory added)
   scheduled-tasks/ops/lint.md        (bash → Python, post-op advisory added)
   scheduled-tasks/ops/conventions.md (updated for v2.3)
-  scheduled-tasks/refresh-hot.md  (Step 3 updated to detect claude-code-enhanced skill)
+  scheduled-tasks/refresh-hot.md  (Step 3 updated to detect claude-code-enhanced skill; backed up to backups/)
   wiki/hot.md  (Schema bumped to v2.3; Python: field added)
 
 Files UNTOUCHED:
@@ -193,6 +194,7 @@ f. Copy each script from `blueprint/template/scripts/` to `scripts/`:
 g. Copy updated ops files from `blueprint/template/scheduled-tasks/ops/` to
    `scheduled-tasks/ops/`:
    `audit.md`, `ingest.md`, `lint.md`, `conventions.md`
+g1.5. Copy `scheduled-tasks/refresh-hot.md` → `backups/refresh-hot.md-v2.1-<YYYY-MM-DD>.bak`
 g2. Copy `blueprint/template/scheduled-tasks/refresh-hot.md` → `scheduled-tasks/refresh-hot.md`
 h. Delete `scheduled-tasks/ops/token-reference.md` if it exists.
 i. Patch `hot.md`:
@@ -205,8 +207,8 @@ j. Append to `wiki/log.md`:
 
 ### Confirm
 
-> "Migration complete. Cold-start: ~7,780 → ~1,080 tokens. Query routing is now wiki-first.
-> Backups saved to `backups/CLAUDE.md-v2.1-<date>.bak` and `backups/conventions.md-v2.1-<date>.bak` — delete when satisfied."
+> "Migration complete. Cold-start: ~7,780 → ~2,100 tokens. Query routing is now wiki-first.
+> Backups saved to `backups/CLAUDE.md-v2.1-<date>.bak`, `backups/conventions.md-v2.1-<date>.bak`, and `backups/refresh-hot.md-v2.1-<date>.bak` — delete when satisfied."
 
 ---
 
@@ -219,5 +221,5 @@ j. Append to `wiki/log.md`:
 
 ## Rollback
 
-- **v2.2→v2.3:** Rename `backups/CLAUDE.md-v2.2-<date>.bak` → `CLAUDE.md`; rename `backups/conventions.md-v2.2-<date>.bak` → `scheduled-tasks/ops/conventions.md`; rename `backups/blueprint-sync.md-v2.2-<date>.bak` → `scheduled-tasks/ops/blueprint-sync.md`; revert `Schema:` in `hot.md` to `v2.2`.
-- **v2.1→v2.3:** Rename `backups/CLAUDE.md-v2.1-<date>.bak` → `CLAUDE.md`; rename `backups/conventions.md-v2.1-<date>.bak` → `scheduled-tasks/ops/conventions.md`; revert `Schema:` in `hot.md` to `v2.1`. All new ops files and scripts/ are inert without the v2.1 `CLAUDE.md` referencing them.
+- **v2.2→v2.3:** Rename `backups/CLAUDE.md-v2.2-<date>.bak` → `CLAUDE.md`; rename `backups/conventions.md-v2.2-<date>.bak` → `scheduled-tasks/ops/conventions.md`; rename `backups/blueprint-sync.md-v2.2-<date>.bak` → `scheduled-tasks/ops/blueprint-sync.md`; rename `backups/refresh-hot.md-v2.2-<date>.bak` → `scheduled-tasks/refresh-hot.md`; revert `Schema:` in `hot.md` to `v2.2`.
+- **v2.1→v2.3:** Rename `backups/CLAUDE.md-v2.1-<date>.bak` → `CLAUDE.md`; rename `backups/conventions.md-v2.1-<date>.bak` → `scheduled-tasks/ops/conventions.md`; rename `backups/refresh-hot.md-v2.1-<date>.bak` → `scheduled-tasks/refresh-hot.md`; revert `Schema:` in `hot.md` to `v2.1`. All new ops files and scripts/ are inert without the v2.1 `CLAUDE.md` referencing them.
