@@ -24,7 +24,11 @@ Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation th
    grep -E '^Gaps:' wiki/log.md | tail -1 | sed -E 's/^Gaps:[[:space:]]*//'
    ```
    If no lint entry exists yet (no `Gaps:` line anywhere in `log.md`), use `none yet — add sources to discover gaps` as the Gaps value. If the most recent lint wrote `Gaps: none`, pass `none` through verbatim — it correctly reflects "lint ran and found no open gaps", which is different from "never linted".
-3. **Derive `Active skills`:** Check whether `scheduled-tasks/query-layer.md` exists (`python scripts/file_check.py scheduled-tasks/query-layer.md`). If it exists, the `sqlite-query` skill is installed — emit `sqlite-query`. If absent, emit `none`. (As additional skills are added, this step expands to check their respective hook files and append their names to the list.)
+3. **Derive `Active skills`:** Check each skill's hook or installed file:
+   - `python scripts/file_check.py scheduled-tasks/query-layer.md` — if present, add `sqlite-query` to the list
+   - `python scripts/file_check.py scheduled-tasks/claude-code-enhanced.md` — if present, add `claude-code-enhanced` to the list
+
+   If neither is present, emit `none`. If one or more are present, emit them comma-separated (e.g. `sqlite-query, claude-code-enhanced`). When a new skill is added to the blueprint, add its detection check here at the same time.
 
 ## Output Format
 
