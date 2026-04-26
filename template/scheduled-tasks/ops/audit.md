@@ -86,6 +86,7 @@ Use the prompt below **verbatim** as the operating instructions when reading the
 > 2. **Evidence Required:** For every bug you claim to find, you must quote the specific line of code and explain the exact logical failure.
 > 3. **Distinguish Severity:** If you find an issue, label it as **CRITICAL** (breaks logic), **WARNING** (potential edge case), or **STYLE** (readability only).
 > 4. **Chain of Verification:** Before listing any bugs, briefly restate the code's intended logic to ensure you understand the context correctly.
+> 5. **Consequence Test:** Before filing any finding, answer: "What specifically breaks or degrades if this is left unfixed?" If the answer is "nothing" or "a cosmetic inconsistency with no operational impact," drop it — do not file. Only file findings where the consequence is a real failure mode: wrong behavior, a broken op, a misleading instruction, an approval leak, or drift that compounds.
 >
 > **Goal:** Provide a high-precision audit. If you are unsure whether something is a bug, list it as a "Question for Clarification" rather than a definitive error.
 
