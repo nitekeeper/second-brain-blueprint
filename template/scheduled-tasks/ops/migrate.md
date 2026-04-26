@@ -43,9 +43,10 @@ Migration: v2.2 → v2.3
 Files UPDATED:
   CLAUDE.md  (Query Routing Rule section replaced — behavior change, no size change)
   scheduled-tasks/ops/conventions.md  (Filing Answers step labels updated to v2.3 numbering)
+  wiki/hot.md  (Schema: v2.2 → v2.3)
 
 Files UNTOUCHED:
-  wiki/  (all pages, index, log, hot preserved)
+  wiki/  (all pages, index, log preserved)
   memory.md, raw/, drafts/
   scheduled-tasks/ops/  (all other ops files preserved)
   scripts/  (all scripts preserved)
@@ -161,9 +162,10 @@ Files UPDATED:
   scheduled-tasks/ops/ingest.md      (bash → Python, post-op advisory added)
   scheduled-tasks/ops/lint.md        (bash → Python, post-op advisory added)
   scheduled-tasks/ops/conventions.md (updated for v2.3)
+  wiki/hot.md  (Schema bumped to v2.3; Python: field added)
 
 Files UNTOUCHED:
-  wiki/  (all pages, index, log, hot preserved)
+  wiki/  (all pages, index, log preserved)
   memory.md, raw/, drafts/
   sqlite-query skill (if installed)
 
