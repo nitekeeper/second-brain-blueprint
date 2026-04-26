@@ -6,12 +6,12 @@
 
 Every new chat session starts cold — the agent has no memory. It re-orients itself by reading two files at startup:
 
-1. `CLAUDE.md` — its operating instructions (~1,000 tokens)
+1. `CLAUDE.md` — its operating instructions (~2,000 tokens)
 2. `wiki/hot.md` — a brief orientation snapshot (~80 tokens)
 
-**Total cold-start cost: ~1,080 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
+**Total cold-start cost: ~2,100 tokens.** This is intentionally lean. The agent defers reading the full index and log until it actually needs them for an operation.
 
-If you saved a session snapshot with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and restore it before clearing it (~1,830 tokens total).
+If you saved a session snapshot with `!! wrap`, say `!! ready` at the start of your next session — the agent will load and restore it before clearing it (~3,500 tokens total).
 
 ---
 
@@ -141,7 +141,7 @@ You can also say it explicitly: `!! update [page-name]` or `"Update the Claude C
 
 At the end of a productive session, say `!! wrap`. The agent will ask if there's anything specific to include, then write a compact context snapshot to `memory.md` capturing the task in flight, exact stopping point, next action, locked decisions, and active files. The format is machine-oriented and intentionally terse — the wiki stores permanent knowledge; the snapshot only bridges the current task thread to the next session.
 
-> **`!! wrap` saves a file — it does not free the current session's context.** To actually get a clean slate, **close this conversation and open a new one**, then say `!! ready` as your first message. That new session starts at ~1,080 tokens regardless of how heavy the previous one was. Running `!! ready` in the same conversation (or after `/compact`) does not reset the context window.
+> **`!! wrap` saves a file — it does not free the current session's context.** To actually get a clean slate, **close this conversation and open a new one**, then say `!! ready` as your first message. That new session starts at ~2,100 tokens regardless of how heavy the previous one was. Running `!! ready` in the same conversation (or after `/compact`) does not reset the context window.
 
 Each `!! wrap` overwrites the previous snapshot, so only one snapshot exists at a time. **If a prior wrapped snapshot — or a truncated snapshot you preserved via `!! ready` → `keep` — is still in `memory.md`, the agent will warn you before overwriting.** Reply `no` to cancel, then consume or clear the existing content first.
 
@@ -218,8 +218,8 @@ The context window is 200,000 tokens per session. Token estimates are computed d
 **Typical session costs:**
 | Action | Estimated tokens |
 |---|---|
-| Cold start | ~1,080 |
-| Cold start with `!! ready` (full memory) | ~1,830 |
+| Cold start | ~2,100 |
+| Cold start with `!! ready` (full memory) | ~3,500 |
 | Ingest a short article | ~3,000–5,000 |
 | Ingest a long document | ~8,000–15,000 |
 | Lint all | ~8,000–12,000 (scales with page count) |
@@ -228,7 +228,7 @@ The context window is 200,000 tokens per session. Token estimates are computed d
 | Audit all (full blueprint) | ~35,000–45,000 |
 | `!! wrap` (realistic) | ~1,500–2,500 |
 
-If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~1,080 tokens to re-orient.
+If a session gets long, the agent may auto-compact. All critical state is in files on disk — starting a new session costs only ~2,100 tokens to re-orient.
 
 ---
 
@@ -249,5 +249,5 @@ If a session gets long, the agent may auto-compact. All critical state is in fil
 - **Draft before ingesting** — use `drafts/` to think through ideas with Claude before they're wiki-ready; drafts surface automatically at session startup
 - **Ask questions freely** — the query waterfall handles routing automatically
 - **Run lint monthly** — or after every 5–10 ingests to keep cross-references tight
-- **New session anytime** — starting fresh costs only ~1,080 tokens; the wiki state is always preserved on disk
+- **New session anytime** — starting fresh costs only ~2,100 tokens; the wiki state is always preserved on disk
 - **Bridge sessions with memory** — say `!! wrap` at the end of any productive session, then `!! ready` next time to pick up exactly where you left off. This is temporary, intentional memory — it clears after being read.
