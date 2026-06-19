@@ -193,6 +193,7 @@ print(f"Total: ~{total} tokens")
 ```
 
 **Why this is better than `token-reference.md`:**
+
 - Always accurate — reads live file sizes, no drift between documented and actual
 - Zero maintenance — no recalibration rule, no headroom tables, no envelope math
 - Simpler audit — the per-file headroom check and envelope check sections are removed from `ops/audit.md`

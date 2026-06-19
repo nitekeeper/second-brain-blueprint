@@ -26,6 +26,7 @@ No new files. No Blueprint Sync Rule cascade — all fixes are STYLE corrections
 **Fix:** Replace lines 125–131 (the preamble block) with a single direct description. The "On approval, execute in order" steps and all other content are untouched.
 
 **Replace:**
+
 ```
 Run all steps from the v2.1 → v2.2 migration (listed below), with two modifications:
 - **Step 3i:** write `Schema: v2.3` (not `v2.2`) when patching `hot.md`
@@ -37,6 +38,7 @@ patch and version bump are implicit.
 ```
 
 **With:**
+
 ```
 Direct migration path from v2.1 to v2.3 in a single step — no intermediate v2.2 stop required. Step c copies `CLAUDE.md` from `blueprint/template/CLAUDE.md`, which already contains the v2.3 Query Routing Rule and v2.3 schema footer, so no separate routing patch is needed. The steps below are the complete v2.1→v2.3 procedure.
 ```
@@ -50,11 +52,13 @@ Direct migration path from v2.1 to v2.3 in a single step — no intermediate v2.
 **Fix:** Replace the single-line estimate sentence (line 96) with a dual-mode bullet block documenting both paths.
 
 **Replace:**
+
 ```
 For `!! audit all`, expect ~35,000–45,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md blueprint/docs/audit-report-template.md` for a live estimate. Warn the user up front if the session is already close to context limits.
 ```
 
 **With:**
+
 ```
 For `!! audit all`, expect ~35,000–45,000 tokens of reads for the tracked files.
 - **Deployed-user mode:** `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md blueprint/docs/audit-report-template.md`
@@ -68,27 +72,32 @@ Warn the user up front if the session is already close to context limits.
 ## Finding AUD-2026-04-25-041 — `blueprint-sync.md`
 
 **Problem:** Two cascade table rows are stale:
+
 - "New scheduled task" row references `template/CLAUDE.md Directory Structure` (section does not exist in CLAUDE.md) and includes `ops/token-reference.md (removed in v2.2; skip)` noise. `ops/reference.md` is absent.
 - "New skill bundle added" row omits `ops/reference.md`, which lists individual skill bundles and goes stale when a new one is added.
 
 **Fix:** Update both rows in the cascade table (lines 20–21).
 
 **"New scheduled task" row — replace:**
+
 ```
 `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical) + `ops/token-reference.md` (removed in v2.2; skip) + `setup-guide.md` + `README.md` and `user-guide.md` if user-visible + `template/CLAUDE.md` Directory Structure + `CHANGELOG.md`
 ```
 
 **With:**
+
 ```
 `blueprint/template/scheduled-tasks/<name>.md` + `ops/audit.md` (informational parenthetical) + `setup-guide.md` + `README.md` and `user-guide.md` if user-visible + `ops/reference.md` (blueprint/ scheduled-tasks subtree) + `CHANGELOG.md`
 ```
 
 **"New skill bundle added" row — replace:**
+
 ```
 `blueprint/skills/<skill>/` + `blueprint/user-guide.md` + `blueprint/setup-guide.md` + `blueprint/ROADMAP.md` + `ops/conventions.md` if skill introduces a new hook contract
 ```
 
 **With:**
+
 ```
 `blueprint/skills/<skill>/` + `blueprint/user-guide.md` + `blueprint/setup-guide.md` + `blueprint/ROADMAP.md` + `ops/conventions.md` if skill introduces a new hook contract + `ops/reference.md` (blueprint/ skills subtree)
 ```

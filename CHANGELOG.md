@@ -24,11 +24,13 @@ command. v2.2 users get a lightweight patch (one section swap + Schema bump).
 ### Cold-start optimization, cross-platform scripts, session hygiene
 
 **Cold-start reduction (~86%):** `CLAUDE.md` rewritten from ~7,700 to ~1,000 tokens. Three large sections extracted into deferred ops files loaded only when triggered:
+
 - `ops/session-memory.md` — `!! wrap`/`!! ready` full state machine (~750 tokens, loaded on command)
 - `ops/blueprint-sync.md` — Blueprint Sync 12-row cascade (~625 tokens, loaded on blueprint edit)
 - `ops/reference.md` — directory structure + tiered read table (~400 tokens, on demand)
 
 **Cross-platform Python scripts:** Six scripts added to `template/scripts/`. Bash commands replaced:
+
 - `log_tail.py` replaces `grep -E "^## \[" log.md | tail -5`
 - `file_check.py` replaces `[ -f path ] && echo exists`
 - `wrap.py` / `ready.py` replace `!! wrap`/`!! ready` state machine prose
@@ -230,7 +232,7 @@ command. v2.2 users get a lightweight patch (one section swap + Schema bump).
   which is approval-exempt — tracking its size adds recalibration churn without
   protecting anything. Removed the row (~94,200 / ~23,550). New table sum: 40,820
   tokens. Envelope tightened from `~30,000–67,000` to `~30,000–43,000` (sum 40,820
-  + ~2,180 cushion). Cascade: `ops/token-reference.md` (row removed, Step 5 envelope
+  - ~2,180 cushion). Cascade: `ops/token-reference.md` (row removed, Step 5 envelope
   and floor note updated), `ops/audit.md` (envelope updated), `user-guide.md` (cost
   table and `!! audit` description updated).
 
@@ -684,8 +686,8 @@ Skill rows: SKILL.md (1,180) + query-layer (630) + ingest-hook (830) = **2,640**
 - **Envelope widened from `~30,000–50,000` to `~30,000–54,000`
   (Step 5 trigger: sum exceeded the upper bound).** Post-recalibration
   Tokens sum: blueprint-doc rows = README (1,280) + setup-guide (3,350)
-  + user-guide (4,150) + troubleshooting (8,300) + CHANGELOG (15,180)
-  + LICENSE (300) = **32,560**; template-side rows = CLAUDE (5,475) +
+  - user-guide (4,150) + troubleshooting (8,300) + CHANGELOG (15,180)
+  - LICENSE (300) = **32,560**; template-side rows = CLAUDE (5,475) +
   refresh-hot (1,100) + changelog-monitor (2,130) + ingest (4,250) +
   lint (630) + query (530) + update (350) + conventions (1,250) +
   audit (1,800) + token-reference (1,830) = **19,345**. Total
@@ -1061,6 +1063,7 @@ prose cascade is required.*
   "File-size or cost change" Blueprint Sync Rule row.
 
 ### Not applied
+
 - **Q1 (per-file schema footers).** Carried from v2.0.3 and v2.0.4.
   Still a judgment call — either add footers to every template file for
   provenance parity, or drop `changelog-monitor.md`'s for symmetry.
@@ -1147,7 +1150,7 @@ prose cascade is required.*
   not per file.
 - **Ingest Estimate Formula made complete (W3).** The formula previously
   read `raw source read + (500 × pages to create) + (200 × pages to update)
-  + 500 overhead`, omitting the fixed reads every ingest pays (`log.md`
+  - 500 overhead`, omitting the fixed reads every ingest pays (`log.md`
   tail at Step 1, `index.md` at Step 8, and `token-reference.md` self-cost
   at the Step 4 approval). Rewritten to include those terms and a concrete
   ~2,455-token fixed floor before variable reads.
@@ -1207,6 +1210,7 @@ prose cascade is required.*
   force an unplanned recalibration.
 
 ### Not applied
+
 - **Q1 (per-file schema footers).** `changelog-monitor.md` carries a
   `*Schema: v2.0 | Created: 2026-04-18*` footer while `refresh-hot.md` and
   `ops/*.md` carry none. Left as a question rather than a fix — either
@@ -1268,6 +1272,7 @@ prose cascade is required.*
   crossed its documented value after this pass.
 
 ### Migration note
+
 Source pages whose `source_hash:` was computed before v2.0.2 will produce a
 one-shot hash mismatch on their next ingest or their next monitor comparison
 (the canonicalized hash differs from the raw-body hash). The system
@@ -1308,31 +1313,38 @@ required.
 **Theme:** rerun-proofness. The entire ingest pipeline is now idempotent on duplicate input, with a content-hash dedupe primitive and timestamped immutable raw snapshots. This unblocks safe scheduled-task monitoring — a daily changelog monitor can now trigger re-ingests without fear of duplicating state. This is a breaking schema change; upgrades require touching every source page.
 
 ### Breaking changes
+
 - **`raw/` files use timestamped naming.** Naming is now `raw/<slug>-<YYYY-MM-DD-HHMMSS>.md` instead of the old `<slug>.md` with collision-handling fallbacks. Second-precision timestamps are physically unique in single-user workflow, so the collision-handling bash snippet in `ops/ingest.md` Step 9 is gone — replaced with a simple `mv`. Existing files under the old naming stay as-is; only newly ingested files use the new scheme.
 - **Source pages require `source_hash:` frontmatter.** 8-char SHA-256 hex prefix of the raw content body (preamble-stripped). This is the new dedupe primitive. Source pages without this field trigger a full regeneration on the next ingest — that's the migration path, not a bug. If you have existing v1.x source pages, expect them to be regenerated the next time their source is ingested.
 - **Schema version bumped to 2.0.** Footer in `CLAUDE.md` (and blueprint template) now reads `Schema version: 2.0`.
 
 ### New behavior
+
 - **`ops/ingest.md` Step 0: hash check.** First action of every ingest. Computes the 8-char SHA-256 prefix of the raw body, compares against the stored `source_hash:` on the existing source page. On match: deletes the inbox file, prints `No change since last ingest — skipped.`, exits cleanly. No log entry, no `hot.md` refresh, no recalibration. On mismatch: regenerates the source page from the new content (no in-place merge).
 - **`!! ingest all` batch hash check (B3.6).** The batch flow hash-checks each file up front and excludes no-ops from the approval. Running `!! ingest all` twice in a row is now a guaranteed no-op on the second run.
 - **Provenance footnotes in source pages.** Every curated bullet in the `## Key Takeaways` section ends with a `[^n]` footnote referencing the raw snapshot: `[^1]: raw/<filename> — fetched YYYY-MM-DD`. Makes "where did this fact come from and when" answerable from the page itself.
 - **Rerun-proof guarantee.** Same input → zero state change. Re-running any ingest (manually or from a scheduled task) is safe by design.
 
 ### Force re-ingest escape hatch
+
 If you need to regenerate a source page *without* the underlying content having changed (e.g. the previous generation was poorly worded and you want a do-over), delete the `source_hash:` line from the source page's frontmatter. The next ingest will treat the missing hash as a mismatch and regenerate. No `--force` flag, no ops change — the escape hatch is the absence of the field.
 
 ### Estimate re-baselining
+
 - **`ops/ingest.md` recalibrated.** The new Step 0 hash-check + B3.5 batch-level pre-read + B3.6 batch hash-check + `source_hash:` discipline together pushed the file past its v1.14 headroom. Chars column bumped from ~7,900 → ~10,000; Tokens ~1,980 → ~2,500. *(This subsection was backfilled in v2.0.2 after `!! audit all` flagged the audit-trail gap — the Chars change itself shipped with v2.0 but was not accompanied by a changelog entry.)*
 
 ### New file
+
 - **`scheduled-tasks/changelog-monitor.md` restored.** The original trigger for this migration. A daily scheduled task that fetches four monitored documentation pages, computes content hashes, compares against wiki state, and reports findings via Slack DM. Read-only — never writes files. The user runs `!! ingest` manually after reviewing the Slack summary.
 
 ### Migration note
+
 Existing source pages without `source_hash:` will trigger a full re-ingest on next run for that source. This is the intended migration path — the next ingest for each source writes the hash in place. No bulk migration script is needed; the transition happens gradually as sources are re-ingested in normal operation.
 
 ## v1.14 — 2026-04-18
 
 ### Safety / footgun fixes
+
 - **`!! ready` truncation-branch `clear` and `keep` now log and refresh `hot.md`.**
   In v1.13 and earlier, recovery choices on a truncated `memory.md` mutated the
   file but left no trace in `log.md` and didn't refresh `hot.md` — the "any
@@ -1351,11 +1363,13 @@ Existing source pages without `source_hash:` will trigger a full re-ingest on ne
   future memory-flow log entries are covered symmetrically for both commands.
 
 ### Estimate re-baselining
+
 - **`ops/ingest.md` recalibrated.** File grew during v1.14 edits, leaving <2%
   headroom against documented Chars (well below the 10% convention). Chars
   column bumped from ~7,300 → ~7,900; Tokens ~1,830 → ~1,980.
 
 ### Scope & notation cleanup
+
 - **README `!! audit` exception drift fixed.** `README.md`'s "Approval before
   every wiki write" bullet listed `!! wrap` and `!! ready` as "the only
   exceptions" — but `CLAUDE.md` and `user-guide.md` include `!! audit` as a
@@ -1366,6 +1380,7 @@ Existing source pages without `source_hash:` will trigger a full re-ingest on ne
   `log.md`). Renamed to "History review" to remove the ambiguity.
 
 ### Style / readability
+
 - **`ops/ingest.md` step 9: `$file` precondition made explicit.** Preamble now
   states that both `$WORKDIR` and `$file` must be exported in the same Bash
   invocation as the snippet. The `${file:?…}` guard still catches misuse at
@@ -1378,6 +1393,7 @@ Existing source pages without `source_hash:` will trigger a full re-ingest on ne
 ## v1.13 — 2026-04-18
 
 ### Spec additions
+
 - **`!! ingest <URL>` branch spec'd (U1–U5).** The URL ingest path now has explicit
   steps for fetch → slug → preamble → approval to-do integration. User-guide text
   reframed as neutral "Web Clipper or URL — your choice" rather than implying
@@ -1387,6 +1403,7 @@ Existing source pages without `source_hash:` will trigger a full re-ingest on ne
   `setup-guide.md`'s initial hot.md snippet.
 
 ### Estimate re-baselining
+
 - **`memory.md` cost estimates raised to match the "detailed summary" spec.** Read
   cost went from ~125 → ~750 tokens. Cold-start-with-memory figure cascaded
   through `CLAUDE.md` and `user-guide.md` (~4,760 → ~5,385). Realistic `!! wrap`
@@ -1396,6 +1413,7 @@ Existing source pages without `source_hash:` will trigger a full re-ingest on ne
   (previously invisible in the estimate).
 
 ### Safety / footgun fixes
+
 - **`!! wrap` pre-write safeguard extended to `TRUNCATED_ACKNOWLEDGED`.** Previously
   only `WRAPPED` triggered the overwrite warning, so a preserved truncated summary
   could be silently destroyed by the next `!! wrap`. The safeguard now catches
@@ -1403,6 +1421,7 @@ Existing source pages without `source_hash:` will trigger a full re-ingest on ne
   one-shot preservation.
 
 ### Scope & notation cleanup
+
 - **Path notation normalized to bare `@scheduled-tasks/...`.** The `@Library/`
   prefix was removed from all 9 references in `CLAUDE.md`. Setup-time
   find-and-replace step dropped from `setup-guide.md`. Paths are now
@@ -1412,6 +1431,7 @@ Existing source pages without `source_hash:` will trigger a full re-ingest on ne
   any downstream propagation after an audit fix.
 
 ### Style / readability
+
 - **Footer-block discipline wording unified across `CLAUDE.md` + `user-guide.md`.**
   Both files now describe the footer as "5 command-hint lines + blank separator +
   💡 tip line = 7 physical lines total," resolving the ambiguous "six lines" /
@@ -1422,9 +1442,10 @@ Existing source pages without `source_hash:` will trigger a full re-ingest on ne
   Reminder is now repeated where it can fail.
 
 ### Operator note
+
 - **Blueprint-authoring workspaces:** when an op runs against a workspace that
   contains only `blueprint/` (no live `wiki/`, no `scheduled-tasks/`), log append
-  + `hot.md` refresh are skipped transparently rather than bootstrapping files
+  - `hot.md` refresh are skipped transparently rather than bootstrapping files
   that shouldn't live there.
 
 ## v1.12 and earlier

@@ -48,10 +48,12 @@
 ## Scope
 
 **Audited:**
+
 - `[file or directory path]`
 - `[file or directory path]`
 
 **Excluded:**
+
 - `blueprint/.git/` — VCS state, never audited
 
 ---
@@ -97,9 +99,9 @@
 
 Sorted by severity. The agent checks off items (`- [x]`) as fixes are applied via the normal approval flow.
 
-- [ ] `AUD-YYYY-MM-DD-001` **[CRITICAL]** [Title] — Owner: ___ | Target: ___
-- [ ] `AUD-YYYY-MM-DD-002` **[WARNING]** [Title] — Owner: ___ | Target: ___
-- [ ] `AUD-YYYY-MM-DD-003` **[STYLE]** [Title] — Owner: ___ | Target: ___
+- [ ] `AUD-YYYY-MM-DD-001` **[CRITICAL]** [Title] — Owner: ___| Target:___
+- [ ] `AUD-YYYY-MM-DD-002` **[WARNING]** [Title] — Owner: ___| Target:___
+- [ ] `AUD-YYYY-MM-DD-003` **[STYLE]** [Title] — Owner: ___| Target:___
 
 ---
 

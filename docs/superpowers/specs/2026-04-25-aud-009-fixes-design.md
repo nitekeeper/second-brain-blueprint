@@ -27,11 +27,13 @@
 ### AUD-034 — `skills/sqlite-query/query-layer.md` step 3
 
 **Remove:**
+
 ```
 If grep also returns nothing, proceed to Step 3 of the core query op (read `index.md`).
 ```
 
 **Replace with:**
+
 ```
 If grep also returns nothing, read `wiki/index.md` directly and continue from sub-step 4 of the query waterfall (read candidate pages; answer with [[wiki link]] citations).
 ```
@@ -43,16 +45,19 @@ If grep also returns nothing, read `wiki/index.md` directly and continue from su
 ### AUD-035 — `template/scheduled-tasks/ops/migrate.md`
 
 **Add after step b2:**
+
 ```
 b3. Copy `scheduled-tasks/ops/blueprint-sync.md` → `backups/blueprint-sync.md-v2.2-<YYYY-MM-DD>.bak`
 ```
 
 **Extend the Rollback v2.2→v2.3 bullet** — insert before `; revert Schema:`:
+
 ```
 ; rename `backups/blueprint-sync.md-v2.2-<date>.bak` → `scheduled-tasks/ops/blueprint-sync.md`
 ```
 
 **Update Confirm message** to add the third backup file:
+
 ```
 Backups saved to `backups/CLAUDE.md-v2.2-<date>.bak`, `backups/conventions.md-v2.2-<date>.bak`, and `backups/blueprint-sync.md-v2.2-<date>.bak` — delete when satisfied.
 ```
@@ -64,6 +69,7 @@ Backups saved to `backups/CLAUDE.md-v2.2-<date>.bak`, `backups/conventions.md-v2
 ### AUD-036 + Related — `template/scheduled-tasks/ops/audit.md`
 
 **Append to `!! audit all` scope list:**
+
 ```
 - `blueprint/docs/audit-report-template.md`
 ```
@@ -84,6 +90,7 @@ Replace with: `open STYLEs only → \`LOW\``
 ### AUD-037 — `template/scheduled-tasks/ops/reference.md`
 
 **Add to `blueprint/` subtree after `ROADMAP.md`:**
+
 ```
 │   ├── ROADMAP.md
 │   ├── docs/                   ← Audit report template and design specs. Developer use only.
@@ -98,11 +105,13 @@ Replace with: `open STYLEs only → \`LOW\``
 ### AUD-038 — `docs/audit-report-template.md`
 
 **Remove:**
+
 ```
 Risk is derived from the highest-severity open finding: any unresolved CRITICAL → CRITICAL; all resolved CRITICALs but open WARNINGs → HIGH; all resolved WARNINGs but open STYLEs → MEDIUM; only resolved or STYLE findings → LOW; zero findings → CLEAN.
 ```
 
 **Replace with:**
+
 ```
 Risk is derived from the highest-severity open finding in priority order: (1) any unresolved CRITICAL → CRITICAL; (2) open WARNINGs (no open CRITICALs) → HIGH; (3) only resolved findings and/or open STYLEs → LOW; (4) zero findings → CLEAN. STYLE findings do not elevate risk above LOW — they are documentation-only.
 ```
@@ -114,6 +123,7 @@ Risk is derived from the highest-severity open finding in priority order: (1) an
 ### Audit Report Update — `audits/AUD-2026-04-25-009.md`
 
 For each of AUD-034, AUD-035, AUD-036, AUD-037, AUD-038:
+
 - Set `**Status**` to `RESOLVED`
 - Check off the corresponding Action Items entry (`- [ ]` → `- [x]`)
 
@@ -130,6 +140,7 @@ For each of AUD-034, AUD-035, AUD-036, AUD-037, AUD-038:
 ## Commit Strategy
 
 Single commit. Message:
+
 ```
 fix: resolve AUD-034 through AUD-038 from AUD-2026-04-25-009
 ```

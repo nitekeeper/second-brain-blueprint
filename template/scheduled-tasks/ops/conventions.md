@@ -3,22 +3,27 @@
 Read this file before creating or editing any wiki pages.
 
 ## File Naming (Slugs)
+
 Lowercase, hyphenated: `cognitive-load.md`, `elon-musk.md`, `claude-code.md`
 
 ## Dates
+
 Always ISO 8601: `YYYY-MM-DD`
 
 ## Wiki Links
+
 Use `[[Page Title]]` (Obsidian-style) for cross-references within pages.
 Piped links: `[[Page Title|display text]]`
 
 ## Tags
+
 No `#` prefix in YAML frontmatter — Obsidian treats `#tag` as invalid there.
 ✅ Correct: `tags: [concept, llm, tool]`
 ❌ Wrong: `tags: [#concept, #llm, #tool]`
 The `#` prefix is only valid for inline body text tags.
 
 ## Page Frontmatter
+
 ```yaml
 ---
 title: "Page Title"
@@ -34,21 +39,26 @@ related: [page-slug-1, page-slug-2]
 The `related:` field lists slugs of directly connected pages — concepts, entities, analyses, or sources that share a meaningful relationship with this page. Use lowercase-hyphenated slugs (same as filenames, without `.md`). This field is the relationship layer: the agent queries it with grep instead of reading page content, keeping cross-page lookups fast and token-cheap as the wiki grows.
 
 **Grep query pattern** — find all pages that reference a given slug:
+
 ```bash
 grep -rl "slug-name" wiki/pages --include="*.md"
 ```
+
 This scans frontmatter and body in one pass. For frontmatter-only precision (faster on large wikis):
+
 ```bash
 grep -rl "^related:.*slug-name" wiki/pages --include="*.md"
 ```
 
 Source pages also include:
+
 - `original_file:` pointing to the raw file (timestamped: `raw/<slug>-<YYYY-MM-DD-HHMMSS>.md`)
 - `source_hash: <8-char-hex>` — 8-char SHA-256 hex prefix of the **canonicalized** source body (see `@scheduled-tasks/ops/ingest.md` §Hash Canonicalization for the normalizer spec: preamble-strip-if-present + line-ending normalization + whitespace collapse + trim). Required. This is the dedupe primitive used by Step 0 of the ingest op — the canonicalizer ensures Clipper-ingested and URL-fetched versions of the same source converge on the same hash. Deleting or blanking this line will force a full regeneration on the next ingest — that is the documented "force re-ingest" escape hatch.
 
 Analysis pages also include: `query:` with the original question.
 
 ## Page Body
+
 - Use `[[Wiki Links]]` for all cross-references
 - Aim for dense, useful content — no padding
 - End every page with a `## Related Pages` section listing key links
@@ -67,11 +77,13 @@ Format:
 ```
 
 Rules:
+
 - One footnote per raw snapshot, reused across bullets that derive from the same snapshot.
 - When a source page is regenerated from a newer raw snapshot (hash-mismatch regeneration), the footnotes point to the NEW raw filename. The old raw file stays in `raw/` as an immutable archive but is no longer cited by the source page.
 - Format the date as ISO 8601 (YYYY-MM-DD), not locale-dependent formats.
 
 ## Bulk File Edits
+
 Always use Python — never `sed -i`. The `sed -i` command leaves `XX*` temp files that Obsidian cannot open.
 
 **Important: set an absolute root before globbing.** Relative paths like `"wiki/pages"` silently match zero files if cwd is not the working folder root, and the agent will think the edit succeeded.
@@ -118,6 +130,7 @@ A file at `scheduled-tasks/ingest-hook.md` runs after Step 11 of the ingest op. 
 - **Side effects:** hook is responsible for keeping any external index (e.g. `wiki.db`) in sync with the markdown files
 
 ## Immutable Files
+
 Never modify anything in `raw/` — these are the original source documents.
 
 `raw/` files use timestamped naming: `<slug>-<YYYY-MM-DD-HHMMSS>.md`. Every successful ingest writes a new timestamped snapshot — filenames are physically unique at second precision, so the directory grows monotonically. The user is free to prune `raw/` manually (e.g. keep only the most recent snapshot per slug) — the agent must not prune autonomously. A missing raw file only breaks the footnote trail for that specific snapshot; it does not affect the source page's `source_hash:` dedupe behavior.
@@ -127,6 +140,7 @@ Never modify anything in `raw/` — these are the original source documents.
 After any Step 1 (wiki synthesis) or Step 2 (web) answer, ask: "Worth filing this as an analysis page?"
 
 If yes:
+
 1. Read this file (`@scheduled-tasks/ops/conventions.md`) — already loaded, no extra read needed
 2. Show approval request with token estimate (`python scripts/estimate_tokens.py wiki/pages/analyses/<slug>.md` after drafting) and file list
 3. Wait for confirmation

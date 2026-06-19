@@ -20,11 +20,13 @@ If you saved a session snapshot with `!! wrap`, say `!! ready` at the start of y
 ### Adding Knowledge — Ingest
 
 **The recommended path:**
+
 1. Find an article or document you want to add
 2. Clip it with Obsidian Web Clipper → saves to `wiki/inbox/` as clean markdown
 3. Tell the agent: `!! ingest [filename]`
 
 **What happens:**
+
 - **Hash check first.** Before any work, the agent runs the source body through a deterministic canonicalizer (preamble-strip + whitespace / line-ending normalization) and computes an 8-char SHA-256 hash of the canonicalized content. It compares this against the stored `source_hash:` on the existing source page (if one exists). The same canonicalizer runs for both Clipper ingest and URL ingest, so the same underlying source produces the same hash either way. If the hashes match, the agent prints `No change since last ingest — skipped.`, deletes the inbox file, and stops. No log entry, no page edits, no cost. This is the rerun-proof guarantee.
 - If the hash differs (or there's no existing source page), the agent proceeds:
   - Discusses 3–5 key takeaways with you
@@ -61,6 +63,7 @@ After a Step 1 (wiki synthesis) or Step 2 (web) answer, the agent will ask: *"Wo
 When working through a complex idea or system change, the agent uses `drafts/` as a scrapbook — creating a working file to think through the problem across the conversation.
 
 **What happens:**
+
 - Agent creates a file in `drafts/` (e.g. `drafts/topic-name.md`) and iterates on it with you
 - At startup, the agent checks `drafts/` and surfaces any in-progress files in its readiness announcement — so nothing gets lost between sessions
 - When a draft is ready to become a source, the agent moves it to `wiki/inbox/` for ingestion
@@ -77,6 +80,7 @@ Run periodically to keep the wiki clean.
 - `!! lint [page-name]` — check a specific page
 
 **What lint checks:**
+
 - Broken wiki links
 - Orphan pages (no inbound links)
 - Missing cross-references
@@ -160,6 +164,7 @@ If you start a session without saying `!! ready`, the snapshot stays in `memory.
 After `!! ingest`, `!! lint`, or `!! audit` completes, the agent will show a session advisory recommending you start a new session before doing more work. This is because each turn in a long session re-reads the entire conversation history, increasing cost non-linearly.
 
 **Recommended workflow:**
+
 - One ingest (or batch ingest) per session
 - One lint pass per session
 - `!! audit all` always in its own session
@@ -216,6 +221,7 @@ Whenever the agent recommends a change to your system, it will always show both 
 The context window is 200,000 tokens per session. Token estimates are computed dynamically via `scripts/estimate_tokens.py` (file size ÷ 4).
 
 **Typical session costs:**
+
 | Action | Estimated tokens |
 |---|---|
 | Cold start | ~2,100 |

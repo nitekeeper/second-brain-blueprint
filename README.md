@@ -35,6 +35,7 @@ This system is different. An AI agent reads your sources, builds a wiki of inter
 ## How to Set Up
 
 ### 1. Install the tools
+
 - Install **Obsidian** (you'll point it at `wiki/` after setup — don't create a vault yet)
 - Install **Claude Desktop** and enable Cowork mode
 - Install the **Obsidian Web Clipper** Chrome extension
@@ -51,9 +52,11 @@ Replace `<BLUEPRINT_REPO_URL>` with the location you're distributing this bluepr
 > **Verify the URL is accessible** before sharing this blueprint with others. If the repo is private or has moved, update the URL here before distributing, and make sure anyone cloning it has read access.
 
 ### 3. Select your working folder in Cowork
+
 In the Cowork window, click **"Select folder"** and choose the folder where you cloned the repo (the parent folder containing `blueprint/`). This is your working directory — **not** `wiki/`.
 
 ### 4. Tell your AI to set it up
+
 Open Claude Desktop (Cowork) and send this message:
 
 ```
@@ -63,6 +66,7 @@ Read blueprint/setup-guide.md and set up the wiki system for me.
 Claude will execute the full setup — creating folders, copying files, and initializing the wiki. You only need to approve each setup step.
 
 ### 5. Start using it
+
 Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 
 ---
@@ -86,6 +90,7 @@ Once setup is complete, follow `blueprint/user-guide.md` for daily usage.
 See `blueprint/user-guide.md` for the full daily workflow.
 
 **The four things you'll do most:**
+
 - Clip an article → `!! ingest [filename]`
 - Ask a question → just ask, no command needed
 - Health check → `!! lint all`

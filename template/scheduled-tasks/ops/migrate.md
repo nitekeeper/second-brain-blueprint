@@ -31,6 +31,7 @@ Announce at most once per session (do not repeat on every response).
 ### Pre-flight
 
 Run `python scripts/check_deps.py --python`
+
 - If exit non-zero: stop. Show the printed instructions. Do not continue.
 
 ### Approval request
@@ -109,9 +110,10 @@ c4. Copy `blueprint/template/scheduled-tasks/refresh-hot.md` → `scheduled-task
 d. Read `CLAUDE.md` footer (last non-empty line). If it already reads
    `Schema version: 2.3`, skip this step entirely.
    Otherwise (footer reads `Schema version: 2.2`), make these two edits:
-   - Find the line containing `below v2.2` and replace the whole line with:
-     `   - If \`hot.md\`'s \`Schema:\` is below \`v2.3\`: announce "Blueprint v2.3 is available — run \`!! migrate\` to update." (once per session)`
-   - Find the footer line `*Schema version: 2.2 | Created:` and replace `2.2` with `2.3`.
+
+- Find the line containing `below v2.2` and replace the whole line with:
+     `- If \`hot.md\`'s \`Schema:\` is below \`v2.3\`: announce "Blueprint v2.3 is available — run \`!! migrate\` to update." (once per session)`
+- Find the footer line `*Schema version: 2.2 | Created:` and replace `2.2` with `2.3`.
 e. Patch `hot.md`: update `Schema: v2.2` → `Schema: v2.3`
 f. Append to `wiki/log.md`:
    `## [YYYY-MM-DD] migrate | v2.2 → v2.3 — wiki-first query routing redesign`
@@ -131,6 +133,7 @@ Direct migration path from v2.1 to v2.3 in a single step — no intermediate v2.
 ### Pre-flight
 
 Run `python scripts/check_deps.py --python`
+
 - If exit non-zero: stop. Show the printed instructions. Do not continue.
 
 ### Approval request
@@ -198,9 +201,10 @@ g1.5. Copy `scheduled-tasks/refresh-hot.md` → `backups/refresh-hot.md-v2.1-<YY
 g2. Copy `blueprint/template/scheduled-tasks/refresh-hot.md` → `scheduled-tasks/refresh-hot.md`
 h. Delete `scheduled-tasks/ops/token-reference.md` if it exists.
 i. Patch `hot.md`:
-   - Add `Python: [python | python3]` line (detect by running
+
+- Add `Python: [python | python3]` line (detect by running
      `python --version` or `python3 --version` and using whichever succeeds)
-   - Update `Schema: v2.1` → `Schema: v2.3`
+- Update `Schema: v2.1` → `Schema: v2.3`
 j. Append to `wiki/log.md`:
    `## [YYYY-MM-DD] migrate | v2.1 → v2.3 — lean cold-start + wiki-first routing`
    (≤500 chars)

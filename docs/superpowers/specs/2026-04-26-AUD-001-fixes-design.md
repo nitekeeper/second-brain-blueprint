@@ -34,36 +34,43 @@ No other changes to the replacement block. The v2.1→v2.3 path is unaffected (i
 ### migrate.md — v2.2→v2.3 path
 
 1. **Approval request** — add to `Files UPDATED`:
+
    ```
      scheduled-tasks/refresh-hot.md  (Step 3 updated to detect claude-code-enhanced skill)
    ```
 
 2. **Execution steps** — add after step `c3`:
+
    ```
    c4. Copy `blueprint/template/scheduled-tasks/refresh-hot.md` → `scheduled-tasks/refresh-hot.md`
    ```
 
 ### migrate.md — v2.1→v2.3 path
 
-3. **Approval request** — add to `Files UPDATED`:
+1. **Approval request** — add to `Files UPDATED`:
+
    ```
      scheduled-tasks/refresh-hot.md  (Step 3 updated to detect claude-code-enhanced skill)
    ```
 
-4. **Execution steps** — add after step `g`:
+2. **Execution steps** — add after step `g`:
+
    ```
    g2. Copy `blueprint/template/scheduled-tasks/refresh-hot.md` → `scheduled-tasks/refresh-hot.md`
    ```
 
 ### blueprint-sync.md — cascade table
 
-5. Update the `Refresh-hot.md change` row to include `migrate.md`:
+1. Update the `Refresh-hot.md change` row to include `migrate.md`:
 
    From:
+
    ```
    | Refresh-hot.md change | `blueprint/template/scheduled-tasks/refresh-hot.md`, `blueprint/template/CLAUDE.md` (hot.md Format block), `blueprint/setup-guide.md` (initial hot.md snippet) |
    ```
+
    To:
+
    ```
    | Refresh-hot.md change | `blueprint/template/scheduled-tasks/refresh-hot.md`, `blueprint/template/CLAUDE.md` (hot.md Format block), `blueprint/setup-guide.md` (initial hot.md snippet), `blueprint/template/scheduled-tasks/ops/migrate.md` (add copy step for both migration paths; update Files UPDATED lists) |
    ```
@@ -75,6 +82,7 @@ No other changes to the replacement block. The v2.1→v2.3 path is unaffected (i
 **Files:** `README.md`, `user-guide.md`
 
 Figures from `estimate_tokens.py` (chars ÷ 4):
+
 - `template/CLAUDE.md`: ~2,013 tokens
 - `wiki/hot.md`: ~80 tokens (from audit appendix)
 - Cold-start total: 2,013 + 80 = **~2,093 → round to ~2,100**
@@ -115,10 +123,13 @@ The Overall Risk line lists `MEDIUM` as a valid option, but the derivation rule 
 **Change:** Remove `/ \`MEDIUM\`` from the Overall Risk line.
 
 From:
+
 ```
 **Overall Risk:** `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` / `CLEAN`
 ```
+
 To:
+
 ```
 **Overall Risk:** `CRITICAL` / `HIGH` / `LOW` / `CLEAN`
 ```

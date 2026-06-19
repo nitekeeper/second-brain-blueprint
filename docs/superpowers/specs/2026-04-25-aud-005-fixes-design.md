@@ -95,11 +95,13 @@ Append two new rows to the cascade table (after the existing last row):
 In the Notes section, replace the existing estimate/range sentence:
 
 **Old:**
+
 ```
 For `!! audit all`, expect ~30,000–47,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md` for a live estimate. Warn the user up front if the session is already close to context limits.
 ```
 
 **New:**
+
 ```
 For `!! audit all`, expect ~60,000–70,000 tokens of reads for the tracked files (CHANGELOG.md alone accounts for ~30,000+ tokens and grows with every audit cycle). Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/CHANGELOG.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md blueprint/skills/claude-code-enhanced/*.md` for a live estimate. Warn the user up front if the session is already close to context limits.
 ```
@@ -107,6 +109,7 @@ For `!! audit all`, expect ~60,000–70,000 tokens of reads for the tracked file
 ### audits/AUD-2026-04-25-005.md — All findings
 
 For each of the four findings (AUD-023, AUD-024, AUD-025, AUD-026):
+
 - Set `**Status**` field to `RESOLVED`
 - Check off the corresponding action item line (`- [ ]` → `- [x]`)
 

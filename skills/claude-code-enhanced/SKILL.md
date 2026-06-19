@@ -13,6 +13,7 @@
 ```
 
 The agent will:
+
 1. Verify `.claude/` exists at working folder root (confirms Claude Code environment)
 2. Copy `blueprint/skills/claude-code-enhanced/slash-commands.md` to `scheduled-tasks/claude-code-enhanced.md`
 3. Confirm: "claude-code-enhanced installed. You can now use /wrap, /ready, and /migrate alongside the !! command syntax."

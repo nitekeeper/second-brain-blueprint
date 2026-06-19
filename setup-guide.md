@@ -20,6 +20,7 @@ Do not proceed until the user confirms the folder is selected.
 ## Pre-flight Check
 
 Before starting, confirm:
+
 1. You have access to the working folder (the Cowork working directory)
 2. The `blueprint/` folder exists inside it (you are reading this file from there)
 
@@ -52,6 +53,7 @@ mkdir -p backups
 All subsequent shell commands in this setup run with your working folder as cwd. Cowork's Bash tool preserves cwd between commands (env vars like `$WORKDIR` do **not** persist between Bash calls, but cwd does), so no re-cd is required. Verify with `pwd` if uncertain.
 
 **What each folder is for:**
+
 - `raw/` — immutable source archive; Claude moves files here after ingesting
 - `drafts/` — Claude's scrapbook for in-progress planning and drafting; outside the Obsidian vault
 - `wiki/inbox/` — drop clipped articles here; Obsidian Web Clipper saves here
@@ -120,6 +122,7 @@ Do **not** copy `blueprint/template/CLAUDE.md` via Bash `cp`. Instead:
 Show approval request, then create these four files:
 
 **`wiki/index.md`**
+
 ```markdown
 # Wiki Index
 
@@ -164,6 +167,7 @@ To see recent activity, read `log.md`.
 ```
 
 **`wiki/log.md`**
+
 ```markdown
 # Wiki Log
 
@@ -196,9 +200,11 @@ Hot: none yet
 Active skills: none
 Python: python
 ```
+
 (or `python3` depending on what Step 2.5 resolved)
 
 **`memory.md`** (at working folder root)
+
 ```markdown
 <!-- MEMORY_STATE: EMPTY -->
 # Session Memory
@@ -247,6 +253,7 @@ Instruct the user to do this manually in Obsidian (you cannot do this via file e
 Instruct the user to do this manually in the Chrome extension settings:
 
 > In the Obsidian Web Clipper extension settings:
+>
 > - Set vault to your `wiki/` folder
 > - Set save location to `inbox`
 > - Set output format to Markdown
@@ -290,6 +297,7 @@ Tell the user:
 > For daily usage, see `blueprint/user-guide.md`."
 
 Then display the standard footer:
+
 ```
 📥 !! ingest: [URL | Page Name | All]
 🧹 !! lint: [Page Name | All]

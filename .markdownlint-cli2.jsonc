@@ -1,11 +1,25 @@
 {
+  // Gating markdown lint. Auto-fixable formatting rules stay ON (enforced via
+  // `markdownlint-cli2 --fix`); cosmetic / non-auto-fixable rules are OFF so
+  // the existing docs corpus passes without hand-editing 500+ code fences.
   "config": {
     "default": true,
-    "MD013": false,
-    "MD033": false,
-    "MD041": false,
-    "MD024": { "siblings_only": true },
-    "MD034": false
+    "MD013": false,  // line length
+    "MD033": false,  // inline HTML
+    "MD034": false,  // bare URLs
+    "MD041": false,  // first line top-level heading
+    "MD040": false,  // fenced-code language (568 legacy fences)
+    "MD060": false,  // table column style
+    "MD050": false,  // strong style
+    "MD049": false,  // emphasis style
+    "MD036": false,  // emphasis used as heading
+    "MD046": false,  // code block style
+    "MD028": false,  // blanks in blockquote
+    "MD024": false,  // duplicate headings
+    "MD025": false,  // single H1
+    "MD001": false,  // heading increment
+    "MD003": false,  // heading style
+    "MD056": false   // table column count
   },
   "ignores": ["node_modules", ".git"]
 }

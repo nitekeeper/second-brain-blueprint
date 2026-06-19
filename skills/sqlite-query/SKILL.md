@@ -22,10 +22,12 @@ Plus creates `wiki/wiki.db` inside the wiki folder.
 ### Steps
 
 1. **Compatibility check.** Run:
+
    ```python
    import sqlite3
    print("ok")
    ```
+
    If this fails, inform the user: "Python sqlite3 is unavailable on this system — falling back to the built-in grep layer. No changes made." Stop here.
 
 2. **Show approval request:**
@@ -35,6 +37,7 @@ Plus creates `wiki/wiki.db` inside the wiki folder.
    - "Shall I proceed?"
 
 3. **Create `wiki.db`** using Python:
+
    ```python
    import sqlite3, pathlib, os
 
@@ -74,7 +77,7 @@ Plus creates `wiki/wiki.db` inside the wiki folder.
 
 5. **Backfill check.** If `wiki/pages/` contains any pages:
    - Ask: "Your wiki has existing pages. Backfill wiki.db from them now? (yes/no)"
-   - If yes: first read `wiki/index.md` and build a slug→summary map by parsing each `- [[Title]] — <summary> | updated: …` entry (the summary is the text between `— ` and ` | updated:`). Then read every page in `wiki/pages/` and for each, extract `slug`, `title`, `type`, `tags`, `created`, `updated` from frontmatter and `related:` slugs for relations — look up `summary` from the index.md map (not from frontmatter, which does not carry summaries). Insert into `wiki.db` using the ingest-hook pattern. Report count on completion.
+   - If yes: first read `wiki/index.md` and build a slug→summary map by parsing each `- [[Title]] — <summary> | updated: …` entry (the summary is the text between `—` and `| updated:`). Then read every page in `wiki/pages/` and for each, extract `slug`, `title`, `type`, `tags`, `created`, `updated` from frontmatter and `related:` slugs for relations — look up `summary` from the index.md map (not from frontmatter, which does not carry summaries). Insert into `wiki.db` using the ingest-hook pattern. Report count on completion.
    - If no: skip. The DB will populate naturally as pages are ingested or updated going forward.
 
 6. **Confirm:** "sqlite-query skill installed. Query and ingest ops will now use wiki.db."
@@ -106,6 +109,7 @@ If `wiki.db` becomes corrupted or a query fails at runtime, `query-layer.md` cat
 Tell the agent: `!! uninstall sqlite-query`
 
 Steps:
+
 1. Delete `scheduled-tasks/query-layer.md`
 2. Delete `scheduled-tasks/ingest-hook.md`
 3. Ask: "Delete wiki/wiki.db too? (yes/no)" — default no, since it may be useful to keep as a cache

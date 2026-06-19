@@ -13,6 +13,7 @@
 ### Task 1: Verify current file state and spec coverage
 
 **Files:**
+
 - Read: `meta/run-session/SKILL.md`
 - Read: `docs/superpowers/specs/2026-05-10-meta-run-session-design.md`
 
@@ -65,6 +66,7 @@ All items should be present. If any are missing from the spec, stop and flag bef
 ### Task 2: Write the new SKILL.md
 
 **Files:**
+
 - Modify: `meta/run-session/SKILL.md` (full rewrite of procedure, checklist, anti-patterns, references; frontmatter bump)
 
 - [ ] **Step 1: Update the frontmatter**
@@ -211,6 +213,7 @@ git commit -m "feat: substantiate meta:run-session — three-phase procedure v0.
 ### Task 3: Post-write verification
 
 **Files:**
+
 - Read: `meta/run-session/SKILL.md` (after edit)
 
 - [ ] **Step 1: Re-run the coverage checklist from Task 1 Step 3**
@@ -220,6 +223,7 @@ Read the updated SKILL.md. Tick off each item in the coverage checklist. Every i
 - [ ] **Step 2: Verify frontmatter**
 
 Confirm:
+
 ```yaml
 status: draft
 version: 0.1.0

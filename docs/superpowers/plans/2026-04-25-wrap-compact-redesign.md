@@ -22,6 +22,7 @@
 ### Task 1: Update `wrap.py`
 
 **Files:**
+
 - Modify: `template/scripts/wrap.py`
 
 - [ ] **Step 1: Replace the file with the updated version**
@@ -105,6 +106,7 @@ FILES: template/scripts/wrap.py
 ```
 
 Expected output:
+
 ```
 [OK] Snapshot written to memory.md (... chars, ~... tokens)
 ```
@@ -125,6 +127,7 @@ echo "exit: $?"
 ```
 
 Expected output:
+
 ```
 WRAPPED
 exit: 1
@@ -139,6 +142,7 @@ echo "exit: $?"
 ```
 
 Expected:
+
 ```
 EMPTY
 exit: 0
@@ -156,6 +160,7 @@ git commit -m "feat: remove MAX_BODY_CHARS limit and exit-3 path from wrap.py"
 ### Task 2: Update `session-memory.md`
 
 **Files:**
+
 - Modify: `template/scheduled-tasks/ops/session-memory.md`
 
 - [ ] **Step 1: Replace step 3 of the `!! wrap` section**
@@ -181,6 +186,7 @@ In `template/scheduled-tasks/ops/session-memory.md`, replace everything from lin
 
    **Format:**
    ```
+
    [SNAPSHOT]
    TASK: <one sentence — what is being built or fixed>
    STATE: <one sentence — exactly where in the task we stopped>
@@ -189,6 +195,7 @@ In `template/scheduled-tasks/ops/session-memory.md`, replace everything from lin
    FILES: <comma-separated file paths currently in play>
    WATCH: <one sentence — real blocker or gotcha only; omit line entirely if none>
    [/SNAPSHOT]
+
    ```
 
    Do not add prose, markdown headers, or explanation outside the `[SNAPSHOT]` block.
@@ -200,6 +207,7 @@ In `template/scheduled-tasks/ops/session-memory.md`, replace everything from lin
 - [ ] **Step 2: Verify the full `!! wrap` section reads correctly**
 
 Read `template/scheduled-tasks/ops/session-memory.md` and confirm:
+
 - Step 3 uses `[SNAPSHOT]` format
 - No mention of `≤2,400 characters`, `~600 tokens`, `trim`, or `ok`
 - Exit 3 handling is gone

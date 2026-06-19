@@ -106,4 +106,5 @@ Read this file when the user asks about the wiki folder layout, file locations, 
 | 2 — Operations | `index.md` + `log.md` tail (via `log_tail.py`) | Before any wiki operation |
 | 3 — On demand | Individual wiki pages | Only pages needed for current task |
 | 3 — History review | Full `log.md` | Only when user requests history |
+
 ---
