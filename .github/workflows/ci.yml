@@ -1,0 +1,26 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [master]
+permissions:
+  contents: read
+jobs:
+  markdownlint:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: markdownlint-cli2
+        run: npx --yes markdownlint-cli2 "**/*.md"
+  links:
+    name: Link check
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: lychee link check
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --max-retries 2 "./**/*.md"
+          fail: false
