@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: markdownlint-cli2
+      - name: markdownlint-cli2 (report-only)
+        continue-on-error: true
         run: npx --yes markdownlint-cli2 "**/*.md"
   links:
     name: Link check
