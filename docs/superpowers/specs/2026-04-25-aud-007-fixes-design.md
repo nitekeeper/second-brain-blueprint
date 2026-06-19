@@ -21,10 +21,13 @@ Three logical changes across five files. No schema version bump. No cascade to `
 **Fix:**
 
 1. In the approval request block, add to the Files UPDATED section:
+
    ```
    scheduled-tasks/ops/blueprint-sync.md  (two new v2.3 cascade rows added)
    ```
+
 2. In execution steps, add after step `c2`:
+
    ```
    c3. Copy blueprint/template/scheduled-tasks/ops/blueprint-sync.md → scheduled-tasks/ops/blueprint-sync.md
    ```

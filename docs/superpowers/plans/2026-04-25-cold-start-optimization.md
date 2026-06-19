@@ -17,6 +17,7 @@
 ## File Map
 
 ### Created
+
 ```
 template/scripts/check_deps.py
 template/scripts/log_tail.py
@@ -34,11 +35,13 @@ blueprint/skills/claude-code-enhanced/slash-commands.md
 ```
 
 ### Rewritten
+
 ```
 template/CLAUDE.md
 ```
 
 ### Modified
+
 ```
 template/scheduled-tasks/ops/audit.md
 template/scheduled-tasks/ops/ingest.md
@@ -52,6 +55,7 @@ CHANGELOG.md
 ```
 
 ### Deleted
+
 ```
 template/scheduled-tasks/ops/token-reference.md
 ```
@@ -63,6 +67,7 @@ template/scheduled-tasks/ops/token-reference.md
 ### Task 1: create template/scripts/check_deps.py
 
 **Files:**
+
 - Create: `template/scripts/check_deps.py`
 
 - [ ] **Step 1: Create the file**
@@ -179,6 +184,7 @@ git commit -m "feat: add check_deps.py — cross-platform Python/SQLite checker"
 ### Task 2: create template/scripts/log_tail.py
 
 **Files:**
+
 - Create: `template/scripts/log_tail.py`
 
 - [ ] **Step 1: Create the file**
@@ -233,6 +239,7 @@ git commit -m "feat: add log_tail.py — cross-platform grep+tail replacement"
 ### Task 3: create template/scripts/file_check.py
 
 **Files:**
+
 - Create: `template/scripts/file_check.py`
 
 - [ ] **Step 1: Create the file**
@@ -265,11 +272,13 @@ if __name__ == "__main__":
 ```bash
 python template/scripts/file_check.py template/scripts/file_check.py
 ```
+
 Expected: `exists` and exit 0
 
 ```bash
 python template/scripts/file_check.py nonexistent.md
 ```
+
 Expected: `not found` and exit 1
 
 - [ ] **Step 3: Commit**
@@ -284,6 +293,7 @@ git commit -m "feat: add file_check.py — cross-platform file existence check"
 ### Task 4: create template/scripts/estimate_tokens.py
 
 **Files:**
+
 - Create: `template/scripts/estimate_tokens.py`
 
 - [ ] **Step 1: Create the file**
@@ -326,6 +336,7 @@ if __name__ == "__main__":
 ```bash
 python template/scripts/estimate_tokens.py template/CLAUDE.md
 ```
+
 Expected: one line with `~NNNN tokens  template/CLAUDE.md` and `Total: ~NNNN tokens`
 
 - [ ] **Step 3: Commit**
@@ -340,6 +351,7 @@ git commit -m "feat: add estimate_tokens.py — dynamic token estimation replaci
 ### Task 5: create template/scripts/wrap.py
 
 **Files:**
+
 - Create: `template/scripts/wrap.py`
 
 - [ ] **Step 1: Create the file**
@@ -406,6 +418,7 @@ if __name__ == "__main__":
 ```bash
 python template/scripts/wrap.py check
 ```
+
 Expected: `EMPTY` and exit 0 (memory.md does not exist in blueprint-authoring mode)
 
 - [ ] **Step 3: Commit**
@@ -420,6 +433,7 @@ git commit -m "feat: add wrap.py — session memory write with marker-state hand
 ### Task 6: create template/scripts/ready.py
 
 **Files:**
+
 - Create: `template/scripts/ready.py`
 
 - [ ] **Step 1: Create the file**
@@ -512,6 +526,7 @@ if __name__ == "__main__":
 ```bash
 python template/scripts/ready.py read
 ```
+
 Expected: `STATE:EMPTY` and exit 0
 
 - [ ] **Step 3: Commit**
@@ -530,6 +545,7 @@ git commit -m "feat: add ready.py — session memory read/truncation-detect/wipe
 Extract Session Memory Commands from CLAUDE.md and update to use scripts.
 
 **Files:**
+
 - Create: `template/scheduled-tasks/ops/session-memory.md`
 
 - [ ] **Step 1: Create the file**
@@ -564,19 +580,25 @@ Read this file when the user says `!! wrap` or `!! ready`.
 
 3. Compose a detailed summary structured as:
    ```
-   # Session Memory — [YYYY-MM-DD]
 
-   ## Worked on
+# Session Memory — [YYYY-MM-DD]
+
+## Worked on
+
    …
 
-   ## Key decisions
+## Key decisions
+
    …
 
-   ## Files created / modified
+## Files created / modified
+
    …
 
-   ## Open questions / next steps
+## Open questions / next steps
+
    …
+
    ```
    Then pipe it to: `python scripts/wrap.py write`
    The script writes the summary with the correct state markers and completion marker.
@@ -617,6 +639,7 @@ Read this file when the user says `!! wrap` or `!! ready`.
 ```bash
 python template/scripts/file_check.py template/scheduled-tasks/ops/session-memory.md
 ```
+
 Expected: `exists`
 
 - [ ] **Step 3: Commit**
@@ -633,6 +656,7 @@ git commit -m "feat: add ops/session-memory.md — extracted from CLAUDE.md, upd
 Extract Blueprint Sync Rule from CLAUDE.md verbatim.
 
 **Files:**
+
 - Create: `template/scheduled-tasks/ops/blueprint-sync.md`
 
 - [ ] **Step 1: Create the file**
@@ -683,6 +707,7 @@ git commit -m "feat: add ops/blueprint-sync.md — extracted Blueprint Sync Rule
 Extract Directory Structure and Tiered Read sections from CLAUDE.md.
 
 **Files:**
+
 - Create: `template/scheduled-tasks/ops/reference.md`
 
 - [ ] **Step 1: Create the file**
@@ -699,6 +724,7 @@ Read this file when the user asks about the wiki folder layout, file locations, 
 > `<WorkingFolder>` below is whatever the user named their Cowork working folder (e.g. `Library`, `MyWiki`). Substitute mentally — this diagram is layout-only, not a literal path.
 
 ```
+
 <WorkingFolder>/
 ├── CLAUDE.md                   ← This file. Auto-read every session. Lean core schema.
 ├── memory.md                   ← Session memory. Written by `!! wrap`, read+wiped by `!! ready`.
@@ -769,6 +795,7 @@ Read this file when the user asks about the wiki folder layout, file locations, 
         ├── entities/
         ├── sources/
         └── analyses/
+
 ```
 
 ---
@@ -796,6 +823,7 @@ git commit -m "feat: add ops/reference.md — directory structure + tiered read 
 ### Task 10: create ops/session-hygiene.md
 
 **Files:**
+
 - Create: `template/scheduled-tasks/ops/session-hygiene.md`
 
 - [ ] **Step 1: Create the file**
@@ -813,6 +841,7 @@ Read this file when `SESSION_HEAVY` is set and the user issues a `!! command`
 Reply with exactly this (substitute `[op]` and `[N]`):
 
 ```
+
 ⚠️  A !![op] operation completed earlier in this session. Continuing will
 reprocess ~[N] tokens of prior context on every turn.
 
@@ -820,6 +849,7 @@ reprocess ~[N] tokens of prior context on every turn.
   🔄 !! ready — restore it next session
 
 Say !! proceed to continue here anyway.
+
 ```
 
 - Replace `[op]` with the op that set SESSION_HEAVY (ingest / lint / audit).
@@ -832,6 +862,7 @@ Say !! proceed to continue here anyway.
 Append to the final response of every `!! ingest`, `!! lint`, and `!! audit` op:
 
 ```
+
 ---
 ⚠️  Session advisory: This session has completed a !![op] operation and the
 context is now heavy. Starting a new session for follow-up work avoids
@@ -841,8 +872,9 @@ Before you leave:
   💾 Say !! wrap to save a session summary.
   🔄 Say !! ready at the start of your next session to restore it.
 
-To continue in this session anyway, say !! proceed.
+To continue in this session anyway, say !! proceed
 ---
+
 ```
 
 Replace `[op]` with the completed op name.
@@ -873,6 +905,7 @@ git commit -m "feat: add ops/session-hygiene.md — soft block intercept after h
 ### Task 11: create ops/migrate.md
 
 **Files:**
+
 - Create: `template/scheduled-tasks/ops/migrate.md`
 
 - [ ] **Step 1: Create the file**
@@ -906,6 +939,7 @@ Announce at most once per session (do not repeat on every response).
 2. **Show approval request:**
 
    ```
+
    Migration: v2.1 → v2.2
 
    Files REPLACED:
@@ -939,6 +973,7 @@ Announce at most once per session (do not repeat on every response).
      sqlite-query skill (if installed)
 
    Shall I proceed?
+
    ```
 
 3. **On approval, execute in order:**
@@ -1001,11 +1036,13 @@ git commit -m "feat: add ops/migrate.md — v2.1 → v2.2 migration flow"
 Remove recalibration step, update token estimate reference, add post-op advisory, update audit-all token note.
 
 **Files:**
+
 - Modify: `template/scheduled-tasks/ops/audit.md`
 
 - [ ] **Step 1: Remove step 7 (recalibration)**
 
 Find and delete the entire step 7 line:
+
 ```
 7. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if an applied fix changed a tracked file's size enough to exceed its documented Chars value.
 ```
@@ -1013,11 +1050,13 @@ Find and delete the entire step 7 line:
 - [ ] **Step 2: Update step 5 — replace token-reference.md cost with estimate_tokens.py**
 
 Replace:
+
 ```
 Show a normal approval request (summary + token estimate including the `token-reference.md` self-cost (see `@scheduled-tasks/ops/token-reference.md` header) + to-do list of affected files).
 ```
 
 With:
+
 ```
 Show a normal approval request (summary + token estimate via `python scripts/estimate_tokens.py <affected-files>` + to-do list of affected files).
 ```
@@ -1025,11 +1064,13 @@ Show a normal approval request (summary + token estimate via `python scripts/est
 - [ ] **Step 3: Update the audit-all token note (Notes section)**
 
 Replace:
+
 ```
 For `!! audit all`, expect ~30,000–47,000 tokens of reads for the tracked files (re-derive by summing the blueprint-doc and template-side rows in `token-reference.md`). Warn the user up front if the session is already close to context limits.
 ```
 
 With:
+
 ```
 For `!! audit all`, expect ~30,000–47,000 tokens of reads for the tracked files. Run `python scripts/estimate_tokens.py blueprint/README.md blueprint/setup-guide.md blueprint/user-guide.md blueprint/troubleshooting.md blueprint/template/CLAUDE.md blueprint/template/scheduled-tasks/refresh-hot.md blueprint/template/scheduled-tasks/ops/*.md blueprint/skills/sqlite-query/*.md` for a live estimate. Warn the user up front if the session is already close to context limits.
 ```
@@ -1056,15 +1097,19 @@ git commit -m "fix: update audit.md — remove recalibration step, use estimate_
 Replace bash grep+tail, replace token-reference.md references, remove step 13, add post-op advisory.
 
 **Files:**
+
 - Modify: `template/scheduled-tasks/ops/ingest.md`
 
 - [ ] **Step 1: Replace grep+tail in Step 1**
 
 Replace:
+
 ```
 1. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
 ```
+
 With:
+
 ```
 1. Read the last 5 entries of `wiki/log.md` for recent context: run `python scripts/log_tail.py`
 ```
@@ -1072,10 +1117,13 @@ With:
 - [ ] **Step 2: Update Step 4 — replace token-reference.md with estimate_tokens.py**
 
 Replace:
+
 ```
 4. Show approval request (summary + token estimate + to-do list) and wait for confirmation — include the cost of re-reading `token-reference.md` itself (see the self-cost figure in its header) in the estimate
 ```
+
 With:
+
 ```
 4. Show approval request (summary + token estimate + to-do list) and wait for confirmation — run `python scripts/estimate_tokens.py <files-to-write>` to compute the estimate
 ```
@@ -1083,10 +1131,13 @@ With:
 - [ ] **Step 3: Update B4 — remove token-reference.md mention**
 
 Replace:
+
 ```
 B4. Show a combined approval request listing every filename, the per-file and total token cost (including the B3.5 pre-reads and **one** (not per-file) read of `token-reference.md`), and all pages to be created/updated across the batch. Use the same per-approval `token-reference.md` cost as a single-file ingest. This stands in for `[main-steps 3 and 4]`
 ```
+
 With:
+
 ```
 B4. Show a combined approval request listing every filename, the per-file and total token cost (including the B3.5 pre-reads — run `python scripts/estimate_tokens.py <files-to-write>` for the estimate), and all pages to be created/updated across the batch. This stands in for `[main-steps 3 and 4]`
 ```
@@ -1094,24 +1145,31 @@ B4. Show a combined approval request listing every filename, the per-file and to
 - [ ] **Step 4: Remove step 13 (recalibration)**
 
 Find and delete:
+
 ```
 13. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section)
 ```
 
 Also remove its reference in B5:
+
 ```
 skip `[main-steps 1, 3, 4, 12, 13]`
 ```
+
 → Change to:
+
 ```
 skip `[main-steps 1, 3, 4, 12]`
 ```
 
 And update B6:
+
 ```
 B6. After all files are processed, run `[main-steps 12 and 13]` **ONCE** at the end of the batch
 ```
+
 → Change to:
+
 ```
 B6. After all files are processed, run `[main-step 12]` **ONCE** at the end of the batch
 ```
@@ -1119,11 +1177,13 @@ B6. After all files are processed, run `[main-step 12]` **ONCE** at the end of t
 - [ ] **Step 5: Add post-op advisory (new step 13)**
 
 Append to the Steps section:
+
 ```
 13. **Post-op advisory.** Append the session advisory block from `@scheduled-tasks/ops/session-hygiene.md` (Post-op advisory block section) to this response. Set `SESSION_HEAVY = true`.
 ```
 
 Also update B6 to include the advisory at batch level:
+
 ```
 B6. After all files are processed, run `[main-step 12]` **ONCE** at the end of the batch, then run `[main-step 13]` (post-op advisory).
 ```
@@ -1142,15 +1202,19 @@ git commit -m "fix: update ingest.md — use log_tail.py, estimate_tokens.py, re
 Replace bash grep+tail, replace token-reference.md references, remove step 10, add post-op advisory.
 
 **Files:**
+
 - Modify: `template/scheduled-tasks/ops/lint.md`
 
 - [ ] **Step 1: Replace grep+tail in Step 2**
 
 Replace:
+
 ```
 2. Read the last 5 entries of `wiki/log.md` for recent context (`grep -E "^## \[" wiki/log.md | tail -5`)
 ```
+
 With:
+
 ```
 2. Read the last 5 entries of `wiki/log.md` for recent context: run `python scripts/log_tail.py`
 ```
@@ -1158,10 +1222,13 @@ With:
 - [ ] **Step 2: Update Step 5 — replace token-reference.md with estimate_tokens.py**
 
 Replace:
+
 ```
 5. Show approval request (summary + token estimate + to-do list) for any fixes — include the cost of re-reading `token-reference.md` itself (see the self-cost figure in its header) in the estimate
 ```
+
 With:
+
 ```
 5. Show approval request (summary + token estimate + to-do list) for any fixes — run `python scripts/estimate_tokens.py <files-to-write>` to compute the estimate
 ```
@@ -1169,6 +1236,7 @@ With:
 - [ ] **Step 3: Remove step 10 (recalibration)**
 
 Find and delete:
+
 ```
 10. Recalibrate token estimates — follow `@scheduled-tasks/ops/token-reference.md` (Recalibration section) — only if any file's measured actual now exceeds its documented Chars value
 ```
@@ -1176,6 +1244,7 @@ Find and delete:
 - [ ] **Step 4: Add post-op advisory (new step 10)**
 
 Append to the Steps section:
+
 ```
 10. **Post-op advisory.** Append the session advisory block from `@scheduled-tasks/ops/session-hygiene.md` (Post-op advisory block section) to this response. Set `SESSION_HEAVY = true`.
 ```
@@ -1192,6 +1261,7 @@ git commit -m "fix: update lint.md — use log_tail.py, estimate_tokens.py, remo
 ### Task 15: update ops/conventions.md — append Filing Answers
 
 **Files:**
+
 - Modify: `template/scheduled-tasks/ops/conventions.md`
 
 - [ ] **Step 1: Append the Filing Answers section at end of file**
@@ -1232,6 +1302,7 @@ git commit -m "fix: append Filing Answers section to conventions.md"
 This is the critical step. Read the current `template/CLAUDE.md` in full before writing to understand every section being removed.
 
 **Files:**
+
 - Rewrite: `template/CLAUDE.md`
 
 - [ ] **Step 1: Read current template/CLAUDE.md in full**
@@ -1388,6 +1459,7 @@ Always read tail only — run `python scripts/log_tail.py`. Fallback (if scripts
 ```bash
 python -c "print(len(open('template/CLAUDE.md').read()), 'chars')"
 ```
+
 Expected: under 5,000 chars (~1,250 tokens)
 
 - [ ] **Step 4: Commit**
@@ -1404,6 +1476,7 @@ git commit -m "feat: rewrite CLAUDE.md to lean v2.2 — 86% cold-start reduction
 ### Task 17: delete token-reference.md and update .gitignore
 
 **Files:**
+
 - Delete: `template/scheduled-tasks/ops/token-reference.md`
 - Modify: `.gitignore`
 
@@ -1416,6 +1489,7 @@ git rm template/scheduled-tasks/ops/token-reference.md
 - [ ] **Step 2: Add backups/ to .gitignore**
 
 Append to `.gitignore`:
+
 ```
 # Migration backups
 backups/
@@ -1435,11 +1509,13 @@ git commit -m "feat: delete token-reference.md (replaced by estimate_tokens.py);
 ### Task 18: update setup-guide.md
 
 **Files:**
+
 - Modify: `setup-guide.md`
 
 - [ ] **Step 1: Update Step 1 — add scripts/ to mkdir list**
 
 In the `mkdir -p` block, add after `mkdir -p scheduled-tasks/ops`:
+
 ```bash
 mkdir -p scripts
 mkdir -p backups
@@ -1448,11 +1524,13 @@ mkdir -p backups
 - [ ] **Step 2: Update Step 2 — remove token-reference.md row, add new ops file rows and scripts copy**
 
 Remove this row from the copy table:
+
 ```
 | `blueprint/template/scheduled-tasks/ops/token-reference.md` | `scheduled-tasks/ops/token-reference.md` |
 ```
 
 Add these rows:
+
 ```
 | `blueprint/template/scheduled-tasks/ops/session-memory.md` | `scheduled-tasks/ops/session-memory.md` |
 | `blueprint/template/scheduled-tasks/ops/blueprint-sync.md` | `scheduled-tasks/ops/blueprint-sync.md` |
@@ -1488,6 +1566,7 @@ In the hot.md template block, add `Python: [python | python3]` as the last line 
 Active skills: none
 Python: python
 ```
+
 (or `python3` depending on what Step 2.5 resolved)
 
 - [ ] **Step 5: Update Step 4.5 — rename and extend the offer step**
@@ -1505,10 +1584,13 @@ After the existing SQLite offer block, append:
 - [ ] **Step 6: Update Step 7 — update ops file count and add scripts/ check**
 
 Replace:
+
 ```
 - [ ] All 6 ops files exist in `scheduled-tasks/ops/`
 ```
+
 With:
+
 ```
 - [ ] All 11 ops files exist in `scheduled-tasks/ops/`
       (ingest, lint, audit, update, conventions, session-memory, blueprint-sync, reference, session-hygiene, migrate, refresh-hot)
@@ -1528,6 +1610,7 @@ git commit -m "fix: update setup-guide.md for v2.2 — scripts/, Python check, n
 ### Task 19: update user-guide.md
 
 **Files:**
+
 - Modify: `user-guide.md`
 
 - [ ] **Step 1: Update cold-start figures**
@@ -1574,19 +1657,25 @@ Python 3.8+ is required. If Python is not installed, the agent will show OS-spec
 - [ ] **Step 5: Update the cost table**
 
 In the "Typical session costs" table, update:
+
 ```
 | Cold start | ~7,780 |
 ```
+
 To:
+
 ```
 | Cold start | ~1,080 |
 ```
 
 And update:
+
 ```
 | Cold start with `!! ready` (full memory) | ~8,730 |
 ```
+
 To:
+
 ```
 | Cold start with `!! ready` (full memory) | ~1,830 |
 ```
@@ -1613,12 +1702,14 @@ git commit -m "fix: update user-guide.md for v2.2 — token figures, session hyg
 ### Task 20: update ROADMAP.md and CHANGELOG.md
 
 **Files:**
+
 - Modify: `ROADMAP.md`
 - Modify: `CHANGELOG.md`
 
 - [ ] **Step 1: Update ROADMAP.md — mark claude-code-enhanced as shipped**
 
 Add to the skills table:
+
 ```
 | `claude-code-enhanced` | ✅ Shipped | Optional Claude Code CLI skill. Registers /wrap, /ready, /migrate as native slash commands. |
 ```
@@ -1671,6 +1762,7 @@ git commit -m "docs: update ROADMAP.md and CHANGELOG.md for v2.2.0"
 ### Task 21: create claude-code-enhanced skill
 
 **Files:**
+
 - Create: `blueprint/skills/claude-code-enhanced/SKILL.md`
 - Create: `blueprint/skills/claude-code-enhanced/slash-commands.md`
 
@@ -1688,7 +1780,9 @@ git commit -m "docs: update ROADMAP.md and CHANGELOG.md for v2.2.0"
 ## Install
 
 ```
+
 !! install claude-code-enhanced
+
 ```
 
 The agent will:
@@ -1699,7 +1793,9 @@ The agent will:
 ## Uninstall
 
 ```
+
 !! uninstall claude-code-enhanced
+
 ```
 
 Deletes `scheduled-tasks/claude-code-enhanced.md`. The `!! wrap`, `!! ready`, and `!! migrate` commands remain available.
@@ -1768,6 +1864,7 @@ python template/scripts/file_check.py template/scheduled-tasks/ops/migrate.md
 python template/scripts/file_check.py blueprint/skills/claude-code-enhanced/SKILL.md
 python template/scripts/file_check.py blueprint/skills/claude-code-enhanced/slash-commands.md
 ```
+
 Expected: `exists` for every line
 
 - [ ] **Step 2: Verify token-reference.md is deleted**
@@ -1775,6 +1872,7 @@ Expected: `exists` for every line
 ```bash
 python template/scripts/file_check.py template/scheduled-tasks/ops/token-reference.md
 ```
+
 Expected: `not found`
 
 - [ ] **Step 3: Verify lean CLAUDE.md character count**
@@ -1782,6 +1880,7 @@ Expected: `not found`
 ```bash
 python -c "s=open('template/CLAUDE.md').read(); print(len(s), 'chars,', len(s)//4, 'est tokens')"
 ```
+
 Expected: under 5,000 chars
 
 - [ ] **Step 4: Run estimate_tokens.py on new files to confirm they have content**
@@ -1795,6 +1894,7 @@ python template/scripts/estimate_tokens.py \
   template/scheduled-tasks/ops/session-hygiene.md \
   template/scheduled-tasks/ops/migrate.md
 ```
+
 Expected: all files show non-zero token estimates
 
 - [ ] **Step 5: Open a new session and run `!! audit all`**
@@ -1804,6 +1904,7 @@ Start a fresh session (new chat). The agent should cold-start reading only the l
 Run: `!! audit all`
 
 Expected:
+
 - No CRITICAL findings
 - No blueprint-sync drift between CLAUDE.md, user-guide.md, setup-guide.md, README.md
 - All 34+ cross-reference checks pass

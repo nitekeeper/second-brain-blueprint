@@ -11,12 +11,14 @@ Real issues encountered during the original setup, with fixes.
 **Cause:** The Glob tool can silently return empty results for specific file paths that exist on disk. This is distinct from a legitimate "no match" — the tool returns no error, just an empty result, making the failure invisible. The issue was first observed during skill-presence detection (checking for `query-layer.md` and `ingest-hook.md` in `scheduled-tasks/`), causing the agent to conclude no skill was installed and skip the SQLite query waterfall.
 
 **Fix:** Use `python scripts/file_check.py` for all file existence checks (cross-platform, works on Windows/macOS/Linux):
+
 ```bash
 python scripts/file_check.py scheduled-tasks/query-layer.md
 # prints "exists" or "missing"
 ```
 
 If `scripts/` is not yet set up (pre-v2.2), fall back to listing the directory:
+
 ```bash
 ls scheduled-tasks/
 ```
@@ -32,6 +34,7 @@ ls scheduled-tasks/
 **Cause:** Tags were written with a `#` prefix in frontmatter — e.g. `tags: [#concept, #llm]`. Obsidian only accepts the `#` prefix for inline body tags, not YAML frontmatter.
 
 **Fix:** Tags in frontmatter must be plain words without `#`:
+
 ```yaml
 # ✅ Correct
 tags: [concept, llm, tool]
@@ -51,11 +54,13 @@ If this happened across many pages, fix with Python (see Bulk Edits section belo
 **Cause:** `sed -i` was used for bulk file edits. GNU and BSD `sed -i` disagree on arguments — BSD/macOS `sed -i` requires an explicit suffix argument, and a misuse ends up treating a subsequent argument as the suffix or a file name. Depending on the exact invocation (and interplay with shell globbing and temp-file naming used by some sed implementations, editor swap files, or cleanup tools), you can end up with stray `XX*`-prefixed files that Obsidian cannot open. The root cause is always the same: `sed -i` is non-portable and easy to misuse across files.
 
 **Fix:** Delete the `XX*` files. Run from your working-folder root:
+
 ```bash
 find wiki/pages -name "XX*" -delete
 ```
 
 **Prevention:** Always use Python for bulk edits across multiple pages — never `sed -i`. Anchor to an absolute root and handle encoding/read errors so a silent zero-match doesn't look like success:
+
 ```python
 import os, re, pathlib
 ROOT = pathlib.Path(os.environ.get("WIKI_ROOT", ".")).resolve()
@@ -75,6 +80,7 @@ for f in pages.rglob("*.md"):
         edited += 1
 print(f"edited {edited} files under {pages}")
 ```
+
 A count of 0 means the pattern matched nothing — investigate before assuming success.
 
 ---
@@ -86,6 +92,7 @@ A count of 0 means the pattern matched nothing — investigate before assuming s
 **Cause:** Obsidian auto-creates a note when you click an unresolved `[[wiki link]]`, and it places it in the default new note location (which defaults to vault root).
 
 **Fix:**
+
 1. Delete the stray files from the vault root
 2. Go to **Obsidian Settings → Files and links → Default location for new notes**
 3. Set it to `pages` (or a subfolder like `pages/concepts/`) — this is vault-relative, and the Obsidian vault root is `wiki/`
@@ -101,6 +108,7 @@ This prevents Obsidian from creating notes in the wrong location in future.
 **Cause:** The `CLAUDE.md` schema file contained a literal `[[Page Title]]` in an example code block, which Obsidian rendered as a real wiki link.
 
 **Fix:** Escape the brackets in example code so Obsidian ignores them:
+
 ```
 \[\[Page Title\]\]
 ```
@@ -378,6 +386,7 @@ Run via the agent's shell sandbox or in your own terminal. Always export `WIKI_R
 **Fix (v2.1.7+):** The skill now uses `sqlite3.connect(f"file:{db}?nolock=1", uri=True)` with `PRAGMA journal_mode=MEMORY` and `PRAGMA synchronous=OFF`. This bypasses `fcntl` locking entirely. The DB is stored at `wiki/wiki.db` inside the persistent library folder.
 
 **Recovery if you hit stale journal state:**
+
 1. Manually delete `wiki.db` and `wiki.db-journal` from your library folder (the agent cannot delete files there)
 2. Run `!! install sqlite-query` — the install creates a fresh `wiki/wiki.db` on a clean path
 3. Choose yes to backfill when prompted

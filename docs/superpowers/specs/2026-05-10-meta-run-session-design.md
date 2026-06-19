@@ -109,15 +109,18 @@ Commit the session file, `DESIGN_NOTES.md` changes, lesson files, proposed wiki 
 ## Checklist
 
 **Open:**
+
 - [ ] Session file created with correct frontmatter and `status: in-progress`.
 - [ ] `GOALS.md`, `ROADMAP.md`, `.ai/ACTIVE.md` read.
 - [ ] Pre-work alignment complete for session type.
 
 **Work:**
+
 - [ ] Delegated to appropriate skill or approach for session type.
 - [ ] No wiki or lesson files written mid-session.
 
 **Close:**
+
 - [ ] Session file body complete; `status: complete`.
 - [ ] Decisions logged to `DESIGN_NOTES.md`.
 - [ ] Lessons captured via Memex `capture-lesson`.
@@ -139,6 +142,7 @@ Commit the session file, `DESIGN_NOTES.md` changes, lesson files, proposed wiki 
 ## Skill file changes
 
 The target file is `meta/run-session/SKILL.md`. Changes:
+
 - Bump `status` from `skeleton` to `draft`.
 - Bump `version` from `0.0.1` to `0.1.0`.
 - Replace `*TODO: skeleton.*` procedure with the three-phase procedure above.

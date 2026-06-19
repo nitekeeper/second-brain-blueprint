@@ -9,6 +9,7 @@ Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation th
 1. Read `wiki/index.md` — collect every entry line across ALL sections (Sources, Concepts, Entities, Analyses) by matching `^- \[\[`. The page count for `Pages: N` is the length of that list (not a separate counter anywhere in `index.md` — derived from the entries themselves so it cannot go stale). To identify the 5 pages with the most recent `updated:` dates, sort the same list in memory by the `updated: YYYY-MM-DD` field inside each line (ISO-8601 dates are lexicographically sortable) and take the top 5. If fewer than 5 total pages exist, list all of them; if none, emit `Hot: none yet` and `Pages: 0`.
 
    If a shell alternative is needed, extract the date into a leading sort key first — a naive `sort -t: -k2` is unsafe because any colon in a title or summary shifts the key off the date. Use `awk`'s **1-argument** `match(str, regex)` form (portable across GNU and BSD/macOS awk — it sets `RSTART` and `RLENGTH` on both). Avoid the 3-argument form `match(str, regex, array)`, which is a GNU-awk-only extension and silently produces no output on macOS's default BSD awk. Avoid `sed -E '... \t ...'` too — BSD sed does not interpret `\t` as a tab in the replacement string, so downstream `cut -f` breaks. Emitting the tab from awk guarantees a real tab byte:
+
    ```bash
    awk 'match($0, /updated: [0-9]{4}-[0-9]{2}-[0-9]{2}/) {
           d = substr($0, RSTART + 9, 10)
@@ -18,11 +19,14 @@ Overwrite `wiki/hot.md` with a fresh orientation snapshot after any operation th
      | head -5 \
      | cut -f2-
    ```
+
    If you prefer a one-step Python alternative, use `pathlib` + `re.findall` and sort in memory — safer than any shell pipeline when titles may contain unusual punctuation.
 2. Read `wiki/log.md` — get the last log entry (use `grep -E "^## \[" wiki/log.md | tail -1`) and the most recent open gaps list from the latest lint entry. `ops/lint.md` guarantees every lint entry contains a canonical `Gaps:` line immediately under the header, so extract the most recent one portably:
+
    ```bash
    grep -E '^Gaps:' wiki/log.md | tail -1 | sed -E 's/^Gaps:[[:space:]]*//'
    ```
+
    If no lint entry exists yet (no `Gaps:` line anywhere in `log.md`), use `none yet — add sources to discover gaps` as the Gaps value. If the most recent lint wrote `Gaps: none`, pass `none` through verbatim — it correctly reflects "lint ran and found no open gaps", which is different from "never linted".
 3. **Derive `Active skills`:** Check each skill's hook or installed file:
    - `python scripts/file_check.py scheduled-tasks/query-layer.md` — if present, add `sqlite-query` to the list

@@ -30,11 +30,13 @@ The Token Awareness table at line 228 of `user-guide.md` shows `~30,000–47,000
 Update the `!! audit all` row in the Token Awareness table:
 
 **Before:**
+
 ```
 | Audit all (full blueprint) | ~30,000–47,000 |
 ```
 
 **After:**
+
 ```
 | Audit all (full blueprint) | ~60,000–70,000 (CHANGELOG.md alone accounts for ~30,000+ tokens and grows with every audit cycle) |
 ```
@@ -102,11 +104,13 @@ Both migration paths copy a new `conventions.md` over the user's existing file (
 #### Step b2 — added to both migration paths (after existing step b)
 
 **v2.2→v2.3:**
+
 ```
 b2. Copy `scheduled-tasks/ops/conventions.md` → `backups/conventions.md-v2.2-<YYYY-MM-DD>.bak`
 ```
 
 **v2.1→v2.3:**
+
 ```
 b2. Copy `scheduled-tasks/ops/conventions.md` → `backups/conventions.md-v2.1-<YYYY-MM-DD>.bak`
 ```
@@ -114,12 +118,14 @@ b2. Copy `scheduled-tasks/ops/conventions.md` → `backups/conventions.md-v2.1-<
 #### Confirm messages — updated to mention conventions.md backup
 
 **v2.2→v2.3:**
+
 ```
 "Migration complete. Query routing is now wiki-first.
 Backups saved to `backups/CLAUDE.md-v2.2-<date>.bak` and `backups/conventions.md-v2.2-<date>.bak` — delete when satisfied."
 ```
 
 **v2.1→v2.3:**
+
 ```
 "Migration complete. Cold-start: ~7,780 → ~1,080 tokens. Query routing is now wiki-first.
 Backups saved to `backups/CLAUDE.md-v2.1-<date>.bak` and `backups/conventions.md-v2.1-<date>.bak` — delete when satisfied."

@@ -58,6 +58,7 @@ The block is wrapped in the existing state markers by `wrap.py`:
 ## Composition Rules
 
 **Include:**
+
 - What task is in flight
 - Exactly where in the task execution we stopped
 - The single next action to take
@@ -66,6 +67,7 @@ The block is wrapped in the existing state markers by `wrap.py`:
 - Real blockers or gotchas (only if they exist)
 
 **Exclude:**
+
 - Anything already captured in the wiki
 - Resolved steps and completed work
 - Conversation history and back-and-forth

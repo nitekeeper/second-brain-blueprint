@@ -29,6 +29,7 @@ The Step 1 Python block currently uses `subprocess.run(["find", ...])` to resolv
 
 2. Replace the slug-to-path resolution block:
    - Before:
+
      ```python
      candidate_paths = []
      pages_dir = str(WORKDIR / "wiki" / "pages")
@@ -41,7 +42,9 @@ The Step 1 Python block currently uses `subprocess.run(["find", ...])` to resolv
          if path:
              candidate_paths.append(path)
      ```
+
    - After:
+
      ```python
      candidate_paths = []
      pages_dir = WORKDIR / "wiki" / "pages"
@@ -58,6 +61,7 @@ The Step 1 Python block currently uses `subprocess.run(["find", ...])` to resolv
 The Query Layer Hook Contract (under `## Query Layer Hook Contract`) contains one sentence directing future skill authors to use `subprocess.run(["find", ...])`. This propagates the Windows-incompatible pattern.
 
 **Change:** Replace that sentence:
+
 - Before: `Use \`find wiki/pages -name "<slug>.md"\` (via \`subprocess.run\`) to resolve slugs to concrete paths.`
 - After: `Use \`pathlib.rglob(f"{slug}.md")\` on the \`wiki/pages\` directory (cross-platform — works on Windows, macOS, and Linux). Do NOT use \`subprocess.run(["find", ...])\` — it invokes OS-specific utilities that fail silently on Windows.`
 
@@ -70,6 +74,7 @@ The Query Layer Hook Contract (under `## Query Layer Hook Contract`) contains on
 Step 2 (Web Search) in the Query Routing Rule has three condition bullets but omits the "Worth filing this as an analysis page?" prompt that `conventions.md` and `user-guide.md` both document as post-Step-2 behavior. Step 1 already includes this prompt (sub-step 5).
 
 **Change:** Append one bullet after the three existing Step 2 condition bullets:
+
 - After: `- After summarizing: ask "Worth filing this as an analysis page?" — if yes, read \`@scheduled-tasks/ops/conventions.md\` first`
 
 Wording matches Step 1's sub-step 5 exactly for consistency.
@@ -83,12 +88,16 @@ Wording matches Step 1's sub-step 5 exactly for consistency.
 The blueprint/ directory tree in the Directory Structure section lists `docs/` with only `audit-report-template.md`. The tracked repo contains `docs/superpowers/` (with `plans/` and `specs/` subdirectories) which is absent from the diagram.
 
 **Change:** Expand the `docs/` subtree entry:
+
 - Before:
+
   ```
   │   ├── docs/                   ← Audit report template and design specs. Developer use only.
   │   │   └── audit-report-template.md
   ```
+
 - After:
+
   ```
   │   ├── docs/                   ← Audit report template and developer workfiles. Maintainer use only.
   │   │   ├── audit-report-template.md
@@ -108,11 +117,15 @@ The description is also updated from "design specs. Developer use only." to "dev
 Step 3 only checks for `scheduled-tasks/query-layer.md` (sqlite-query skill). The `claude-code-enhanced` skill — a first-party bundled skill already present in the blueprint — installs `scheduled-tasks/claude-code-enhanced.md` but is never checked, so `Active skills:` in `hot.md` omits it.
 
 **Change:** Replace Step 3 with an expanded multi-check form:
+
 - Before:
+
   ```
   3. **Derive `Active skills`:** Check whether `scheduled-tasks/query-layer.md` exists (`python scripts/file_check.py scheduled-tasks/query-layer.md`). If it exists, the `sqlite-query` skill is installed — emit `sqlite-query`. If absent, emit `none`. (As additional skills are added, this step expands to check their respective hook files and append their names to the list.)
   ```
+
 - After:
+
   ```
   3. **Derive `Active skills`:** Check each skill's hook or installed file:
      - `python scripts/file_check.py scheduled-tasks/query-layer.md` — if present, add `sqlite-query` to the list
@@ -128,6 +141,7 @@ The forward-looking parenthetical from the old text is preserved as the final st
 ## Audit Report Update
 
 After all fixes are applied, update `audits/AUD-2026-04-25-011.md`:
+
 - Mark all four action items checked (`- [x]`)
 - Update the status of each finding from `OPEN` to `RESOLVED`
 
@@ -136,6 +150,7 @@ After all fixes are applied, update `audits/AUD-2026-04-25-011.md`:
 ## Commit Strategy
 
 Single commit after all six file edits (5 blueprint/skills files + 1 audit report update):
+
 ```
 fix: resolve AUD-042 through AUD-045 from AUD-2026-04-25-011
 ```

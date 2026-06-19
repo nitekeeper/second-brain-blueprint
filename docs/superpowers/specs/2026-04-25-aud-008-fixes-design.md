@@ -22,11 +22,13 @@ Fix all open findings from audit report `AUD-2026-04-25-008`. Both findings are 
 ### Edit 1 — `README.md` line 73
 
 **Current:**
+
 ```
 - **Approval before every wiki write** — `!! wrap` and `!! ready` are the only exceptions (each gated by built-in safeguards); every other write pauses with a plan + token estimate before touching a file
 ```
 
 **New:**
+
 ```
 - **Approval before every wiki write** — `!! wrap`, `!! ready`, and `!! audit` are the only exceptions (`!! audit` writes its report as an implicit side-effect; `!! wrap` and `!! ready` have additional built-in safeguards); every other write pauses with a plan + token estimate before touching a file
 ```

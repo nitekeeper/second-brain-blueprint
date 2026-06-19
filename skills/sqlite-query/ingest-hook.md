@@ -9,6 +9,7 @@ Keeps `wiki.db` in sync with the wiki after every ingest.
 ## Input
 
 Available from the current ingest op's working memory:
+
 - `slug` — the ingested page's slug
 - `title` — page title
 - `type` — page type (`source`, `concept`, `entity`, `analysis`)

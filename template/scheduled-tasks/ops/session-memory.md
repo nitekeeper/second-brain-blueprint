@@ -8,6 +8,7 @@ Read this file when the user says `!! wrap` or `!! ready`.
 ## Explicit state markers
 
 `memory.md` uses HTML-comment markers:
+
 - Empty: `<!-- MEMORY_STATE: EMPTY -->`
 - Valid snapshot: begins with `<!-- MEMORY_STATE: WRAPPED -->`, ends with `<!-- MEMORY_WRAP_COMPLETE -->`
 - Acknowledged truncated: `<!-- MEMORY_STATE: TRUNCATED_ACKNOWLEDGED -->` — treated identically to EMPTY
@@ -42,6 +43,7 @@ Read this file when the user says `!! wrap` or `!! ready`.
    - Rationale visible by reading the current file state
 
    **Format:**
+
    ```
    [SNAPSHOT]
    TASK: <one sentence — what is being built or fixed>

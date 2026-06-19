@@ -13,16 +13,19 @@
 ### Task 1: Replace the Query Routing Rule section
 
 **Files:**
+
 - Modify: `template/CLAUDE.md:27-45`
 
 - [ ] **Step 1: Verify current content before editing**
 
 Read `template/CLAUDE.md` lines 25–47 and confirm the section starts with:
+
 ```
 **CRITICAL: Follow this waterfall for every user question — no exception for perceived simplicity or confidence level.**
 
 **Step 1 — Training knowledge**
 ```
+
 and ends before `---` / `## Ops Routing`.
 
 - [ ] **Step 2: Replace the Query Routing Rule block**
@@ -61,6 +64,7 @@ Omit the caveat when score is 8–10 and the topic is not time-sensitive.
 - [ ] **Step 3: Verify the edit**
 
 Read `template/CLAUDE.md` lines 25–55 and confirm:
+
 - `Step 1 — Wiki` appears before `Step 2 — Web Search`
 - `Step 3 — Training Knowledge` is the last step
 - `Confidence: N/10` line is present

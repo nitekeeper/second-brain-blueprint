@@ -13,6 +13,7 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
 ## Steps
 
 1. **Query `wiki.db`** for pages related to the topic slug — both directions:
+
    ```python
    import sqlite3, pathlib, os
 
@@ -58,9 +59,11 @@ A topic slug (lowercase-hyphenated) derived from the user's question.
 2. **If `candidate_paths` is populated:** read those pages and synthesize the answer. Skip the grep fallback.
 
 3. **If `candidate_paths` is empty (topic not in DB):** fall back to grep:
+
    ```bash
    grep -rl "topic-slug" wiki/pages --include="*.md"
    ```
+
    If grep also returns nothing, read `wiki/index.md` directly and continue from sub-step 4 of the query waterfall (read candidate pages; answer with [[wiki link]] citations).
 
 4. **If fallback triggered by exception:** log the warning inline ("Note: SQLite query failed, using grep fallback") and proceed with grep as above.

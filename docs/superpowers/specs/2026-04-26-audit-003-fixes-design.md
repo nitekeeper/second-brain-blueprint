@@ -63,14 +63,17 @@ Check whether an `audits/` directory exists (`python scripts/file_check.py audit
 Status updates and action item checkoffs for all three findings.
 
 ### AUD-052
+
 - Set `**Status**` field: `OPEN` → `RESOLVED`
 - Action Items: `- [ ] \`AUD-2026-04-26-052\`` → `- [x] \`AUD-2026-04-26-052\``
 
 ### AUD-053
+
 - Set `**Status**` field: `OPEN` → `RESOLVED`
 - Action Items: `- [ ] \`AUD-2026-04-26-053\`` → `- [x] \`AUD-2026-04-26-053\``
 
 ### AUD-054
+
 - Set `**Status**` field: `OPEN` → `RESOLVED`
 - Action Items: `- [ ] \`AUD-2026-04-26-054\`` → `- [x] \`AUD-2026-04-26-054\``
 

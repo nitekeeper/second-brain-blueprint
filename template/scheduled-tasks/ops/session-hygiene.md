@@ -56,4 +56,5 @@ Replace `[op]` with the completed op name.
 | User says `!! proceed` | Clear |
 | `!! wrap` or `!! ready` | No change (always allowed regardless of flag) |
 | New session | Cleared automatically (flag is in-memory only) |
+
 ---
